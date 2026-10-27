@@ -16,22 +16,24 @@ SHEET FORMAT (all character, NPC and monster sheets in this task):
 - All playable characters are adults.
 
 ANATOMY AND EQUIPMENT RULES (check every figure):
-- Ears: the reference image shows elves, but do NOT copy its pointed ears. Humans, dwarves, halflings and gnomes have normal round human ears. Only figures explicitly listed as elf or dark elf get pointed ears. Beastfolk have only their animal ears on top of the head, no extra human or elf ears.
+- Ears: the reference image shows elves, but do NOT copy its pointed ears. Humans, dwarves, halflings and gnomes have normal round human ears. Only figures explicitly listed as elf or dark elf get pointed ears.
+- BEASTFOLK = humans with animal ears and a tail ONLY (kemonomimi style). They have a fully human face, human nose and mouth, human skin, human hands and human body. NO animal muzzle, NO snout, NO animal nose, NO fur on the face or body, NO paws. Only the animal ears on top of the head (no extra human ears) and the tail.
 - Weapons are held correctly and readably: a one-handed weapon in one hand, a shield strapped on the OTHER forearm, never the weapon and the shield in the same hand. Two-handed weapons (great axe, greatsword, halberd, spear, pike, lance, bow, crossbow, staff) are held with both hands or in a natural ready grip. Every weapon has a visible handle and is not cut off or overlapping the face.
 - Poses: each of the 6 figures on a sheet has a slightly different stance that suits the job and the person (confident, cautious, relaxed, eager...), not one copied pose. Keep all poses readable and facing the same direction.
-- Body types: women are clearly mature adults with glamorous, voluptuous figures — a large bust, slim defined waist and full hips — drawn in the same chibi pixel style; men have varied adult builds.
-- Women's outfits are pretty and stylish, like heroines of a high-quality fantasy JRPG: elegant fitted corsets and bodices, decorative trims and embroidery, flowing skirts or tabards over thigh-high boots, capes and sashes, cute accents (ribbons, hair ornaments, earrings, small jewels), armor pieces shaped gracefully to the figure. Each woman's outfit has its own fashionable twist while keeping the job theme. Glamorous adult fantasy costume, tasteful, never ragged or plain.
-- Men's outfits: same job theme on all, tailored to each body, armor and clothing shaped to fit the figure.
+- Body types: women are clearly mature adult women with very curvy, voluptuous hourglass figures: a LARGE, full bust (noticeably bigger than in the reference image), a slim waist and wide hips, on every woman of every race, including elves and beastfolk, drawn in the same chibi pixel style. Men have varied adult builds.
+- Women's outfits: SIMPLE and clean but attractive — form-fitting clothes and light armor that follow the figure (fitted bodice or tunic, short skirt or fitted pants, boots), clear silhouette, few decorations. At most one small accent (a ribbon OR a simple hair clip). No heavy embroidery, no layers of trims, no jewelry piles.
+- Men's outfits: SIMPLE and clean, same job theme, tailored to each body, few decorations.
 
 IDENTITY RULE (very important): each job line has 6 fixed people (identities). The person in slot N must be the SAME person (same face, race, gender, skin tone, hair color and hairstyle, body type) on every sheet of that line; only the outfit, weapon and effects change with the job. Promoting a character must look like the same person in new gear.
 
-SIGNATURE WEAPON RULE (very important): in this game every character owns ONE personal weapon that grows with them. Each identity below has a "signature weapon motif" (colors and ornaments). That motif must appear on the person's weapon on EVERY sheet of their line. The weapon TYPE follows the job (sword, axe, spear, bow, staff...), but the motif stays and becomes more ornate with each tier: tier 1 = the motif is simple and worn, tier 2 = refined with some metal, tier 3 = grand, gilded and glowing in the motif's colors. On every sheet, the 6 weapons must look clearly different from each other in shape details and colors — never 6 copies of the same weapon. Weapons are big, bold and readable at small size.
+SIGNATURE WEAPON RULE (very important): in this game every character owns ONE personal weapon that grows with them. Each identity below has a "signature weapon motif" (colors and ornaments). That motif must appear on the person's weapon on EVERY sheet of their line. The weapon TYPE follows the job (sword, axe, spear, bow, staff...), but the motif stays and becomes a little more refined with each tier: tier 1 = simple and worn, tier 2 = cleaner metal, tier 3 = polished with a soft glow in the motif's colors. Keep weapon decoration minimal: one or two motif details only. On every sheet, the 6 weapons must look clearly different from each other in shape details and colors — never 6 copies of the same weapon. Weapons are big, bold and readable at small size.
 
 TIER RULE:
 - Tier 1 = cheap worn leather/cloth, plain weapon.
-- Tier 2 = better fitted gear, some metal, one accent color.
-- Tier 3 = elite ornate gear with gold or silver trim and glowing or enchanted weapon accents.
-- Hidden = tier 3 quality with a unique silhouette and one distinctive magical motif.
+- Tier 2 = cleaner fitted gear, a few metal pieces, one accent color.
+- Tier 3 = polished higher-quality gear with a little silver or gold trim and a subtle glow on the weapon. Still simple and readable, NOT ornate.
+- Hidden = tier 3 quality with a unique silhouette and one distinctive magical motif, still simple.
+- OVERALL: keep every outfit simple with few decorations and clear shapes, like the reference image. Avoid busy details.
 
 ==================================================
 LINE A — WARRIOR LINE
@@ -47,9 +49,9 @@ Sheets:
 - knight.png — Tier 2 Knight: chainmail with steel breastplate, kite shield with a simple crest, longsword, short cape.
 - swordsman.png — Tier 2 Swordsman: light armored coat, a well-made longsword held ready, no shield.
 - berserker.png — Tier 2 Berserker: fur shoulder mantle, partly bare muscular arms, war paint, huge two-handed axe.
-- fortressknight.png — Tier 3 Fortress Knight: massive layered heavy plate, huge tower shield with spikes, short mace.
-- paladin.png — Tier 3 Paladin: silver full plate with gold trim, white cape, glowing holy sword, ornate crest shield.
-- swordsaint.png — Tier 3 Sword Saint: elegant long coat with silver trim, a katana-like longsword with a pale blue glow, calm stance.
+- fortressknight.png — Tier 3 Fortress Knight: heavy heavy plate, huge tower shield with spikes, short mace.
+- paladin.png — Tier 3 Paladin: silver full plate with light gold trim, white cape, glowing holy sword, crest shield.
+- swordsaint.png — Tier 3 Sword Saint: long coat with silver trim, a katana-like longsword with a pale blue glow, calm stance.
 - warlord.png — Tier 3 Warlord: dark crimson heavy armor, horned helm, massive greatsword with a red aura.
 
 ==================================================
@@ -60,13 +62,13 @@ Identities:
 3. human man, bald with a grey mustache, dark skin, older veteran; signature weapon motif: old battle-worn notches, brass rings and a faded red veteran cord
 4. human woman, short auburn bob hair, freckles, fair skin; signature weapon motif: copper fittings and a little bell charm
 5. human woman, black hair in a single braid, tan skin; signature weapon motif: black braided cord and a silver star stud
-6. bear beastfolk woman, small round bear ears, brown hair, big sturdy build; signature weapon motif: honey-colored wood and a bear-claw charm
+6. bear beastfolk woman, small round bear ears, brown hair, curvy sturdy build, human face; signature weapon motif: honey-colored wood and a bear-claw charm
 Sheets:
 - spearman.png — Tier 1 Spearman: padded gambeson, simple iron cap, plain wooden spear.
 - phalanx.png — Tier 2 Phalanx: large rectangular tower shield, long pike, half helmet, mail shirt.
 - halberdier.png — Tier 2 Halberdier: halberd, steel breastplate over gambeson, open-face helm.
 - sapper.png — Tier 2 Sapper: work apron over light armor, shovel-axe tool weapon, rope coils, a small wooden barricade stake on the back.
-- guardcaptain.png — Tier 3 Guard Captain: polished plate armor with gold trim, crested helmet, ornate spear and emblem shield, green cape.
+- guardcaptain.png — Tier 3 Guard Captain: polished plate armor with light gold trim, crested helmet, spear and emblem shield, green cape.
 - dragoon.png — Tier 3 Dragoon: dragon-scale themed armor, winged helm, long lance with a glowing blue tip.
 - siegeengineer.png — Tier 3 Siege Engineer: reinforced leather and brass gear, goggles, a big wrench-hammer, small mechanical crossbow turret parts on the back.
 
@@ -102,7 +104,7 @@ Sheets:
 - ranger.png — Tier 2 Ranger: hooded forest cloak, tall longbow, hunting knife.
 - hunter.png — Tier 2 Hunter: fur-trimmed coat, bow, bear-trap and rope on belt, animal pelt cape.
 - crossbowman.png — Tier 2 Crossbowman: padded jacket with steel shoulder plate, heavy crossbow, bolt case.
-- hawkeye.png — Tier 3 Hawkeye: ornate recurve longbow with a glowing string, feathered mantle, small monocle lens.
+- hawkeye.png — Tier 3 Hawkeye: recurve longbow with a glowing string, feathered mantle, small monocle lens.
 - monsterhunter.png — Tier 3 Monster Hunter: heavy bow, armor decorated with monster horns and scales, trophy fangs on a cord.
 - siegearcher.png — Tier 3 Siege Archer: heavy armored coat, huge reinforced arbalest crossbow, glowing piercing bolt loaded.
 
@@ -120,9 +122,9 @@ Sheets:
 - elementalist.png — Tier 2 Elementalist: robe with fire/water/wind/earth colored trims, gem-topped staff, small floating element sparks.
 - warlock.png — Tier 2 Warlock: deep violet and black robe, staff with a small skull ornament, green flame in the free hand.
 - barriermage.png — Tier 2 Barrier Mage: white and teal robe, staff topped with a hexagon crystal, a translucent cyan hexagon shield floating in front.
-- archmage.png — Tier 3 Archmage: star-patterned long robe with gold trim, tall ornate staff, glowing orb floating beside them.
+- archmage.png — Tier 3 Archmage: star-patterned long robe with light gold trim, tall staff, glowing orb floating beside them.
 - darkmage.png — Tier 3 Dark Sorcerer: black and crimson layered robe, cracked crystal staff, dark purple aura, glowing runes around hands.
-- grandbarrier.png — Tier 3 Grand Warden: ornate white and gold robe, tall staff with a ring of floating crystals, large glowing hexagon barrier dome behind them.
+- grandbarrier.png — Tier 3 Grand Warden: white and gold robe, tall staff with a ring of floating crystals, large glowing hexagon barrier dome behind them.
 
 ==================================================
 LINE F — CLERIC LINE
@@ -138,8 +140,8 @@ Sheets:
 - priest.png — Tier 2 Priest: embroidered white and blue vestments, holy book chained at the hip, staff with a soft light.
 - monk.png — Tier 2 Monk: martial arts robe with sash, bandaged fists, prayer beads, sandals.
 - inquisitor.png — Tier 2 Inquisitor: dark grey and white armored robe, heavy flanged mace, holy symbol shield, wide-brim hat or hood.
-- highpriest.png — Tier 3 High Priest: gold-trimmed long vestments, tall mitre or circlet, radiant sun staff with halo glow.
-- grandmaster.png — Tier 3 Grandmaster: refined fighting robe with gold trim, metal knuckle gauntlets, golden aura of inner energy.
+- highpriest.png — Tier 3 High Priest: long vestments, tall mitre or circlet, radiant sun staff with halo glow.
+- grandmaster.png — Tier 3 Grandmaster: refined fighting robe with light gold trim, metal knuckle gauntlets, golden aura of inner energy.
 - grandinquisitor.png — Tier 3 Grand Inquisitor: black and gold plate under a long coat, burning holy flail, chains with seals, white flame aura.
 
 ==================================================
@@ -153,7 +155,7 @@ HIDDEN CLASSES (one sheet each, 6 different people per sheet, slots 1-3 men and 
 - necromancer.png — Necromancer: tattered black and bone-white robe, bone staff with a pale green flame, tiny floating skull wisps.
 - bard.png — Bard: feathered cap, colorful doublet and short cape, lute, rapier at the hip, tiny glowing music notes.
 - alchemist.png — Alchemist: leather apron over a long coat, goggles on the forehead, belt of colored potion flasks, a bomb flask in hand.
-- summoner.png — Spirit Summoner: flowing layered robe, ornate ring-topped staff, a tiny floating elemental spirit companion.
+- summoner.png — Spirit Summoner: flowing layered robe, ring-topped staff, a tiny floating elemental spirit companion.
 
 ==================================================
 MAIN HERO — SEJIN (one sheet, the SAME single person in all 6 cells)
@@ -162,7 +164,7 @@ MAIN HERO — SEJIN (one sheet, the SAME single person in all 6 cells)
   2. Wounded in the village: bandages on head and arm, plain linen village shirt and trousers, suit jacket draped over the shoulder.
   3. Tactician (tier 1): linen shirt with leather vest, belt pouches, notebook and pencil in one hand, simple short sword at the hip.
   4. Strategist (tier 2): long dark green field coat, map case on the back, short sword, wooden command baton in hand.
-  5. Lord (tier 3): dark blue noble coat with gold trim, cape bearing a simple village emblem (a mountain and a lantern), longsword at the hip, confident stance.
+  5. Lord (tier 3): dark blue noble coat with light gold trim, cape bearing a simple village emblem (a mountain and a lantern), longsword at the hip, confident stance.
   6. Otherworld Pioneer (hidden): the lord's coat traced with faint glowing cyan geometric lines like a digital interface, glasses lenses glowing softly cyan, small translucent square panels floating near one hand.
 
 ==================================================
