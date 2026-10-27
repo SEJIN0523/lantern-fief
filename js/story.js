@@ -147,7 +147,7 @@ function sceneEffect(id) {
 function startChapter1() {
   G.chapter = 1; G.story = "ch1";
   const hans = newUnit({ job: "villager", slot: 0, name: "한스", lv: 1, traits: { personality: "diligent", hobby: "train", origin: "farm" } });
-  const elma = newUnit({ job: "villager", slot: 3, name: "엘마", lv: 1, traits: { personality: "kind", hobby: "cook", origin: "farm" } });
+  const elma = newUnit({ job: "villager", slot: 2, name: "엘마", lv: 1, traits: { personality: "kind", hobby: "cook", origin: "farm" } });
   G.roster.push(hans, elma);
   G.form = [{ id: hans.id, col: 0, lane: 1 }, { id: elma.id, col: 0, lane: 3 }, { id: heroU().id, col: 1, lane: 2 }];
   refreshOffers();

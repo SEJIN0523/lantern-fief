@@ -20,11 +20,11 @@ ANATOMY AND EQUIPMENT RULES (check every figure):
 - BEASTFOLK = humans with animal ears and a tail ONLY (kemonomimi style). They have a fully human face, human nose and mouth, human skin, human hands and human body. NO animal muzzle, NO snout, NO animal nose, NO fur on the face or body, NO paws. Only the animal ears on top of the head (no extra human ears) and the tail.
 - Weapons are held correctly and readably: a one-handed weapon in one hand, a shield strapped on the OTHER forearm, never the weapon and the shield in the same hand. Two-handed weapons (great axe, greatsword, halberd, spear, pike, lance, bow, crossbow, staff) are held with both hands or in a natural ready grip. Every weapon has a visible handle and is not cut off or overlapping the face.
 - POSES: calm, natural standing ready poses like the reference image — not dynamic action poses. ONE JOB = ONE CONCEPT: on each sheet all 6 people share the same job concept, the same weapon type and a similar pose (small natural differences in head tilt, arm angle and stance width are fine). The pose may change between jobs to suit each job (e.g. a knight holds the shield in front, a mage holds the staff upright, an archer holds the bow at the side). All figures face right and stay inside their cell.
-- Body types: women are clearly mature adult women with very curvy, voluptuous hourglass figures: a LARGE, full bust (noticeably bigger than in the reference image), a slim waist and wide hips, on every woman of every race, including elves and beastfolk, drawn in the same chibi pixel style. Men have varied adult builds.
+- Body types: women are clearly mature adult women with SLIM, slender bodies — slim arms and legs, a narrow waist, NOT chubby, NOT muscular, NOT bulky — combined with a VERY LARGE, full, prominent bust (much bigger than in the reference image). Only the bust is large; everything else stays slim and feminine. This applies to every woman of every race, including elves and beastfolk, drawn in the same chibi pixel style. Men have varied adult builds.
 - Women's outfits: LIGHT and simple — lightweight, airy clothing that follows the figure: sleeveless or short-sleeved tops, bare shoulders and arms, a short skirt or shorts with thigh-high boots, only small light armor pieces (pauldron, bracers, a light chest piece) instead of heavy full armor, even for knights and soldiers. Clear silhouette, few decorations. At most one small accent (a ribbon OR a simple hair clip). No heavy embroidery, no layered robes, no jewelry piles.
 - Men's outfits: SIMPLE and clean, same job theme, tailored to each body, few decorations.
 
-IDENTITY RULE (very important): each job line has 6 fixed people (identities). The person in slot N must be the SAME person (same face, race, gender, skin tone, hair color and hairstyle, body type) on every sheet of that line; only the outfit, weapon and effects change with the job. Promoting a character must look like the same person in new gear.
+IDENTITY RULE (very important): each job line has 6 fixed people (identities): slots 1-2 are men, slots 3-6 are women. The person in slot N must be the SAME person (same face, race, gender, skin tone, hair color and hairstyle, body type) on every sheet of that line; only the outfit, weapon and effects change with the job. Promoting a character must look like the same person in new gear.
 
 SIGNATURE WEAPON RULE (very important): in this game every character owns ONE personal weapon that grows with them. Each identity below has a "signature weapon motif" (colors and ornaments). That motif must appear on the person's weapon on EVERY sheet of their line. The weapon TYPE follows the job (sword, axe, spear, bow, staff...), but the motif stays and becomes a little more refined with each tier: tier 1 = simple and worn, tier 2 = cleaner metal, tier 3 = polished with a soft glow in the motif's colors. Keep weapon decoration minimal: one or two motif details only. On every sheet, the 6 weapons must look clearly different from each other in shape details and colors — never 6 copies of the same weapon. Weapons are big, bold and readable at small size.
 
@@ -39,11 +39,11 @@ TIER RULE:
 LINE A — WARRIOR LINE
 Identities:
 1. human man, short spiky brown hair, tanned skin, small scar on cheek, sturdy build; signature weapon motif: red cloth wrap and a wolf-head pommel
-2. human man, long black hair tied back, dark brown skin, tall; signature weapon motif: blue tassel and crescent-moon guard
-3. dwarf man, short and stocky, red braided beard; signature weapon motif: rune-carved bronze head and braided-leather grip
-4. human woman, blonde high ponytail, fair skin, athletic; signature weapon motif: golden sun emblem and white ribbon
-5. elf woman, long silver hair, pale skin, slender; signature weapon motif: silver leaf filigree and pale green gem
-6. wolf beastfolk woman, grey wolf ears and tail, short grey hair, tan skin; signature weapon motif: bone fang charms and grey fur wrap
+2. dwarf man, short and stocky (clearly shorter than humans), red braided beard; signature weapon motif: rune-carved bronze head and braided-leather grip
+3. human woman, blonde high ponytail, fair skin, athletic; signature weapon motif: golden sun emblem and white ribbon
+4. elf woman, long silver hair, pale skin, slender; signature weapon motif: silver leaf filigree and pale green gem
+5. wolf beastfolk woman (human face, grey wolf ears and tail only), short grey hair, tan skin; signature weapon motif: bone fang charms and grey fur wrap
+6. human woman, long straight black hair, tan skin, tall; signature weapon motif: crimson tassel and a black lacquered guard
 Sheets:
 - warrior.png — Tier 1 Fighter: worn leather armor, simple one-handed sword, round wooden shield.
 - knight.png — Tier 2 Knight: chainmail with steel breastplate, kite shield with a simple crest, longsword, short cape.
@@ -58,11 +58,11 @@ Sheets:
 LINE B — SOLDIER LINE (village militia; shared dark green and tan village uniform colors on every sheet)
 Identities:
 1. human man, buzz-cut black hair, light skin, young farm boy face; signature weapon motif: green ribbon tied below the head and a carved farm-sigil
-2. human man, curly brown hair and full beard, olive skin, broad; signature weapon motif: iron bands and a bronze boar emblem
-3. human man, bald with a grey mustache, dark skin, older veteran; signature weapon motif: old battle-worn notches, brass rings and a faded red veteran cord
-4. human woman, short auburn bob hair, freckles, fair skin; signature weapon motif: copper fittings and a little bell charm
-5. human woman, black hair in a single braid, tan skin; signature weapon motif: black braided cord and a silver star stud
-6. bear beastfolk woman, small round bear ears, brown hair, curvy sturdy build, human face; signature weapon motif: honey-colored wood and a bear-claw charm
+2. human man, bald with a grey mustache, dark skin, older veteran; signature weapon motif: old battle-worn notches, brass rings and a faded red veteran cord
+3. human woman, short auburn bob hair, freckles, fair skin; signature weapon motif: copper fittings and a little bell charm
+4. human woman, black hair in a single braid, tan skin; signature weapon motif: black braided cord and a silver star stud
+5. bear beastfolk woman (fully human face, small round bear ears and a little tail only), long brown hair, slim build; signature weapon motif: honey-colored wood and a bear-claw charm
+6. human woman, short platinum blonde hair, fair skin, confident smile; signature weapon motif: white enamel band and a small blue gem
 Sheets:
 - spearman.png — Tier 1 Spearman: padded gambeson, simple iron cap, plain wooden spear.
 - phalanx.png — Tier 2 Phalanx: large rectangular tower shield, long pike, half helmet, mail shirt.
@@ -76,11 +76,11 @@ Sheets:
 LINE C — ROGUE LINE
 Identities:
 1. human man, messy dark blue-black hair covering one eye, pale skin, lean; signature weapon motif: black wrap and a violet gem
-2. human man, short blond hair, tanned skin, sly grin; signature weapon motif: gold coin set in the pommel
-3. halfling man, small, curly orange hair, freckles; signature weapon motif: orange tassel and a tiny lucky clover
-4. human woman, short black pixie cut, light skin, sharp eyes; signature weapon motif: white stripe wrap and a crow feather
-5. dark elf woman, long white hair, dark grey-blue skin; signature weapon motif: bone-white blade edges and blue runes
-6. cat beastfolk woman, black cat ears and tail, purple-black bob hair, fair skin; signature weapon motif: purple ribbon and a cat-eye gem
+2. halfling man, small (clearly shorter than humans), curly orange hair, freckles; signature weapon motif: orange tassel and a tiny lucky clover
+3. human woman, short black pixie cut, light skin, sharp eyes; signature weapon motif: white stripe wrap and a crow feather
+4. dark elf woman, long white hair, dark grey-blue skin; signature weapon motif: bone-white blade edges and blue runes
+5. cat beastfolk woman (human face, black cat ears and tail only), purple-black bob hair, fair skin; signature weapon motif: purple ribbon and a cat-eye gem
+6. human woman, long wavy red hair, fair skin, sly smile; signature weapon motif: gold coin charm and a red silk cord
 Sheets:
 - thief.png — Tier 1 Thief: patched hood, light leather, two plain daggers, coin pouch.
 - duelist.png — Tier 2 Duelist: fitted vest with a flowing half cape, rapier and parrying dagger, agile taunting pose.
@@ -94,11 +94,11 @@ Sheets:
 LINE D — ARCHER LINE
 Identities:
 1. human man, shaggy light brown hair, fair skin, headband; signature weapon motif: green fletching and leather headband-matching wrap
-2. human man, black hair in a short topknot, East Asian features, light skin; signature weapon motif: red lacquer and a black cord knot
-3. elf man, long golden hair, fair skin; signature weapon motif: golden vine carvings
-4. human woman, red wavy hair, freckles, fair skin; signature weapon motif: red-dyed wood and copper tips
-5. elf woman, long blonde braid, green eyes, fair skin (like the reference); signature weapon motif: green leaf charm and braided gold string
-6. fox beastfolk woman, orange fox ears and fluffy tail, orange hair, tan skin; signature weapon motif: orange fox-tail tassel and amber bead
+2. elf man, long golden hair, fair skin; signature weapon motif: golden vine carvings
+3. human woman, red wavy hair, freckles, fair skin; signature weapon motif: red-dyed wood and copper tips
+4. elf woman, long blonde braid, green eyes, fair skin; signature weapon motif: green leaf charm and braided gold string
+5. fox beastfolk woman (human face, orange fox ears and fluffy tail only), orange hair, tan skin; signature weapon motif: orange fox-tail tassel and amber bead
+6. human woman, black hair in a high ponytail, East Asian features, light skin; signature weapon motif: red lacquer and a black cord knot
 Sheets:
 - archer.png — Tier 1 Archer: leather vest, simple short bow, quiver of arrows, scarf.
 - ranger.png — Tier 2 Ranger: hooded forest cloak, tall longbow, hunting knife.
@@ -112,11 +112,11 @@ Sheets:
 LINE E — MAGE LINE
 Identities:
 1. human man, neat short black hair, round glasses, pale skin; signature weapon motif: brass gears and a small lens
-2. human man, long white hair and short beard, dark skin, older; signature weapon motif: white bone ornament and silver rings
-3. gnome man, small, wild teal hair, big curious eyes; signature weapon motif: teal crystal and spiral copper wire
-4. human woman, long purple-black straight hair, pale skin; signature weapon motif: black wood and a violet moon gem
-5. human woman, short wavy light blonde hair, tan skin; signature weapon motif: driftwood and a sea-blue shell charm
-6. elf woman, long light blue hair, fair skin; signature weapon motif: pale blue crystal and silver snowflake
+2. gnome man, small (clearly shorter than humans), wild teal hair, big curious eyes, round ears; signature weapon motif: teal crystal and spiral copper wire
+3. human woman, long purple-black straight hair, pale skin; signature weapon motif: black wood and a violet moon gem
+4. human woman, short wavy light blonde hair, tan skin; signature weapon motif: driftwood and a sea-blue shell charm
+5. elf woman, long light blue hair, fair skin; signature weapon motif: pale blue crystal and silver snowflake
+6. human woman, silver-white bob hair, dark brown skin; signature weapon motif: white bone ornament and silver rings
 Sheets:
 - mage.png — Tier 1 Apprentice Mage: plain brown and blue robe, simple wooden staff, small spellbook on belt.
 - elementalist.png — Tier 2 Elementalist: robe with fire/water/wind/earth colored trims, gem-topped staff, small floating element sparks.
@@ -130,11 +130,11 @@ Sheets:
 LINE F — CLERIC LINE
 Identities:
 1. human man, short sandy hair, kind face, light skin; signature weapon motif: white ribbon and a small sun disk
-2. human man, shaved head, dark skin, muscular; signature weapon motif: black iron with gold prayer beads
-3. dwarf man, white beard, stocky; signature weapon motif: dwarven bronze knotwork and a white gem
-4. human woman, long golden wavy hair, fair skin; signature weapon motif: golden halo ring motif
-5. human woman, short black hair, East Asian features, light skin; signature weapon motif: red silk tassel and jade bead
-6. rabbit beastfolk woman, long white rabbit ears, white hair, fair skin; signature weapon motif: white fluffy pom charm and a moonstone
+2. dwarf man, white beard, stocky (clearly shorter than humans); signature weapon motif: dwarven bronze knotwork and a white gem
+3. human woman, long golden wavy hair, fair skin; signature weapon motif: golden halo ring motif
+4. human woman, short black hair, East Asian features, light skin; signature weapon motif: red silk tassel and jade bead
+5. rabbit beastfolk woman (human face, long white rabbit ears and a small tail only), white hair, fair skin; signature weapon motif: white fluffy pom charm and a moonstone
+6. human woman, long brown hair in a side braid, olive skin; signature weapon motif: black iron with gold prayer beads
 Sheets:
 - acolyte.png — Tier 1 Acolyte: plain white and beige robe, small wooden mace, holy symbol pendant.
 - priest.png — Tier 2 Priest: embroidered white and blue vestments, holy book chained at the hip, staff with a soft light.
@@ -146,10 +146,10 @@ Sheets:
 
 ==================================================
 VILLAGERS (tier 0, one sheet; 6 new different people)
-- villager.png — Ordinary mountain-village commoners: simple linen and wool clothes, patched aprons and boots, holding a farm tool (pitchfork, wood axe, sickle, hammer, broom, fishing rod). Slots 1-3 men (young farmer, middle-aged woodcutter, old fisherman), slots 4-6 women (young milkmaid, middle-aged baker, sturdy blacksmith's daughter). Mixed skin tones, all human.
+- villager.png — Ordinary mountain-village commoners: simple linen and wool clothes, patched aprons and boots, holding a farm tool (pitchfork, wood axe, sickle, hammer, broom, fishing rod). Slots 1-2 men (young farmer, old woodcutter), slots 3-6 women (young milkmaid, village baker, blacksmith's daughter, young shepherdess). Mixed skin tones, all human.
 
 ==================================================
-HIDDEN CLASSES (one sheet each, 6 different people per sheet, slots 1-3 men and 4-6 women, varied races)
+HIDDEN CLASSES (one sheet each, 6 different people per sheet, slots 1-2 men and 3-6 women, varied races)
 - spellblade.png — Spellblade: light half-plate over a mage coat, sword with glowing blue runes along the blade, small rune circle at the free hand.
 - druid.png — Druid: leaf and bark layered robe, antler or vine circlet, living-wood staff sprouting leaves, glowing green motes.
 - necromancer.png — Necromancer: tattered black and bone-white robe, bone staff with a pale green flame, tiny floating skull wisps.
