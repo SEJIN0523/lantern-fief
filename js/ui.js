@@ -40,13 +40,81 @@ function toast(msg) {
   setTimeout(() => t.remove(), 1800);
 }
 
+// Presentation-only background library. ART images always take priority.
+const UI_BACKGROUNDS = {
+  "city": {
+    "src": "art/ui/backgrounds/rain-city.webp",
+    "alt": "비 내리는 도시의 횡단보도"
+  },
+  "awakening": {
+    "src": "art/ui/backgrounds/twin-moon-forest.webp",
+    "alt": "두 달이 떠 있는 이세계의 숲"
+  },
+  "thicket": {
+    "src": "art/ui/backgrounds/forest-thicket.webp",
+    "alt": "큰 나무와 수풀이 우거진 숲길"
+  },
+  "room": {
+    "src": "art/ui/backgrounds/cottage-room.webp",
+    "alt": "햇빛이 드는 마을 회복실"
+  },
+  "village": {
+    "src": "art/ui/backgrounds/village-morning.webp",
+    "alt": "아침 햇살이 비치는 등불골"
+  },
+  "village_wall": {
+    "src": "art/ui/backgrounds/palisade-night.webp",
+    "alt": "등불 아래의 야간 목책"
+  },
+  "night": {
+    "src": "art/ui/backgrounds/palisade-night.webp",
+    "alt": "달빛 아래의 마을 입구"
+  },
+  "guild": {
+    "src": "art/ui/backgrounds/guild-hall.webp",
+    "alt": "모험가 길드 출장소"
+  },
+  "tavern": {
+    "src": "art/ui/backgrounds/tavern-evening.webp",
+    "alt": "따뜻한 불빛의 마을 주점"
+  },
+  "smithy": {
+    "src": "art/ui/backgrounds/smithy-forge.webp",
+    "alt": "화로가 켜진 마을 대장간"
+  },
+  "mine": {
+    "src": "art/ui/backgrounds/abandoned-mine.webp",
+    "alt": "버려진 광산의 갱도"
+  },
+  "graveyard": {
+    "src": "art/ui/backgrounds/moonlit-graveyard.webp",
+    "alt": "달빛과 안개가 감도는 묘지"
+  },
+  "festival": {
+    "src": "art/ui/backgrounds/village-festival.webp",
+    "alt": "등불이 걸린 마을 축제"
+  }
+};
+function locationBanner(kind, label) {
+  return `<div class="location-banner">${scenery(kind)}<span>${esc(label)}</span></div>`;
+}
+function sceneBackdrop(sc, line) {
+  // Change scenery when the clear scene moves from forest to the village feast.
+  if (sc === SCENES.ch1clear) return line >= 3 ? "festival" : "forest";
+  if (sc === SCENES.raidwin) return "festival";
+  if (sc === SCENES.guildtip) return "guild";
+  return ({story_02_forest:"awakening",story_03_goblins:"thicket",story_04_shield:"thicket"})[sc.art] || sc.bg;
+}
+
 // 풍경(그림이 없을 때 CSS로 그리는 산과 하늘)
 function scenery(kind) {
   const villageLv = Math.min(5, Math.max(1, G ? G.bld.hall : 1));
   const key = kind === "village" ? "village_" + villageLv : typeof ART !== "undefined" && ART["bg_" + kind] ? "bg_" + kind : kind;
   if (typeof ART !== "undefined" && ART[key]) return `<img class="scn-img" src="${ART[key]}" alt="">`;
   if (kind === "forest") return `<img class="scn-img forest-landscape" src="art/ui/forest-clearing.webp" alt="고요한 숲의 공터">`;
-  if (kind === "village" || kind === "dusk") return `<img class="scn-img village-landscape" src="art/ui/lantern-village.webp" alt="등불이 켜진 산골 마을">`;
+  const bg = UI_BACKGROUNDS[kind];
+  if (bg) return `<img class="scn-img background-${kind}" src="${bg.src}" alt="${bg.alt}" decoding="async">`;
+  if (kind === "dusk") return `<img class="scn-img village-landscape" src="art/ui/lantern-village.webp" alt="등불이 켜진 산골 마을">`;
   return `<div class="scn scn-${kind}"><i class="m1"></i><i class="m2"></i><i class="m3"></i>${kind === "village" ? `<i class="houses" style="--n:${villageLv}"></i>` : ""}</div>`;
 }
 
@@ -81,9 +149,16 @@ function speakerArt(who) {
 }
 function playScene(sc, done) {
   let i = 0;
-  const art = sc.art && typeof ART !== "undefined" && ART[sc.art] ? `<img class="sc-art" src="${ART[sc.art]}" alt="">` : `<div class="sc-art">${scenery(sc.bg)}</div>`;
+  const customArt = sc.art && typeof ART !== "undefined" && ART[sc.art];
+  let backdrop = sceneBackdrop(sc, 0);
+  const art = customArt ? `<img class="sc-art" src="${ART[sc.art]}" alt="">` : `<div class="sc-art" id="scene-backdrop">${scenery(backdrop)}</div>`;
   app.innerHTML = `<div class="scene">${art}<div class="sc-who" id="scwho"></div><div class="sc-box" id="scbox"><div class="sc-name" id="scname"></div><div class="sc-text" id="sctext"></div><div class="sc-next">▼</div></div><button class="sc-skip" id="scskip">건너뛰기 ▶▶</button></div>`;
   const show = () => {
+    const kind = sceneBackdrop(sc, i);
+    if (!customArt && kind !== backdrop) {
+      document.getElementById("scene-backdrop").innerHTML = scenery(kind);
+      backdrop = kind;
+    }
     const [who, text] = sc.lines[i];
     const inner = who.endsWith("(속)");
     const name = who === "*" || who === "" ? "" : who.replace("(속)", "");
@@ -191,7 +266,7 @@ function renderRecruit() {
   const offers = G.bld.guild ? G.offers.map((u, i) => recruitCard(u, "guild", i)).join("") || `<p class="dim">오늘은 찾아온 모험가가 없어요. 3일마다 새로 와요.</p>` : `<p class="dim">모험가 길드를 지으면 모험가를 고용할 수 있어요.</p>`;
   const volReady = G.day - G.volDay >= 4;
   const vols = G.volunteers.map((u, i) => recruitCard(u, "vol", i)).join("");
-  return panel("모험가 길드", offers, `${G.roster.length}/${rosterCap()}명`) +
+  return locationBanner("guild", "모험가 길드") + panel("모험가 길드", offers, `${G.roster.length}/${rosterCap()}명`) +
     panel("마을 자원자", vols || (volReady ? `<button class="btn" data-act="vol">자원자 찾기</button>` : `<p class="dim">${4 - (G.day - G.volDay)}일 뒤 다시 찾을 수 있어요.</p>`), "평민 · 무료 · 잠재력 제각각") +
     (G.bld.barracks ? panel("병영", `<button class="btn" data-act="barracks">창병 모집 · 💰20 · 마을 사람 1명</button>`) : "");
 }
@@ -206,7 +281,7 @@ function recruitCard(u, from, i) {
 function renderShop() {
   const items = Object.entries(ITEMS).filter(([, it]) => it.price && it.price <= 80 + G.bld.hall * 60).map(([id, it]) => `
     <div class="shop-it"><span class="shop-ic">${ic(it.slot === "armor" ? "armor" : "ring")}</span><div><b>${it.name}</b><small>${itemStatText(it)}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buy" data-arg="${id}">💰${it.price}</button></div>`).join("");
-  return panel("떠돌이 상인", items, "촌장의 집 레벨이 오르면 품목이 늘어요");
+  return locationBanner("tavern", "주점에 들른 떠돌이 상인") + panel("떠돌이 상인", items, "촌장의 집 레벨이 오르면 품목이 늘어요");
 }
 function itemStatText(it) {
   const n = { atk: "공격", mag: "마공", def: "방어", res: "저항", hp: "HP", eva: "회피", crit: "치명", spd: "속도" };
@@ -311,7 +386,7 @@ function detailGear(u, hireFrom) {
     const cur = s === "armor" ? u.armor : u.acc[i];
     return `<button class="eq" ${hireFrom ? "disabled" : ""} data-act="equip" data-arg="${u.id}:${s}:${i}"><span>${ic(s === "armor" ? "armor" : "ring")}</span><div><b>${cur ? ITEMS[cur].name : "비어 있음"}</b><small>${cur ? itemStatText(ITEMS[cur]) : s === "armor" ? "방어구" : "장신구"}</small></div></button>`;
   };
-  return `<div class="wpn"><div class="wpn-ic">${ic("weapon")}</div><div><b>${esc(weaponName(u))}</b><small>무기 공격 ${Math.round(weaponAtk(u))} · 이 동료만의 무기예요. 전직하면 같은 문양으로 다시 벼려져요.</small></div></div>
+  return locationBanner("smithy", "무기와 장비") + `<div class="wpn"><div class="wpn-ic">${ic("weapon")}</div><div><b>${esc(weaponName(u))}</b><small>무기 공격 ${Math.round(weaponAtk(u))} · 이 동료만의 무기예요. 전직하면 같은 문양으로 다시 벼려져요.</small></div></div>
     ${hireFrom ? "" : G.bld.smithy ? (u.weapon.plus >= cap ? `<p class="dim">대장간 레벨을 올리면 더 강화할 수 있어요 (상한 +${cap}).</p>` : `<button class="btn gold wide" data-act="forge" data-arg="${u.id}">${ic("forge", "sm")} 강화 +${u.weapon.plus + 1} · ${costText(fc)} · 성공 ${Math.round(forgeChance(u) * 100)}%</button>`) : '<p class="dim">대장간을 지으면 강화할 수 있어요. +20, +40, +60에서 각성해 이름을 지을 수 있어요.</p>'}
     <h4 class="sub">장비</h4><div class="eqs">${slot("armor", 0)}${slot("acc", 0)}${slot("acc", 1)}</div>`;
 }

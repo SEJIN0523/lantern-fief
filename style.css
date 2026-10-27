@@ -719,3 +719,16 @@ h4.sub { margin:10px 0 5px; font-size:12px; line-height:18px; letter-spacing:0; 
   .banner-v { height:78px; }.village-heading { top:8px; }.plaque { top:8px; }.vstat { bottom:6px; }.resbar { padding-top:5px; padding-bottom:5px; }
   .cell { height:46px; }.dun-art { height:66px; }.dt-art { height:94px; }.dt-hero { padding-top:10px; }.title-copy { margin:16px 0 12px; }
 }
+
+/* Situation backgrounds: short contextual banners preserve list space. */
+.location-banner { position:relative; height:52px; margin:8px 10px; overflow:hidden; border:1px solid #526b7460; border-radius:6px; isolation:isolate; }
+.location-banner .scn-img { image-rendering:auto; object-position:center 40%; }
+.location-banner:after { content:""; position:absolute; inset:0; background:linear-gradient(90deg,#071722c9,transparent 85%); z-index:0; }
+.location-banner>span { position:absolute; z-index:1; left:12px; top:50%; transform:translateY(-50%); color:#f2dfb8; font-size:12px; font-weight:650; text-shadow:0 2px 4px #000; }
+.dt-body>.location-banner { margin:5px 0 8px; height:44px; }
+.sc-art .scn-img { image-rendering:auto; object-position:center center; }
+.sc-art .background-awakening { object-position:center 35%; }
+.banner-v .background-village { object-position:center 52%; }
+.battle-scenery .background-village_wall { object-position:center 55%; }
+.location-banner .background-guild { object-position:center 35%; }
+.location-banner .background-smithy { object-position:center 40%; }
