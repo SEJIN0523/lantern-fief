@@ -43,7 +43,7 @@ Identities:
 3. human woman, blonde high ponytail, fair skin, athletic; signature weapon motif: golden sun emblem and white ribbon
 4. elf woman, long silver hair, pale skin, slender; signature weapon motif: silver leaf filigree and pale green gem
 5. wolf beastfolk woman (human face, grey wolf ears and tail only), short grey hair, tan skin; signature weapon motif: bone fang charms and grey fur wrap
-6. human woman, long straight black hair, tan skin, tall; signature weapon motif: crimson tassel and a black lacquered guard
+6. cow beastfolk woman (fully human face, small cow horns, floppy cow ears and a thin cow tail only; no muzzle, no fur on the body), long white hair with a few black streaks, fair skin, gentle eyes; signature weapon motif: brass cowbell charm and a black-and-white cloth wrap
 Sheets:
 - warrior.png — Tier 1 Fighter: worn leather armor, simple one-handed sword, round wooden shield.
 - knight.png — Tier 2 Knight: chainmail with steel breastplate, kite shield with a simple crest, longsword, short cape.
@@ -134,7 +134,7 @@ Identities:
 3. human woman, long golden wavy hair, fair skin; signature weapon motif: golden halo ring motif
 4. human woman, short black hair, East Asian features, light skin; signature weapon motif: red silk tassel and jade bead
 5. rabbit beastfolk woman (human face, long white rabbit ears and a small tail only), white hair, fair skin; signature weapon motif: white fluffy pom charm and a moonstone
-6. human woman, long brown hair in a side braid, olive skin; signature weapon motif: black iron with gold prayer beads
+6. cow beastfolk woman (fully human face, small cow horns, floppy cow ears and a thin cow tail only; no muzzle, no fur on the body), long cream-blonde hair, fair skin, soft smile; signature weapon motif: golden bell and white lace ribbon
 Sheets:
 - acolyte.png — Tier 1 Acolyte: plain white and beige robe, small wooden mace, holy symbol pendant.
 - priest.png — Tier 2 Priest: embroidered white and blue vestments, holy book chained at the hip, staff with a soft light.
