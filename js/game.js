@@ -34,6 +34,7 @@ function load() {
     const s = localStorage.getItem(SAVE_KEY);
     if (!s) return false;
     G = JSON.parse(s);
+    G.roster.forEach(ensureProfile);
     return true;
   } catch (e) { return false; }
 }
@@ -111,7 +112,7 @@ function hire(u, from) {
   if (G.res.gold < (u.price || 0)) return "금화가 부족해요";
   if (from === "vol" || from === "barracks") { if (freeVillagers() < 1) return "남는 마을 사람이 없어요"; G.pop--; }
   G.res.gold -= u.price || 0;
-  G.roster.push(u);
+  G.roster.push(ensureProfile(u));
   if (from === "guild") G.offers = G.offers.filter((x) => x !== u);
   if (from === "vol") G.volunteers = G.volunteers.filter((x) => x !== u);
   log(`${u.name}(${JOBS[u.job].name}) 합류`);

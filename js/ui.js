@@ -292,7 +292,7 @@ function recruitCard(u, from, i) {
 function renderShop() {
   const items = Object.entries(ITEMS).filter(([, it]) => it.price && it.price <= 80 + G.bld.hall * 60).map(([id, it]) => `
     <div class="shop-it"><span class="shop-ic">${itemIc(id, it.slot)}</span><div><b>${it.name}</b><small>${itemStatText(it)}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buy" data-arg="${id}">💰${it.price}</button></div>`).join("");
-  return locationBanner("tavern", "주점에 들른 떠돌이 상인") + panel("떠돌이 상인", items, "촌장의 집 레벨이 오르면 품목이 늘어요");
+  return locationBanner("tavern", "주점에 들른 떠돌이 상인") + panel("떠돌이 상인", items, "촌장의 집 레벨이 오르면 품목이 늘어요") + panel("선물", renderGiftShop(), "동료에게 건네면 호감이 올라요");
 }
 // 장비 아이콘: items 시트 칸이 있으면 그림, 없으면 UI 아이콘
 const ITEM_ART = { leather: "items_armor_2", chain: "items_armor_3", robe: "items_armor_6", plate: "items_armor_5", ring_str: "items_accessory_1", amulet: "items_accessory_4", charm: "items_accessory_7", coin: "items_accessory_8", belt: "items_armor_23", pen: "items_otherworld_1" };
@@ -318,7 +318,7 @@ function renderParty() {
       <div class="cc-art" style="--lc:${LINES[u.line].color}">${unitSprite(u)}<span class="lv">Lv${u.lv}</span></div>
       <div class="cc-tx"><b>${esc(u.name)}</b><small>${JOBS[u.job].name}</small>
       <div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div>
-      <div class="tags">${st}${promo}</div><small class="pw">전투력 ${fmt(power(u))}</small></div></div>`;
+      <div class="tags">${st}${promo}${loveTag(u)}</div><small class="pw">전투력 ${fmt(power(u))}</small></div></div>`;
   }).join("");
   return panel("동료", `<div class="cards">${cards}</div>`, `${G.roster.length}/${rosterCap()}명`);
 }
@@ -365,8 +365,8 @@ function showDetail(u, hireFrom) {
   const m = document.createElement("div");
   m.className = "modal"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true"); m.setAttribute("aria-label", "동료 상세");
   m.dataset.uid = u.id;
-  const tabs = [["stat", "능력"], ["trait", "특성"], ["gear", "장비"], ["skill", "기술"]];
-  const body = DTAB === "stat" ? detailStats(u, d) : DTAB === "trait" ? detailTraits(u) : DTAB === "gear" ? detailGear(u, hireFrom) : detailSkills(u, hireFrom);
+  const tabs = [["stat", "능력"], ["trait", "특성"], ["prof", u.gender === "f" && !u.hero && !hireFrom ? "관계" : "프로필"], ["gear", "장비"], ["skill", "기술"]];
+  const body = DTAB === "stat" ? detailStats(u, d) : DTAB === "trait" ? detailTraits(u) : DTAB === "prof" ? detailProfile(u, hireFrom) : DTAB === "gear" ? detailGear(u, hireFrom) : detailSkills(u, hireFrom);
   m.innerHTML = `<div class="sheet">
     <div class="dt-hero" style="--lc:${LINES[u.line].color}">
       <button class="x" data-act="close">✕</button>

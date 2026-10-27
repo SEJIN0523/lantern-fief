@@ -2,6 +2,7 @@
 "use strict";
 
 let PEEK = null; // 영입 전에 들여다보는 동료
+const LOVE_Q = []; // 전투 뒤에 보여 줄 호감 단계 장면
 
 function startNewGame() {
   newGame();
@@ -34,6 +35,7 @@ async function runExpedition(did, fi) {
     const B = createBattle(alive, floorEnemies(did, fi), { carry, forest: D.bg === "forest" });
     await playBattle(B, { title: `${D.name} ${F.boss ? "보스" : fi + 1 + "층"} (${n + 1}/${total})`, bg: D.bg });
     const rw = battleRewards(B);
+    LOVE_Q.push(...romanceAfterBattle(B));
     gold += rw.gold;
     G.res.gold += rw.gold;
     for (const c of B.units.filter((x) => x.side === "A")) carry[c.unit.id] = c.alive ? c.hp / c.maxHp : 0;
@@ -59,6 +61,7 @@ async function runExpedition(did, fi) {
 
 // 밤: 습격 판정 → 하루 마감 → 다음 날 이벤트
 async function night() {
+  await new Promise((r) => playLoveScenes(LOVE_Q.splice(0), r));
   const raid = raidTonight();
   if (raid) {
     G.seen["raid" + raid.day] = true;
@@ -68,6 +71,7 @@ async function night() {
       const B = createBattle(party, rollEnemies(raid.pool, raid.n, raid.lv), { night: true, wall: G.bld.palisade * 0.08, carry });
       await playBattle(B, { title: "🌙 밤 습격", bg: "village_wall" });
       const rw = battleRewards(B);
+      LOVE_Q.push(...romanceAfterBattle(B));
       G.res.gold += rw.gold;
       win = B.win;
       await new Promise((r) => showResult(win ? "습격 격퇴!" : "습격을 막지 못했어요", rewardLines(B, rw), [{ label: "확인", fn: r }]));
@@ -80,6 +84,7 @@ async function night() {
       log("밤 습격에 마을이 약탈당했다");
     }
     await new Promise((r) => playScenes([win ? "raidwin" : "raidlose"], r));
+    await new Promise((r) => playLoveScenes(LOVE_Q.splice(0), r));
   }
   endDay();
   const evs = dayEvents();
@@ -178,6 +183,16 @@ const ACT = {
       SEL = null;
     } else if (here) { SEL = here.id; }
     save(); showHub();
+  },
+  lovetalk(id) { closeModal(true); loveTalk(unitById(id)); },
+  lovegift(arg) { const [id, g] = arg.split(":"); closeModal(true); loveGift(unitById(id), g); },
+  loveconfess(id) { closeModal(true); loveConfess(unitById(id)); },
+  loveoath(id) { closeModal(true); loveOath(unitById(id)); },
+  buygift(id) {
+    const g = GIFTS[id];
+    if (G.res.gold < g.price) return toast("금화가 부족해요");
+    G.res.gold -= g.price; G.inv[id] = (G.inv[id] || 0) + 1;
+    toast(g.name + " 구입"); save(); showHub();
   },
   expe(arg) { const [did, fi] = arg.split(":"); runExpedition(did, +fi); },
 };

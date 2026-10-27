@@ -44,6 +44,7 @@ function createBattle(party, enemies, opts = {}) {
   const heroC = B.units.find((c) => c.side === "A" && c.unit.hero);
   B.hero = heroC || null;
   B.aura = heroC ? HERO_AURA[JOBS[heroC.unit.job].tier] : 0;
+  if (typeof loveBattleBonus === "function") loveBattleBonus(B);
   B.lonerOK = party.length <= 3;
   for (const c of B.units) {
     c.ct = (1000 / c.spd) * rnd(0.3, 1.0);

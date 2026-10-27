@@ -769,3 +769,19 @@ div.mc-holy, div.mc-heal { border-color: #ffe680; box-shadow: 0 0 14px #ffe680, 
 @keyframes facein { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
 .sc-face img { object-position: 50% 0; }
 .oi .oface { object-fit: cover; object-position: 50% 0; }
+
+/* 프로필·관계 */
+.pf { display: grid; gap: 6px; }
+.pf-row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 10px; border-radius: 4px; background: #0c1d26aa; border: 1px solid #2c4650; font-size: 13px; }
+.pf-row span { color: #9fb4b8; }
+.pf-row b { font-weight: 600; text-align: right; }
+.pf-note { margin: 4px 0 0; padding: 9px 11px; border-left: 3px solid #c9a65e; background: #1a2a2e; font-size: 13px; line-height: 1.6; color: #e4d8bc; }
+.love { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+.love-bar { flex: 1; height: 12px; border-radius: 6px; background: #2a1820; border: 1px solid #6a3a4a; overflow: hidden; }
+.love-bar i { display: block; height: 100%; background: linear-gradient(90deg, #ff7aa8, #ff3d7a); box-shadow: 0 0 8px #ff5a8a; }
+.love b { color: #ff8ab0; font-size: 14px; min-width: 52px; text-align: right; }
+.love-acts { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 8px; }
+.love-acts .btn { flex: 1; min-height: 44px; }
+.gift-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.gift-row .btn { min-height: 40px; display: inline-flex; align-items: center; gap: 4px; }
+.tag.love { color: #ff9ab8; border-color: #8a3a5a; background: #3a1828; }
