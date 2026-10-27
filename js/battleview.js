@@ -68,7 +68,7 @@ function updateBars(B) {
   const ord = document.getElementById("order");
   if (ord && !BV.skip) {
     const q = B.units.filter((c) => c.alive).sort((a, b) => a.ct - b.ct).slice(0, 8);
-    ord.innerHTML = q.map((c, i) => `<div class="oi ${c.side === "E" ? "foe" : ""} ${i === 0 ? "now" : ""}">${c.side === "A" ? unitSprite(c.unit) : monSprite(c.mon)}</div>`).join("");
+    ord.innerHTML = q.map((c, i) => `<div class="oi ${c.side === "E" ? "foe" : ""} ${i === 0 ? "now" : ""}">${orderArt(c)}</div>`).join("");
   }
   const g = document.getElementById("cmdg");
   if (g) {
@@ -77,6 +77,12 @@ function updateBars(B) {
   }
 }
 
+// 행동 순서 줄: 동료는 얼굴, 몬스터는 전신
+function orderArt(c) {
+  if (c.side === "E") return monSprite(c.mon);
+  const k = "face_" + artKey(c.unit);
+  return typeof ART !== "undefined" && ART[k] ? `<img class="spr oface" src="${ART[k]}" alt="">` : unitSprite(c.unit);
+}
 function center(id) {
   const f = document.getElementById("field").getBoundingClientRect();
   const r = document.getElementById("bu-" + id).querySelector(".bu-body").getBoundingClientRect();

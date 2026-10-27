@@ -119,7 +119,7 @@ def longest_run(row):
 
 
 def face_crop(cell, size):
-    """대화창 얼굴: 발 위쪽에서 머리를 찾아 정사각형으로 자른다. 지팡이·활 끝은 가늘어서 건너뛴다."""
+    """얼굴(전투 행동 순서)과 상반신(대화창): 발 위쪽에서 머리를 찾아 정사각형으로 자른다. 지팡이·활 끝은 가늘어서 건너뛴다."""
     rgb, a = keyed(cell)
     ys, xs = np.nonzero(a)
     if not len(ys):
@@ -141,11 +141,15 @@ def face_crop(cell, size):
                 break
     if head is None:
         return None
-    side = int((bot - head) * 0.4)
     c = float(np.median(cx))
-    box = (int(c - side / 2), int(head - side * 0.1), int(c + side / 2), int(head - side * 0.1) + side)
-    im = Image.fromarray(np.dstack([rgb, a]), "RGBA").crop(box)
-    return im.resize((size, size), Image.LANCZOS)
+    im = Image.fromarray(np.dstack([rgb, a]), "RGBA")
+    # 얼굴: 머리만 / 상반신: 머리부터 가슴께까지
+    out = []
+    for ratio, px in ((0.4, size), (0.62, size * 3 // 2)):
+        side = int((bot - head) * ratio)
+        y0 = int(head - side * 0.08)
+        out.append(im.crop((int(c - side / 2), y0, int(c + side / 2), y0 + side)).resize((px, px), Image.LANCZOS))
+    return out
 
 
 def centered(cell, size, margin=0.06):
@@ -177,7 +181,8 @@ def sheet(cat, name, mode, cols, rows, size, keyfn, faces=False):
         if faces:
             f = face_crop(cell, 160)
             if f is not None:
-                save(f, f"faces/{key}.webp", "face_" + key)
+                save(f[0], f"faces/{key}.webp", "face_" + key)
+                save(f[1], f"busts/{key}.webp", "bust_" + key)
 
 
 def scene(cat, name, width, key=None):

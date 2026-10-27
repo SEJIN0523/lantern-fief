@@ -144,17 +144,17 @@ function playScenes(ids, done) {
 // 이야기 속 NPC 그림 (art/npc, art/monsters)
 const NPC_ART = { "보린": "npc_a_1", "리나": "npc_a_2", "마르타": "npc_a_3", "세리": "npc_b_3", "고블린": "goblins_1" };
 function speakerArt(who, sc) {
-  // 얼굴을 잘라 둔 그림(face_키)이 있으면 액자 속 얼굴, 없으면 전신
+  // 상반신을 잘라 둔 그림(bust_키)이 있으면 액자 속 상반신, 없으면 전신
   const has = (k) => typeof ART !== "undefined" && ART[k];
-  const face = (k) => `<div class="sc-face"><img src="${ART["face_" + k]}" alt=""></div>`;
+  const face = (k) => `<div class="sc-face"><img src="${ART["bust_" + k]}" alt=""></div>`;
   const nk = NPC_ART[who];
-  if (nk) return has("face_" + nk) ? face(nk) : has(nk) ? `<img class="spr talk" src="${ART[nk]}" alt="">` : "";
+  if (nk) return has("bust_" + nk) ? face(nk) : has(nk) ? `<img class="spr talk" src="${ART[nk]}" alt="">` : "";
   if (!G) return "";
   const u = who === "세진" ? heroU() : G.roster.find((x) => x.name === who);
   if (!u) return "";
   // 사고 직후(프롤로그 1~4)의 세진은 정장 차림
-  if (u.hero && sc && /^story_0[1-4]/.test(sc.art || "") && has("face_sejin_1")) return face("sejin_1");
-  return has("face_" + artKey(u)) ? face(artKey(u)) : unitSprite(u, "talk");
+  if (u.hero && sc && /^story_0[1-4]/.test(sc.art || "") && has("bust_sejin_1")) return face("sejin_1");
+  return has("bust_" + artKey(u)) ? face(artKey(u)) : unitSprite(u, "talk");
 }
 function playScene(sc, done) {
   let i = 0;
