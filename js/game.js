@@ -43,7 +43,7 @@ function log(msg) { G.log.unshift({ d: G.day, m: msg }); if (G.log.length > 60) 
 
 // 수용 인원과 일꾼
 function rosterCap() { return 3 + G.bld.lodging * 2; }
-function workerCap(b) { return G.bld[b] ? 2 + G.bld[b] * 2 : 0; }
+function workerCap(b) { return G.bld[b] ? 3 + G.bld[b] * 2 : 0; }
 function freeVillagers() { return G.pop - G.workers.farm - G.workers.lumber - G.workers.quarry; }
 
 function canAfford(cost) { return Object.entries(cost).every(([k, v]) => (G.res[k] || 0) >= v); }
@@ -76,7 +76,7 @@ function build(id) {
 function dailyIncome() {
   const w = G.workers;
   const r = {
-    food: w.farm * (1 + G.bld.farm) - Math.ceil(G.pop * 0.45) - G.roster.length,
+    food: w.farm * (1 + G.bld.farm) - Math.ceil(G.pop * 0.3) - G.roster.length,
     wood: w.lumber * (1 + G.bld.lumber),
     stone: w.quarry * (G.bld.quarry ? 1 + G.bld.quarry : 0),
     gold: 4 + Math.floor(G.pop / 4) + G.bld.tavern * 6 - G.roster.reduce((a, u) => a + (u.wage || 0), 0),
@@ -126,6 +126,13 @@ function barracksRecruit() {
 
 // 편성: 비어 있으면 자동 채움
 function formUnits() { return G.form.map((f) => ({ ...f, unit: unitById(f.id) })).filter((f) => f.unit && !f.unit.injured); }
+// 마을 방어전: 부상자도 체력 50%로 싸운다
+function raidParty() {
+  const party = G.form.map((f) => ({ ...f, unit: unitById(f.id) })).filter((f) => f.unit);
+  const carry = {};
+  for (const f of party) if (f.unit.injured) carry[f.unit.id] = 0.5;
+  return { party, carry };
+}
 // onlyId를 주면 그 동료만 빈 칸에 넣는다(직접 뺀 동료를 다시 채우지 않도록)
 function autoForm(onlyId) {
   G.form = G.form.filter((f) => unitById(f.id));

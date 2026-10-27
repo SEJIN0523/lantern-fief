@@ -1,0 +1,17 @@
+{
+  "name": "등불 영지 — 이계의 영주",
+  "short_name": "등불 영지",
+  "description": "이세계 산골 마을을 키우는 영지 경영 + 자동전투 RPG",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#161e2c",
+  "theme_color": "#161e2c",
+  "lang": "ko",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

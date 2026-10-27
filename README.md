@@ -4,3 +4,9 @@
 모바일(안드로이드) 웹앱(PWA)이에요.
 
 - `design/` 설계 문서(스토리, 전투, 직업, 캐릭터, 파고들기 시스템, Codex 아트 프롬프트)
+
+## 플레이
+https://sejin0523.github.io/lantern-fief/ (폰 브라우저에서 열고 "홈 화면에 추가"하면 앱처럼 설치돼요)
+
+## 크레딧
+- 폰트: [Galmuri](https://github.com/quiple/galmuri) (SIL Open Font License 1.1)

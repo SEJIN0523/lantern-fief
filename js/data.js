@@ -226,7 +226,7 @@ const MONSTERS = {
   spider: { name: "거대 거미", icon: "🕷️", range: "ranged", base: [55, 10, 5, 12, 4], skills: ["m_web"], beast: true },
   bat: { name: "동굴 박쥐", icon: "🦇", range: "ranged", base: [30, 8, 2, 16, 1], skills: [], beast: true },
   goblin_chief: { name: "고블린 족장", icon: "👹", range: "melee", base: [150, 15, 10, 9, 3], skills: ["m_howl"] },
-  goblin_king: { name: "고블린 왕", icon: "👑", range: "melee", base: [400, 17, 12, 9, 4], skills: ["m_charge", "m_howl", "m_quake"], boss: true },
+  goblin_king: { name: "고블린 왕", icon: "👑", range: "melee", base: [360, 17, 12, 9, 4], skills: ["m_charge", "m_howl", "m_quake"], boss: true },
 };
 
 // 던전. floors: 층별 몬스터 풀과 레벨

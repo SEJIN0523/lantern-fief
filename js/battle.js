@@ -368,14 +368,14 @@ function battleRewards(B) {
   let exp = killed.reduce((a, e) => a + e.lv * 6 + 4 + (e.boss ? e.lv * 40 : 0), 0);
   let gold = killed.reduce((a, e) => a + Math.round(e.lv * 2.5 + 2 + (e.boss ? 120 : 0)), 0) + B.gold;
   if (!B.win) { exp = Math.round(exp * 0.5); gold = Math.round(gold * 0.3); }
-  const share = Math.round((exp / Math.max(1, as.length)) * 1.6);
+  const share = Math.round((exp / Math.max(1, as.length)) * 2.1);
   const res = { exp: share, gold, ups: {}, injured: [] };
   for (const c of as) {
     const u = c.unit;
     u.battles++;
     const ups = gainExp(u, share);
     if (ups.length) res.ups[u.id] = ups.length;
-    if (!c.alive) { u.injured = Math.max(u.injured, u.hero ? 1 : 2); res.injured.push(u.id); }
+    if (!c.alive && !B.win) { u.injured = Math.max(u.injured, u.hero ? 1 : 2); res.injured.push(u.id); }
   }
   for (const c of as) if (c.unit.traits.personality === "greedy") gold = Math.round(gold * 1.05);
   res.gold = gold;
