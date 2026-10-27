@@ -19,7 +19,7 @@ ANATOMY AND EQUIPMENT RULES (check every figure):
 - Ears: the reference image shows elves, but do NOT copy its pointed ears. Humans, dwarves, halflings and gnomes have normal round human ears. Only figures explicitly listed as elf or dark elf get pointed ears. Beastfolk have only their animal ears on top of the head, no extra human or elf ears.
 - Weapons are held correctly and readably: a one-handed weapon in one hand, a shield strapped on the OTHER forearm, never the weapon and the shield in the same hand. Two-handed weapons (great axe, greatsword, halberd, spear, pike, lance, bow, crossbow, staff) are held with both hands or in a natural ready grip. Every weapon has a visible handle and is not cut off or overlapping the face.
 - Poses: each of the 6 figures on a sheet has a slightly different stance that suits the job and the person (confident, cautious, relaxed, eager...), not one copied pose. Keep all poses readable and facing the same direction.
-- Outfit fit: same job theme on all 6, but tailor the clothing to each body (men and women both wear practical armor; no exaggerated cleavage).
+- Body types: women are clearly mature adults with curvy figures — a noticeably fuller bust, defined waist and hips — drawn in the same chibi pixel style; men have varied adult builds. Outfit fit: same job theme on all 6, tailored to each body; armor and clothing shaped to fit the figure.
 
 IDENTITY RULE (very important): each job line has 6 fixed people (identities). The person in slot N must be the SAME person (same face, race, gender, skin tone, hair color and hairstyle, body type) on every sheet of that line; only the outfit, weapon and effects change with the job. Promoting a character must look like the same person in new gear.
 
