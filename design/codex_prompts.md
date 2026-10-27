@@ -9,19 +9,19 @@ PART 1 — PLAYABLE CHARACTERS (51 sheets, saved as output/jobs/<file>.png)
 
 SHEET FORMAT (all character, NPC and monster sheets in this task):
 - Canvas exactly 1536x1024, 3 columns x 2 rows = 6 cells of 512x512. Cell order: top-left = slot 1, top-middle = slot 2, top-right = slot 3, bottom-left = slot 4, bottom-middle = slot 5, bottom-right = slot 6.
-- One figure per cell, centered, all figures drawn at the same scale (a human adult is about 80% of the cell height), feet on the same baseline in each row, nothing crossing cell borders. Keep natural race heights: dwarves, halflings and gnomes are clearly shorter than humans; big races are taller.
+- One figure per cell, centered, all figures drawn at the same scale (a human adult is about 80% of the cell height), feet on the same baseline in each row, nothing crossing cell borders. Keep natural race heights: halflings and gnomes are clearly shorter than humans. Do NOT draw any dwarves anywhere in this task.
 - Background: solid flat #FF00FF magenta everywhere, no gradient, no texture, no floor, no ground shadow. Never use magenta or hot pink inside the figures.
 - No text, no labels, no numbers, no UI, no frames.
 - Player characters and NPCs face RIGHT. Monsters face LEFT.
 - All playable characters are adults.
 
 ANATOMY AND EQUIPMENT RULES (check every figure):
-- Ears: the reference image shows elves, but do NOT copy its pointed ears. Humans, dwarves, halflings and gnomes have normal round human ears. Only figures explicitly listed as elf or dark elf get pointed ears.
+- Ears: the reference image shows elves, but do NOT copy its pointed ears. Humans, halflings and gnomes have normal round human ears. Only figures explicitly listed as elf or dark elf get pointed ears.
 - BEASTFOLK = humans with animal ears and a tail ONLY (kemonomimi style). They have a fully human face, human nose and mouth, human skin, human hands and human body. NO animal muzzle, NO snout, NO animal nose, NO fur on the face or body, NO paws. Only the animal ears on top of the head (no extra human ears) and the tail.
 - Weapons are held correctly and readably: a one-handed weapon in one hand, a shield strapped on the OTHER forearm, never the weapon and the shield in the same hand. Two-handed weapons (great axe, greatsword, halberd, spear, pike, lance, bow, crossbow, staff) are held with both hands or in a natural ready grip. Every weapon has a visible handle and is not cut off or overlapping the face.
 - POSES: calm, natural standing ready poses like the reference image — not dynamic action poses. ONE JOB = ONE CONCEPT: on each sheet all 6 people share the same job concept, the same weapon type and a similar pose (small natural differences in head tilt, arm angle and stance width are fine). The pose may change between jobs to suit each job (e.g. a knight holds the shield in front, a mage holds the staff upright, an archer holds the bow at the side). All figures face right and stay inside their cell.
 - Body types: women are clearly mature adult women with SLIM, slender bodies — slim arms and legs, a narrow waist, NOT chubby, NOT muscular, NOT bulky — combined with a VERY LARGE, full, prominent bust (much bigger than in the reference image). Only the bust is large; everything else stays slim and feminine. This applies to every woman of every race, including elves and beastfolk, drawn in the same chibi pixel style. Men have varied adult builds.
-- Women's outfits: LIGHT and simple — lightweight, airy clothing that follows the figure: sleeveless or short-sleeved tops, bare shoulders and arms, a short skirt or shorts with thigh-high boots, only small light armor pieces (pauldron, bracers, a light chest piece) instead of heavy full armor, even for knights and soldiers. Clear silhouette, few decorations. At most one small accent (a ribbon OR a simple hair clip). No heavy embroidery, no layered robes, no jewelry piles.
+- Women's outfits: LIGHT, simple and REVEALING glamorous adult fantasy costumes, like sexy heroines of a fantasy JRPG: midriff-baring crop tops, deep necklines that show cleavage, bare shoulders and arms, very short skirts or short shorts, bare thighs above thigh-high boots, bikini-style light armor pieces (small breastplate, pauldron, bracers, armored belt) instead of full armor — even for knights and soldiers. Mages and clerics wear short, open, slit robes over a revealing top. No nudity: chest and hips stay covered. Clear silhouette, few decorations; at most one small accent (a ribbon OR a simple hair clip).
 - Men's outfits: SIMPLE and clean, same job theme, tailored to each body, few decorations.
 
 IDENTITY RULE (very important): each job line has 6 fixed people (identities): slots 1-2 are men, slots 3-6 are women. The person in slot N must be the SAME person (same face, race, gender, skin tone, hair color and hairstyle, body type) on every sheet of that line; only the outfit, weapon and effects change with the job. Promoting a character must look like the same person in new gear.
@@ -39,7 +39,7 @@ TIER RULE:
 LINE A — WARRIOR LINE
 Identities:
 1. human man, short spiky brown hair, tanned skin, small scar on cheek, sturdy build; signature weapon motif: red cloth wrap and a wolf-head pommel
-2. dwarf man, short and stocky (clearly shorter than humans), red braided beard; signature weapon motif: rune-carved bronze head and braided-leather grip
+2. human man, long black hair tied back, dark brown skin, tall; signature weapon motif: blue tassel and crescent-moon guard
 3. human woman, blonde high ponytail, fair skin, athletic; signature weapon motif: golden sun emblem and white ribbon
 4. elf woman, long silver hair, pale skin, slender; signature weapon motif: silver leaf filigree and pale green gem
 5. wolf beastfolk woman (human face, grey wolf ears and tail only), short grey hair, tan skin; signature weapon motif: bone fang charms and grey fur wrap
@@ -130,7 +130,7 @@ Sheets:
 LINE F — CLERIC LINE
 Identities:
 1. human man, short sandy hair, kind face, light skin; signature weapon motif: white ribbon and a small sun disk
-2. dwarf man, white beard, stocky (clearly shorter than humans); signature weapon motif: dwarven bronze knotwork and a white gem
+2. human man, shaved head, dark skin, broad shoulders; signature weapon motif: black iron and a white sun gem
 3. human woman, long golden wavy hair, fair skin; signature weapon motif: golden halo ring motif
 4. human woman, short black hair, East Asian features, light skin; signature weapon motif: red silk tassel and jade bead
 5. rabbit beastfolk woman (human face, long white rabbit ears and a small tail only), white hair, fair skin; signature weapon motif: white fluffy pom charm and a moonstone
