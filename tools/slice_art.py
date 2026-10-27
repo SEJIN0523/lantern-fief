@@ -200,7 +200,7 @@ def main():
     for p in sorted((SRC / "npc").glob("*.png")):
         sheet("npc", p.stem, "foot", 3, 2, 256, lambda n, s=p.stem: f"{s}_{n}", faces=True)
     for p in sorted((SRC / "monsters").glob("*.png")):
-        sheet("monsters", p.stem, "foot", 3, 2, 256, lambda n, s=p.stem: f"{s}_{n}")
+        sheet("monsters", p.stem, "foot", 3, 2, 256, lambda n, s=p.stem: f"{s}_{n}", faces=True)
     for name, (a, b) in BUILDINGS.items():
         sheet("buildings", name, "foot", 3, 2, 256, lambda n, a=a, b=b: f"bld_{a if n <= 3 else b}_{(n - 1) % 3 + 1}")
     for cat in ("items", "ui"):
