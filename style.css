@@ -732,3 +732,33 @@ h4.sub { margin:10px 0 5px; font-size:12px; line-height:18px; letter-spacing:0; 
 .battle-scenery .background-village_wall { object-position:center 55%; }
 .location-banner .background-guild { object-position:center 35%; }
 .location-banner .background-smithy { object-position:center 40%; }
+
+/* ---------- 전투 연출 v2: 그림 효과, 마법진, 꼬리, 먼지, 플래시 ---------- */
+.bu { width: 25%; }
+.bu.big { width: 40%; }
+.bu-body .spr { filter: drop-shadow(0 2px 0 #0008); }
+.fxi { position: absolute; pointer-events: none; image-rendering: pixelated; z-index: 90; }
+.mcircle { position: absolute; aspect-ratio: 1; pointer-events: none; z-index: 5; image-rendering: pixelated; }
+div.mcircle { border-radius: 50%; border: 3px solid #7fd8ff; box-shadow: 0 0 14px #7fd8ff, inset 0 0 10px #7fd8ff; }
+div.mc-fire, div.mc-dark { border-color: #ff7a5a; box-shadow: 0 0 14px #ff7a5a, inset 0 0 10px #ff7a5a; }
+div.mc-holy, div.mc-heal { border-color: #ffe680; box-shadow: 0 0 14px #ffe680, inset 0 0 10px #ffe680; }
+.ring { position: absolute; width: 70px; height: 70px; border-radius: 50%; border: 3px solid; pointer-events: none; z-index: 89; }
+.proj-img { width: 46px; height: auto; z-index: 91; image-rendering: pixelated; }
+.proj-arrow.proj-img, .proj-bolt.proj-img { width: 40px; }
+.trail { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #fff6c8; box-shadow: 0 0 6px #ffd27a; pointer-events: none; z-index: 88; }
+.trail-fire { background: #ffcf7a; box-shadow: 0 0 8px #ff7a2e; width: 9px; height: 9px; }
+.trail-dark { background: #e0c0ff; box-shadow: 0 0 8px #9a4ae0; width: 8px; height: 8px; }
+.trail-holy, .trail-heal { background: #eaffd8; box-shadow: 0 0 8px #8ff0a0; width: 8px; height: 8px; }
+.trail-magic { background: #d8f4ff; box-shadow: 0 0 8px #5fc8ff; width: 8px; height: 8px; }
+.proj-heal { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(#fff, #8ff0a0); box-shadow: 0 0 12px #8ff0a0; }
+.proj-bolt { font-size: 20px; color: #e0e0e0; }
+.hcross { position: absolute; color: #8ff0a0; font-style: normal; font-size: 16px; text-shadow: 0 0 6px #3c8, 0 1px 0 #000; pointer-events: none; z-index: 92; }
+.flash { position: absolute; inset: 0; pointer-events: none; z-index: 95; mix-blend-mode: screen; }
+.pop { font-family: Georgia, "Times New Roman", serif; font-weight: 900; font-size: 19px; -webkit-text-stroke: 1px #000; paint-order: stroke fill; z-index: 96; pointer-events: none; }
+.pop.crit { font-size: 26px; color: #ffd84a; text-shadow: 0 0 8px #ff7a2e, 0 2px 0 #000, 2px 0 0 #000, -2px 0 0 #000; }
+.pop.miss, .pop.buff, .pop.debuff, .pop.shield, .pop.dot { font-family: inherit; font-weight: 400; -webkit-text-stroke: 0; }
+.dust { position: absolute; inset: 0; pointer-events: none; z-index: 4; overflow: hidden; }
+.dust i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff2c8; opacity: 0; animation: dustfloat 8s linear infinite; }
+@keyframes dustfloat { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 0.55; } 85% { opacity: 0.35; } 100% { transform: translate(28px, -70px); opacity: 0; } }
+.b-spd [data-sfx] { min-width: 40px; }
+@media (prefers-reduced-motion: reduce) { .dust { display: none; } }

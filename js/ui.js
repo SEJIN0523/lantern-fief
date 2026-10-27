@@ -141,7 +141,11 @@ function playScenes(ids, done) {
   };
   next();
 }
+// 이야기 속 NPC 그림 (art/npc, art/monsters)
+const NPC_ART = { "보린": "npc_a_1", "리나": "npc_a_2", "마르타": "npc_a_3", "세리": "npc_b_3", "고블린": "goblins_1" };
 function speakerArt(who) {
+  const nk = NPC_ART[who];
+  if (nk && typeof ART !== "undefined" && ART[nk]) return `<img class="spr talk" src="${ART[nk]}" alt="">`;
   if (!G) return "";
   if (who === "세진") { const h = heroU(); return h ? unitSprite(h, "talk") : ""; }
   const u = G.roster.find((x) => x.name === who);
@@ -280,8 +284,15 @@ function recruitCard(u, from, i) {
 
 function renderShop() {
   const items = Object.entries(ITEMS).filter(([, it]) => it.price && it.price <= 80 + G.bld.hall * 60).map(([id, it]) => `
-    <div class="shop-it"><span class="shop-ic">${ic(it.slot === "armor" ? "armor" : "ring")}</span><div><b>${it.name}</b><small>${itemStatText(it)}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buy" data-arg="${id}">💰${it.price}</button></div>`).join("");
+    <div class="shop-it"><span class="shop-ic">${itemIc(id, it.slot)}</span><div><b>${it.name}</b><small>${itemStatText(it)}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buy" data-arg="${id}">💰${it.price}</button></div>`).join("");
   return locationBanner("tavern", "주점에 들른 떠돌이 상인") + panel("떠돌이 상인", items, "촌장의 집 레벨이 오르면 품목이 늘어요");
+}
+// 장비 아이콘: items 시트 칸이 있으면 그림, 없으면 UI 아이콘
+const ITEM_ART = { leather: "items_armor_2", chain: "items_armor_3", robe: "items_armor_6", plate: "items_armor_5", ring_str: "items_accessory_1", amulet: "items_accessory_4", charm: "items_accessory_7", coin: "items_accessory_8", belt: "items_armor_23", pen: "items_otherworld_1" };
+function itemIc(id, slot) {
+  const k = ITEM_ART[id];
+  if (k && typeof ART !== "undefined" && ART[k]) return `<img class="ic item-ic" src="${ART[k]}" alt="">`;
+  return ic(slot === "armor" ? "armor" : "ring");
 }
 function itemStatText(it) {
   const n = { atk: "공격", mag: "마공", def: "방어", res: "저항", hp: "HP", eva: "회피", crit: "치명", spd: "속도" };
@@ -384,7 +395,7 @@ function detailGear(u, hireFrom) {
   const cap = G.bld.smithy * 10;
   const slot = (s, i) => {
     const cur = s === "armor" ? u.armor : u.acc[i];
-    return `<button class="eq" ${hireFrom ? "disabled" : ""} data-act="equip" data-arg="${u.id}:${s}:${i}"><span>${ic(s === "armor" ? "armor" : "ring")}</span><div><b>${cur ? ITEMS[cur].name : "비어 있음"}</b><small>${cur ? itemStatText(ITEMS[cur]) : s === "armor" ? "방어구" : "장신구"}</small></div></button>`;
+    return `<button class="eq" ${hireFrom ? "disabled" : ""} data-act="equip" data-arg="${u.id}:${s}:${i}"><span>${cur ? itemIc(cur, s) : ic(s === "armor" ? "armor" : "ring")}</span><div><b>${cur ? ITEMS[cur].name : "비어 있음"}</b><small>${cur ? itemStatText(ITEMS[cur]) : s === "armor" ? "방어구" : "장신구"}</small></div></button>`;
   };
   return locationBanner("smithy", "무기와 장비") + `<div class="wpn"><div class="wpn-ic">${ic("weapon")}</div><div><b>${esc(weaponName(u))}</b><small>무기 공격 ${Math.round(weaponAtk(u))} · 이 동료만의 무기예요. 전직하면 같은 문양으로 다시 벼려져요.</small></div></div>
     ${hireFrom ? "" : G.bld.smithy ? (u.weapon.plus >= cap ? `<p class="dim">대장간 레벨을 올리면 더 강화할 수 있어요 (상한 +${cap}).</p>` : `<button class="btn gold wide" data-act="forge" data-arg="${u.id}">${ic("forge", "sm")} 강화 +${u.weapon.plus + 1} · ${costText(fc)} · 성공 ${Math.round(forgeChance(u) * 100)}%</button>`) : '<p class="dim">대장간을 지으면 강화할 수 있어요. +20, +40, +60에서 각성해 이름을 지을 수 있어요.</p>'}
