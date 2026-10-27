@@ -19,11 +19,7 @@ SRC = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "design" / "output"
 OUT = ROOT / "art"
 
 # 재생성 대기 중이라 아직 쓰지 않는 시트 ("시트" 전체 또는 "시트#칸")
-SKIP = {
-    "jobs/grandbarrier", "jobs/sejin",
-    "story/story_01_accident", "story/story_02_forest", "story/story_03_goblins",
-    "monsters/rift#4",
-}
+SKIP = set()
 
 # 건물 시트 → 게임 건물 id (위 줄 A, 아래 줄 B)
 BUILDINGS = {
