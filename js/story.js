@@ -134,7 +134,7 @@ function sceneEffect(id) {
   if (id === "garen") {
     const u = newUnit({ job: "warrior", slot: 0, name: "가렌", lv: 3, traits: { personality: "brave", hobby: "drink", origin: "wander", quirk: null } });
     u.wage = 1;
-    G.roster.push(u); autoForm();
+    G.roster.push(u); autoForm(u.id);
   }
   if (id === "ch1late") G.morale = Math.max(0, G.morale - 10);
   if (id === "ch1clear") {

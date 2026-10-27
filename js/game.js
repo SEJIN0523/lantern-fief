@@ -115,7 +115,7 @@ function hire(u, from) {
   if (from === "guild") G.offers = G.offers.filter((x) => x !== u);
   if (from === "vol") G.volunteers = G.volunteers.filter((x) => x !== u);
   log(`${u.name}(${JOBS[u.job].name}) 합류`);
-  autoForm();
+  autoForm(u.id);
   return null;
 }
 function barracksRecruit() {
@@ -126,14 +126,15 @@ function barracksRecruit() {
 
 // 편성: 비어 있으면 자동 채움
 function formUnits() { return G.form.map((f) => ({ ...f, unit: unitById(f.id) })).filter((f) => f.unit && !f.unit.injured); }
-function autoForm() {
+// onlyId를 주면 그 동료만 빈 칸에 넣는다(직접 뺀 동료를 다시 채우지 않도록)
+function autoForm(onlyId) {
   G.form = G.form.filter((f) => unitById(f.id));
   if (G.form.length >= 5) return;
   const used = new Set(G.form.map((f) => f.id));
   const taken = new Set(G.form.map((f) => f.col + ":" + f.lane));
   for (const u of G.roster) {
     if (G.form.length >= 5) break;
-    if (used.has(u.id) || u.injured) continue;
+    if (used.has(u.id) || u.injured || (onlyId && u.id !== onlyId)) continue;
     const J = JOBS[u.job];
     const wantBack = u.hero || ["ranged", "magic", "heal"].includes(J.range);
     const order = wantBack ? [1, 0] : [0, 1];
