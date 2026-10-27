@@ -105,6 +105,49 @@ def foot_anchor(cell, size):
     return im.resize((max(1, round(im.width * scale)), size), Image.LANCZOS)
 
 
+def longest_run(row):
+    """한 줄에서 가장 긴 불투명 구간 (시작, 끝)."""
+    best, start = (0, 0), None
+    for x, v in enumerate(np.append(row, 0)):
+        if v and start is None:
+            start = x
+        elif not v and start is not None:
+            if x - start > best[1] - best[0]:
+                best = (start, x)
+            start = None
+    return best
+
+
+def face_crop(cell, size):
+    """대화창 얼굴: 발 위쪽에서 머리를 찾아 정사각형으로 자른다. 지팡이·활 끝은 가늘어서 건너뛴다."""
+    rgb, a = keyed(cell)
+    ys, xs = np.nonzero(a)
+    if not len(ys):
+        return None
+    S = cell.height
+    top, bot = ys.min(), ys.max()
+    low = ys >= bot - max(4, (bot - top) * 0.12)
+    fx = np.median(xs[low])
+    head, cx = None, []
+    for y in range(top, bot):
+        # 발 근처 열에서 가장 긴 구간만 본다 (옆으로 든 무기 제외)
+        x0 = int(max(0, fx - S * 0.2)); x1 = int(min(a.shape[1], fx + S * 0.2))
+        r0, r1 = longest_run(a[y, x0:x1] > 0)
+        if r1 - r0 >= S * 0.09:
+            if head is None:
+                head = y
+            cx.append(x0 + (r0 + r1) / 2)
+            if y - head > S * 0.12:
+                break
+    if head is None:
+        return None
+    side = int((bot - head) * 0.4)
+    c = float(np.median(cx))
+    box = (int(c - side / 2), int(head - side * 0.1), int(c + side / 2), int(head - side * 0.1) + side)
+    im = Image.fromarray(np.dstack([rgb, a]), "RGBA").crop(box)
+    return im.resize((size, size), Image.LANCZOS)
+
+
 def centered(cell, size, margin=0.06):
     rgb, a = keyed(cell)
     ys, xs = np.nonzero(a)
@@ -117,7 +160,7 @@ def centered(cell, size, margin=0.06):
     return sq.resize((size, size), Image.LANCZOS)
 
 
-def sheet(cat, name, mode, cols, rows, size, keyfn):
+def sheet(cat, name, mode, cols, rows, size, keyfn, faces=False):
     src = SRC / cat / f"{name}.png"
     if not src.exists() or f"{cat}/{name}" in SKIP:
         return
@@ -131,6 +174,10 @@ def sheet(cat, name, mode, cols, rows, size, keyfn):
         out = foot_anchor(cell, size) if mode == "foot" else centered(cell, size)
         if out is not None:
             save(out, f"{cat}/{key}.webp", key)
+        if faces:
+            f = face_crop(cell, 160)
+            if f is not None:
+                save(f, f"faces/{key}.webp", "face_" + key)
 
 
 def scene(cat, name, width, key=None):
@@ -144,9 +191,9 @@ def scene(cat, name, width, key=None):
 
 def main():
     for p in sorted((SRC / "jobs").glob("*.png")):
-        sheet("jobs", p.stem, "foot", 3, 2, 256, lambda n, s=p.stem: f"{s}_{n}")
+        sheet("jobs", p.stem, "foot", 3, 2, 256, lambda n, s=p.stem: f"{s}_{n}", faces=True)
     for p in sorted((SRC / "npc").glob("*.png")):
-        sheet("npc", p.stem, "foot", 3, 2, 256, lambda n, s=p.stem: f"{s}_{n}")
+        sheet("npc", p.stem, "foot", 3, 2, 256, lambda n, s=p.stem: f"{s}_{n}", faces=True)
     for p in sorted((SRC / "monsters").glob("*.png")):
         sheet("monsters", p.stem, "foot", 3, 2, 256, lambda n, s=p.stem: f"{s}_{n}")
     for name, (a, b) in BUILDINGS.items():

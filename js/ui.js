@@ -143,13 +143,18 @@ function playScenes(ids, done) {
 }
 // 이야기 속 NPC 그림 (art/npc, art/monsters)
 const NPC_ART = { "보린": "npc_a_1", "리나": "npc_a_2", "마르타": "npc_a_3", "세리": "npc_b_3", "고블린": "goblins_1" };
-function speakerArt(who) {
+function speakerArt(who, sc) {
+  // 얼굴을 잘라 둔 그림(face_키)이 있으면 액자 속 얼굴, 없으면 전신
+  const has = (k) => typeof ART !== "undefined" && ART[k];
+  const face = (k) => `<div class="sc-face"><img src="${ART["face_" + k]}" alt=""></div>`;
   const nk = NPC_ART[who];
-  if (nk && typeof ART !== "undefined" && ART[nk]) return `<img class="spr talk" src="${ART[nk]}" alt="">`;
+  if (nk) return has("face_" + nk) ? face(nk) : has(nk) ? `<img class="spr talk" src="${ART[nk]}" alt="">` : "";
   if (!G) return "";
-  if (who === "세진") { const h = heroU(); return h ? unitSprite(h, "talk") : ""; }
-  const u = G.roster.find((x) => x.name === who);
-  return u ? unitSprite(u, "talk") : "";
+  const u = who === "세진" ? heroU() : G.roster.find((x) => x.name === who);
+  if (!u) return "";
+  // 사고 직후(프롤로그 1~4)의 세진은 정장 차림
+  if (u.hero && sc && /^story_0[1-4]/.test(sc.art || "") && has("face_sejin_1")) return face("sejin_1");
+  return has("face_" + artKey(u)) ? face(artKey(u)) : unitSprite(u, "talk");
 }
 function playScene(sc, done) {
   let i = 0;
@@ -172,7 +177,9 @@ function playScene(sc, done) {
     const tx = document.getElementById("sctext");
     tx.textContent = inner ? `(${text})` : text;
     tx.classList.toggle("inner", inner);
-    document.getElementById("scwho").innerHTML = name ? speakerArt(name) : "";
+    const who2 = document.getElementById("scwho");
+    who2.innerHTML = name ? speakerArt(name, sc) : "";
+    who2.classList.toggle("has-face", !!who2.querySelector(".sc-face"));
   };
   show();
   app.querySelector(".scene").onclick = (e) => {

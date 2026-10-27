@@ -762,3 +762,9 @@ div.mc-holy, div.mc-heal { border-color: #ffe680; box-shadow: 0 0 14px #ffe680, 
 @keyframes dustfloat { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 0.55; } 85% { opacity: 0.35; } 100% { transform: translate(28px, -70px); opacity: 0; } }
 .b-spd [data-sfx] { min-width: 40px; }
 @media (prefers-reduced-motion: reduce) { .dust { display: none; } }
+
+/* 대화창 얼굴 액자 */
+.sc-who.has-face { left: 14px; width: 116px; bottom: calc(176px + env(safe-area-inset-bottom)); filter: none; z-index: 3; }
+.sc-face { width: 100%; aspect-ratio: 1; border: 2px solid #c9a65e; border-radius: 6px; overflow: hidden; background: radial-gradient(circle at 50% 40%, #2c4a55, #0d1f29 75%); box-shadow: inset 0 0 0 2px #0008, 0 6px 18px #000b; animation: facein .22s ease-out; }
+.sc-face img { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+@keyframes facein { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
