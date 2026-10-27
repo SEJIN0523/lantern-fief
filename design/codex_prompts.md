@@ -204,7 +204,7 @@ PART 3 — MONSTERS (12 sheets, saved as output/monsters/<file>.png, same sheet 
 - memory.png — item-world monsters: animated flying sword, empty living armor, treasure chest mimic, possessed spellbook, faceless memory phantom, crystal memory guardian
 - rift.png — monsters from the rift between worlds, fantasy creatures with uncanny modern-world motifs: wraith with car-headlight eyes, golem made of broken concrete and rebar, static-noise shadow, serpent of glowing neon cables, clockwork angel with a clock face, faceless suited figure with a briefcase
 - bosses_a.png — larger boss versions, each filling most of its cell: Goblin King on a crude throne-chair, Spider Queen, Lich Lord with a floating crown, Troll Chieftain, Fire Wyrm, Frost Queen giantess
-- bosses_b.png — Ancient Dragon, Demon General with flaming wings, Guardian of Memory (giant crystal knight), Abyss Lord made of shadow and stars, Gatekeeper of Return (giant armored figure holding a glowing door-shaped shield, cyan light), hidden boss: a dark mirror version of Sejin with glowing red glasses and a black coat
+- bosses_b.png — Ancient Dragon, Demon General with flaming wings, Guardian of Memory (giant crystal knight), Abyss Lord made of shadow and stars, Gatekeeper of Return (giant armored figure holding a glowing door-shaped shield, cyan light), hidden boss: a dark mirror version of Sejin (same young late-20s face, no glasses) with glowing red eyes and a black coat
 
 ==================================================
 PART 4 — VILLAGE GROWTH (6 images, saved as output/village/<file>.png, canvas 1024x1536 portrait, full scene, no magenta)
