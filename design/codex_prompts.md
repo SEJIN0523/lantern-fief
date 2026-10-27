@@ -9,11 +9,17 @@ PART 1 — PLAYABLE CHARACTERS (51 sheets, saved as output/jobs/<file>.png)
 
 SHEET FORMAT (all character, NPC and monster sheets in this task):
 - Canvas exactly 1536x1024, 3 columns x 2 rows = 6 cells of 512x512. Cell order: top-left = slot 1, top-middle = slot 2, top-right = slot 3, bottom-left = slot 4, bottom-middle = slot 5, bottom-right = slot 6.
-- One figure per cell, centered, all figures the same height and scale, feet on the same baseline in each row, nothing crossing cell borders.
+- One figure per cell, centered, all figures drawn at the same scale (a human adult is about 80% of the cell height), feet on the same baseline in each row, nothing crossing cell borders. Keep natural race heights: dwarves, halflings and gnomes are clearly shorter than humans; big races are taller.
 - Background: solid flat #FF00FF magenta everywhere, no gradient, no texture, no floor, no ground shadow. Never use magenta or hot pink inside the figures.
 - No text, no labels, no numbers, no UI, no frames.
 - Player characters and NPCs face RIGHT. Monsters face LEFT.
 - All playable characters are adults.
+
+ANATOMY AND EQUIPMENT RULES (check every figure):
+- Ears: the reference image shows elves, but do NOT copy its pointed ears. Humans, dwarves, halflings and gnomes have normal round human ears. Only figures explicitly listed as elf or dark elf get pointed ears. Beastfolk have only their animal ears on top of the head, no extra human or elf ears.
+- Weapons are held correctly and readably: a one-handed weapon in one hand, a shield strapped on the OTHER forearm, never the weapon and the shield in the same hand. Two-handed weapons (great axe, greatsword, halberd, spear, pike, lance, bow, crossbow, staff) are held with both hands or in a natural ready grip. Every weapon has a visible handle and is not cut off or overlapping the face.
+- Poses: each of the 6 figures on a sheet has a slightly different stance that suits the job and the person (confident, cautious, relaxed, eager...), not one copied pose. Keep all poses readable and facing the same direction.
+- Outfit fit: same job theme on all 6, but tailor the clothing to each body (men and women both wear practical armor; no exaggerated cleavage).
 
 IDENTITY RULE (very important): each job line has 6 fixed people (identities). The person in slot N must be the SAME person (same face, race, gender, skin tone, hair color and hairstyle, body type) on every sheet of that line; only the outfit, weapon and effects change with the job. Promoting a character must look like the same person in new gear.
 
