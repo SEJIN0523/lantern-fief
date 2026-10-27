@@ -1,5 +1,5 @@
 // 오프라인 실행용 캐시. 코드가 바뀌면 VERSION을 올린다. 그림(art/)은 처음 볼 때 캐시한다.
-const VERSION = "fief-v3";
+const VERSION = "fief-v4";
 const FILES = [
   "./", "index.html", "style.css", "manifest.webmanifest",
   "js/art.js", "js/data.js", "js/units.js", "js/battle.js", "js/game.js", "js/story.js", "js/battleview.js", "js/ui.js", "js/main.js",
@@ -26,7 +26,8 @@ self.addEventListener("fetch", (e) => {
     })));
     return;
   }
-  e.respondWith(fetch(e.request).then((res) => {
+  // GitHub Pages는 브라우저 캐시를 10분 유지하므로, 코드는 캐시를 건너뛰고 서버에 확인한다
+  e.respondWith(fetch(e.request.url, { cache: "no-cache" }).then((res) => {
     const copy = res.clone();
     caches.open(VERSION).then((c) => c.put(e.request, copy));
     return res;
