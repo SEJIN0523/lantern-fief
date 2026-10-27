@@ -13,7 +13,8 @@ function newGame() {
     res: { gold: 60, food: 40, wood: 30, stone: 0 },
     pop: 22, morale: 50, fame: 0,
     workers: { farm: 4, lumber: 3, quarry: 0 },
-    bld: { hall: 1, palisade: 0, lodging: 1, farm: 1, lumber: 1, quarry: 0, guild: 0, barracks: 0, smithy: 0, church: 0, tavern: 0 },
+    bld: { hall: 1, palisade: 0, lodging: 1, farm: 1, lumber: 1, quarry: 0, guild: 0, barracks: 0, smithy: 0, church: 0, tavern: 0, magetower: 0, spring: 0 },
+    chStart: 0, migrants: [], migDay: 0,
     built: {},
     roster: [], form: [], tactic: "all",
     dungeon: { goblin_forest: 0 },
@@ -34,9 +35,24 @@ function load() {
     const s = localStorage.getItem(SAVE_KEY);
     if (!s) return false;
     G = JSON.parse(s);
-    G.roster.forEach(ensureProfile);
+    migrate();
     return true;
   } catch (e) { return false; }
+}
+// 예전 세이브 보정
+function migrate() {
+  for (const k in BUILDINGS) G.bld[k] = G.bld[k] || 0;
+  G.chStart = G.chStart || 0; G.migrants = G.migrants || []; G.migDay = G.migDay || 0;
+  G.offers = [];
+  for (const u of G.roster) {
+    // 예전 평민 계열 → 적성 계열로
+    if (u.line === "villager") {
+      const opts = Object.keys(FIRST_JOB).flatMap((l) => LINES[l].slots.map((s, i) => [l, i, s]).filter(([, , s]) => s[0] === u.gender && s[1] === "인간"));
+      const [l, i] = u.name === "한스" ? ["soldier", 0] : u.name === "엘마" ? ["cleric", 2] : pick(opts);
+      u.line = l; u.slot = i;
+    }
+    ensureProfile(u);
+  }
 }
 function hasSave() { try { return !!localStorage.getItem(SAVE_KEY); } catch (e) { return false; } }
 
@@ -87,35 +103,34 @@ function dailyIncome() {
 }
 
 // 영입
-function refreshOffers() {
-  if (!G.bld.guild) { G.offers = []; return; }
-  const lines = ["warrior", "rogue", "archer", "mage", "cleric"];
-  const first = { warrior: "warrior", rogue: "thief", archer: "archer", mage: "mage", cleric: "acolyte" };
-  G.offers = [];
-  for (let i = 0; i < 3; i++) {
-    const line = pick(lines);
-    const lv = rint(1, 2 + G.bld.guild * 2);
-    const u = newUnit({ job: first[line], lv, potBonus: G.bld.guild >= 3 ? 1 : 0 });
-    u.wage = Math.round((2 + lv * 0.5) * (1 + traitMod(u, "wage")));
-    u.price = 25 + lv * 12;
-    G.offers.push(u);
-  }
-  G.offersDay = G.day;
-}
 function refreshVolunteers() {
-  G.volunteers = [0, 1].map(() => { const u = newUnit({ job: "villager", wide: true }); u.wage = 0; u.price = 0; return u; });
+  G.volunteers = [0, 1].map(() => { const u = newUnit({ job: "villager", race: "인간", wide: true }); u.wage = 0; u.price = 0; return u; });
   G.volDay = G.day;
+}
+// 이주민: 명성이 오르면 다른 종족 가족이 찾아온다. 마을 인구도 늘어난다
+function migrantInterval() { return Math.max(3, 7 - G.bld.guild); }
+function refreshMigrants() {
+  if (G.fame < 5) return;
+  const n = G.fame >= 60 ? 3 : G.fame >= 25 ? 2 : 1;
+  G.migrants = Array.from({ length: n }, () => {
+    const u = newUnit({ job: "villager", wide: true, potBonus: G.fame >= 80 ? 1 : 0, lv: rint(1, 1 + Math.floor(G.chapter * 1.5)) });
+    u.wage = 0; u.price = 10 + u.lv * 4;
+    return u;
+  });
+  G.pop += rint(1, 3);
+  G.migDay = G.day;
+  log(`이주민 ${n}가족이 마을에 도착했다`);
 }
 function canRecruit() { return G.roster.length < rosterCap(); }
 function hire(u, from) {
   if (!canRecruit()) return "숙소가 가득 찼어요";
   if (G.res.gold < (u.price || 0)) return "금화가 부족해요";
-  if (from === "vol" || from === "barracks") { if (freeVillagers() < 1) return "남는 마을 사람이 없어요"; G.pop--; }
+  if (from === "vol" || from === "barracks" || from === "mig") { if (freeVillagers() < 1) return "남는 마을 사람이 없어요"; G.pop--; }
   G.res.gold -= u.price || 0;
   G.roster.push(ensureProfile(u));
-  if (from === "guild") G.offers = G.offers.filter((x) => x !== u);
+  if (from === "mig") G.migrants = G.migrants.filter((x) => x !== u);
   if (from === "vol") G.volunteers = G.volunteers.filter((x) => x !== u);
-  log(`${u.name}(${JOBS[u.job].name}) 합류`);
+  log(`${u.name}(${u.job === "villager" ? u.race + " 주민" : JOBS[u.job].name}) 합류`);
   autoForm(u.id);
   return null;
 }
@@ -159,15 +174,23 @@ function autoForm(onlyId) {
 // 습격 일정(장별)
 const RAIDS = {
   1: [
-    { day: 4, lv: 2, pool: ["goblin", "goblin"], n: 3 },
-    { day: 9, lv: 4, pool: ["goblin", "goblin_archer", "wolf"], n: 4 },
-    { day: 14, lv: 6, pool: ["wolf", "wolf", "goblin_archer"], n: 4 },
-    { day: 20, lv: 8, pool: ["wolf_rider", "goblin", "goblin_shaman", "hobgoblin"], n: 5 },
-    { day: 26, lv: 10, pool: ["wolf_rider", "hobgoblin", "goblin_archer", "goblin_shaman"], n: 5 },
+    { day: 4, lv: 1, pool: ["goblin", "goblin"], n: 3 },
+    { day: 9, lv: 3, pool: ["goblin", "goblin_archer", "wolf"], n: 4 },
+    { day: 14, lv: 5, pool: ["wolf", "wolf", "goblin_archer"], n: 4 },
+    { day: 20, lv: 7, pool: ["wolf_rider", "goblin", "goblin_shaman", "hobgoblin"], n: 4 },
+    { day: 26, lv: 9, pool: ["wolf_rider", "hobgoblin", "goblin_archer", "goblin_shaman"], n: 5 },
   ],
 };
-function raidTonight() { return (RAIDS[G.chapter] || []).find((r) => r.day === G.day && !G.seen["raid" + r.day]); }
-function raidSoon() { return (RAIDS[G.chapter] || []).find((r) => r.day > G.day && r.day - G.day <= 2); }
+// 1장은 1일째 기준, 2장부터는 장 시작일(G.chStart) 기준
+function raidKey(r) { return G.chapter === 1 ? "raid" + r.day : `raid${G.chapter}_${r.day}`; }
+function raidDay(r) { return (G.chapter === 1 ? 0 : G.chStart) + r.day + (r.retry || 0); }
+function raidList() {
+  const list = RAIDS[G.chapter] || [];
+  // 공성전에 지면 5일 뒤 다시 온다
+  return list.map((r) => (r.siege && G.siegeRetry ? { ...r, retry: G.siegeRetry } : r));
+}
+function raidTonight() { return raidList().find((r) => raidDay(r) === G.day && !G.seen[raidKey(r)]); }
+function raidSoon() { const r = raidList().find((r) => raidDay(r) > G.day && raidDay(r) - G.day <= 2 && !G.seen[raidKey(r)]); return r && { ...r, day: raidDay(r), lv: r.lv || r.waves[2].lv }; }
 
 function rollEnemies(pool, n, lv) {
   const slots = [];
@@ -184,8 +207,9 @@ function rollEnemies(pool, n, lv) {
   }
   return out;
 }
-function floorEnemies(did, fi) {
-  const F = DUNGEONS[did].floors[fi];
+function floorEnemies(did, fi, phase = 0) {
+  const F = typeof floorOf === "function" ? floorOf(did, fi) : DUNGEONS[did].floors[fi];
+  if (F.phases) return F.phases[phase].map(([id, col, lane]) => ({ id, lv: F.lv + phase * 2, col, lane }));
   if (F.boss) return F.boss.map(([id, col, lane]) => ({ id, lv: F.lv, col, lane }));
   return rollEnemies(F.pool, rint(F.n[0], F.n[1]), F.lv + rint(0, 1));
 }
@@ -201,10 +225,10 @@ function endDay() {
     if (u.injured > 0) u.injured = Math.max(0, u.injured - (G.bld.church ? 2 : 1) * (traitMod(u, "injury") ? 2 : 1));
     if (!u.busyToday) u.fatigue = Math.max(0, u.fatigue - restBonus - traitMod(u, "rest"));
     if (!u.busyToday && traitMod(u, "idleExp")) gainExp(u, 4 + u.lv);
-    if (!u.busyToday && G.bld.barracks) gainExp(u, G.bld.barracks * 2);
+    if (!u.busyToday && G.bld.barracks) gainExp(u, G.bld.barracks * 2 + Math.floor(u.lv / 4));
     u.busyToday = false;
   }
   G.day++;
-  if (G.day - G.offersDay >= 3) refreshOffers();
+  if (G.day - G.migDay >= migrantInterval()) refreshMigrants();
   save();
 }

@@ -1,7 +1,7 @@
 // 전투 엔진(화면과 분리). 진형: 각 진영 col 0 전열 / 1 후열, lane 0~4
 "use strict";
 
-const HERO_AURA = [0.05, 0.08, 0.11, 0.15];
+const HERO_AURA = [0.05, 0.08, 0.11, 0.15, 0.27];
 
 function mkFromUnit(u, col, lane, opts) {
   const d = derived(u);
@@ -25,10 +25,12 @@ function mkMonster(id, lv, col, lane, idx) {
   const M = MONSTERS[id];
   const [hp, atk, def, spd, mag] = M.base;
   const g = lv - 1;
+  // Lv20을 넘으면 성장을 조금씩 누그러뜨린다(후반 보스가 권장 레벨에서 잡히도록)
+  const damp = 1 / (1 + Math.max(0, g - 20) * 0.007);
   return {
     side: "E", mon: id, id: "e" + idx, name: M.name, icon: M.icon, col, lane, lv, boss: !!M.boss, beast: !!M.beast,
-    maxHp: Math.round(hp * 1.3 * (1 + 0.34 * g)), hp: 0,
-    atk: Math.round(atk * 1.75 * (1 + 0.21 * g)), mag: Math.round(mag * 1.75 * (1 + 0.21 * g)),
+    maxHp: Math.round(hp * 1.3 * (1 + 0.34 * g) * damp), hp: 0,
+    atk: Math.round(atk * 1.75 * (1 + 0.21 * g) * damp), mag: Math.round(mag * 1.75 * (1 + 0.21 * g) * damp),
     def: Math.round(def * (1 + 0.18 * g)), res: Math.round(def * 0.8 * (1 + 0.18 * g)),
     heal: Math.round(mag * 1.4 * (1 + 0.2 * g)),
     spd: Math.round(spd * (1 + 0.03 * g)), acc: 92 + g, eva: Math.min(25, 3 + Math.round(spd * 0.3)), crit: 5,
@@ -331,7 +333,7 @@ function step(B) {
   if (c.taunt > 0) c.taunt--;
   if (c.silence > 0) c.silence--;
   if (c.side === "A" && B.hero && B.hero.alive) {
-    B.cmd = Math.min(100, B.cmd + (has(B.hero, "rally") ? 10.5 : 8));
+    B.cmd = Math.min(100, B.cmd + (has(B.hero, "otherpanel") ? 11 : has(B.hero, "rally") ? 10.5 : 8));
   }
   return finish(B, out);
 }

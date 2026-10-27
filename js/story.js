@@ -66,15 +66,17 @@ const SCENES = {
   ] },
 
   garen: { bg: "village", lines: [
-    ["", "아침, 마을 어귀에 덩치 큰 떠돌이 전사가 나타났다."],
-    ["가렌", "여기가 고블린한테 털린다는 마을인가? 밥만 주면 칼을 빌려주지."],
-    ["세진", "급여는 많이 못 드려요."],
-    ["가렌", "하! 고블린 머리 하나에 빵 하나면 충분해."],
-    ["*", "전사 가렌이 동료가 되었다."],
+    ["", "아침, 낡은 군용 배낭을 멘 덩치 큰 사내가 마을 어귀에 서 있었다."],
+    ["보린", "가렌? 가렌 아니냐! 왕국군에 끌려간 지 10년 만이구나!"],
+    ["가렌", "전역했수다, 촌장님. 고향이 고블린한테 털린다길래 냅다 뛰어왔지."],
+    ["가렌", "당신이 그 이방인 대장인가? 싸움은 내가 할 테니, 머리는 당신이 써."],
+    ["*", "마을 출신 전직 군인, 전사 가렌이 동료가 되었다."],
   ] },
   guildtip: { bg: "village", lines: [
-    ["보린", "세진 군, 마을 사람만으로는 한계가 있어. 목재를 모아 모험가 길드 출장소를 지으면 떠돌이 모험가들이 들를 걸세."],
-    ["보린", "병영을 지으면 마을 젊은이들을 창병으로 훈련시킬 수도 있고."],
+    ["보린", "세진 군, 싸울 사람은 결국 마을에서 나와야 하네. 젊은이들을 받아서 키워 보게."],
+    ["보린", "대장간이 서면 검을, 병영이 서면 창을, 교회가 서면 기도를 가르칠 수 있지. 사람마다 맞는 길이 따로 있을 걸세."],
+    ["세진(속)", "적성이라… 상태창으로 조금씩 보이려나."],
+    ["*", "도움말: 동료는 마을 주민으로 들어와요. Lv5가 되고 맞는 건물이 있으면 1차 직업으로 전직해요."],
     ["*", "도움말: 낮에는 건설·영입·원정을 하고, 「하루 마치기」로 밤을 보내요. 습격은 이틀 전에 예고돼요."],
   ] },
   tax: { bg: "village", lines: [
@@ -102,8 +104,7 @@ const SCENES = {
     ["리나", "아저씨! 이거, 우리 집 보물인데… 아저씨가 가져요. 녹슨 열쇠예요."],
     ["", "리나가 내민 것은— 자동차 키였다. 녹이 슬었지만, 틀림없이 세진의 세계의 물건이었다."],
     ["세진(속)", "…이게 왜 여기에."],
-    ["*", "세진의 직업이 「통솔자」로 바뀌었다. 동료의 잠재력이 조금 보이기 시작한다."],
-    ["*", "제1장 클리어! 2장 「버려진 광산과 망자의 묘」는 다음 업데이트에서 이어져요. 그동안 마을을 키우고 동료를 단련해 두세요."],
+    ["*", "세진의 직업이 「통솔자」로 바뀌었다. 동료의 잠재력과 적성이 보이기 시작한다."],
   ] },
   ch1late: { bg: "village", lines: [
     ["보린", "30일이 지났네… 고블린 왕의 무리는 점점 커지고 있어."],
@@ -132,7 +133,8 @@ function dayEvents() {
 // 장면 부수효과
 function sceneEffect(id) {
   if (id === "garen") {
-    const u = newUnit({ job: "warrior", slot: 0, name: "가렌", lv: 3, traits: { personality: "brave", hobby: "drink", origin: "wander", quirk: null } });
+    const u = newUnit({ job: "warrior", slot: 0, name: "가렌", lv: 3, traits: { personality: "brave", hobby: "drink", origin: "fallen", quirk: null } });
+    ensureProfile(u);
     u.wage = 1;
     G.roster.push(u); autoForm(u.id);
   }
@@ -146,9 +148,9 @@ function sceneEffect(id) {
 
 function startChapter1() {
   G.chapter = 1; G.story = "ch1";
-  const hans = newUnit({ job: "villager", slot: 0, name: "한스", lv: 1, traits: { personality: "diligent", hobby: "train", origin: "farm" } });
-  const elma = newUnit({ job: "villager", slot: 2, name: "엘마", lv: 1, traits: { personality: "kind", hobby: "cook", origin: "farm" } });
+  const hans = newUnit({ job: "villager", line: "soldier", slot: 0, name: "한스", lv: 1, traits: { personality: "diligent", hobby: "train", origin: "farm" } });
+  const elma = newUnit({ job: "villager", line: "cleric", slot: 2, name: "엘마", lv: 1, traits: { personality: "kind", hobby: "cook", origin: "farm" } });
   G.roster.push(hans, elma);
   G.form = [{ id: hans.id, col: 0, lane: 1 }, { id: elma.id, col: 0, lane: 3 }, { id: heroU().id, col: 1, lane: 2 }];
-  refreshOffers();
+  ensureProfile(hans); ensureProfile(elma);
 }

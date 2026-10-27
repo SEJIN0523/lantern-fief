@@ -201,7 +201,7 @@ function showHub() {
   HUB_VIEW = view;
   app.innerHTML = `<div class="hub">
     <header class="banner-v">${scenery("village")}
-      <div class="village-heading"><small>등불 영지</small><h1>${G.chapter ? "제" + G.chapter + "장 · 고블린의 숲" : "프롤로그"}</h1></div><div class="plaque"><b>${G.day}</b><span>일째</span></div>
+      <div class="village-heading"><small>등불 영지</small><h1>${G.chapter ? (G.chapter >= 7 ? "엔딩 후 · " : "제" + G.chapter + "장 · ") + CHAPTERS[G.chapter].name : "프롤로그"}</h1></div><div class="plaque"><b>${G.day}</b><span>일째</span></div>
       <div class="vstat"><span>${ic("pop")} 주민 <b>${G.pop}</b></span><span>${ic("morale")} 사기 <b>${G.morale}</b></span></div>
     </header>
     <div class="resbar">${res("gold")}${res("food")}${res("wood")}${res("stone")}</div>
@@ -229,7 +229,8 @@ function renderTab() {
 function panel(title, body, extra = "") { return `<section class="panel"><h3 class="ptitle">${title}${extra ? `<small>${extra}</small>` : ""}</h3>${body}</section>`; }
 
 function renderVillage() {
-  const goal = G.chapter === 1 && !G.flags.ch1clear ? `<div class="goal">${ic("quest")}<div><span class="eyebrow">현재 목표</span><b>고블린 왕 토벌</b><small>30일째까지 · ${Math.max(0, 31 - G.day)}일 남음</small>${G.seen.tax && !G.seen.taxdone ? `<small>세금 💰150 · 20일째까지</small>` : ""}</div></div>` : "";
+  const cg = chapterGoal();
+  const goal = cg ? `<div class="goal">${ic("quest")}<div><span class="eyebrow">제${G.chapter}장 · ${CHAPTERS[G.chapter].name}</span><b>${cg.title}</b><small>${cg.sub}</small>${G.chapter === 1 && G.seen.tax && !G.seen.taxdone ? `<small>세금 💰150 · 20일째까지</small>` : ""}</div></div>` : "";
   const subs = [["build", "건설", "build"], ["work", "일꾼", "worker"], ["recruit", "모집", "recruit"], ["shop", "상점", "shop"], ["log", "기록", "log"]];
   const seg = `<div class="seg village-seg">${subs.map(([k, n, i]) => `<button data-act="sub" aria-pressed="${SUB === k}" data-arg="${k}" class="${SUB === k ? "on" : ""}">${ic(i, "sm")}${n}</button>`).join("")}</div>`;
   let body = "";
@@ -245,11 +246,11 @@ function uiCost(cost) {
   return Object.entries(cost).filter(([, v]) => v > 0).map(([k, v]) => `<span class="cost-part ${G.res[k] < v ? "neg" : ""}">${ic(k, "sm")}${fmt(v)}</span>`).join("");
 }
 function buildingGlyph(id) {
-  const symbol = {hall:"village",palisade:"party",lodging:"village",farm:"food",lumber:"wood",quarry:"stone",guild:"quest",barracks:"form",smithy:"build",church:"lantern",tavern:"shop"}[id];
+  const symbol = {hall:"village",palisade:"party",lodging:"village",farm:"food",lumber:"wood",quarry:"stone",guild:"quest",barracks:"form",smithy:"build",church:"lantern",tavern:"shop",magetower:"mag",spring:"lantern"}[id];
   return `<div class="bld-crest bld-${id}">${ic(symbol)}</div>`;
 }
 function renderBuild() {
-  const tiles = Object.entries(BUILDINGS).map(([id, b]) => {
+  const tiles = Object.entries(BUILDINGS).filter(([, b]) => !b.unlock || G.flags[b.unlock]).map(([id, b]) => {
     const lv = G.bld[id];
     const why = canBuild(id);
     const max = lv >= b.max;
@@ -274,19 +275,24 @@ function renderWork() {
 }
 
 function renderRecruit() {
-  const offers = G.bld.guild ? G.offers.map((u, i) => recruitCard(u, "guild", i)).join("") || `<p class="dim">오늘은 찾아온 모험가가 없어요. 3일마다 새로 와요.</p>` : `<p class="dim">모험가 길드를 지으면 모험가를 고용할 수 있어요.</p>`;
-  const volReady = G.day - G.volDay >= 4;
+  const volReady = G.day - G.volDay >= 3;
   const vols = G.volunteers.map((u, i) => recruitCard(u, "vol", i)).join("");
-  return locationBanner("guild", "모험가 길드") + panel("모험가 길드", offers, `${G.roster.length}/${rosterCap()}명`) +
-    panel("마을 자원자", vols || (volReady ? `<button class="btn" data-act="vol">자원자 찾기</button>` : `<p class="dim">${4 - (G.day - G.volDay)}일 뒤 다시 찾을 수 있어요.</p>`), "평민 · 무료 · 잠재력 제각각") +
-    (G.bld.barracks ? panel("병영", `<button class="btn" data-act="barracks">창병 모집 · 💰20 · 마을 사람 1명</button>`) : "");
+  const migs = G.migrants.map((u, i) => recruitCard(u, "mig", i)).join("");
+  const migNext = Math.max(0, migrantInterval() - (G.day - G.migDay));
+  return locationBanner("village", "마을 광장") +
+    panel("마을 자원자", vols || (volReady ? `<button class="btn" data-act="vol">자원자 찾기</button>` : `<p class="dim">${3 - (G.day - G.volDay)}일 뒤 다시 찾을 수 있어요.</p>`), `${G.roster.length}/${rosterCap()}명 · 무료`) +
+    panel("이주민", migs || `<p class="dim">${G.fame < 5 ? "마을의 명성이 오르면(습격 격퇴, 원정 승리) 다른 종족 이주민이 찾아와요." : `${migNext}일 뒤 새 이주민이 올 거예요.`}</p>`, `명성 ${G.fame}`) +
+    (G.bld.barracks ? panel("병영", `<button class="btn" data-act="barracks">창병 바로 훈련 · 💰20 · 마을 사람 1명</button>`) : "");
+}
+function aptText(u) {
+  return aptKnown(u) ? `${LINES[u.line].name} 적성` : "적성 ???";
 }
 function recruitCard(u, from, i) {
   return `<div class="rc" role="group" data-act="peek" data-arg="${from}:${i}"><div class="por" style="--lc:${LINES[u.line].color}">${unitSprite(u, "mini")}</div>
-    <div class="rc-tx"><b>${esc(u.name)}</b><small>${u.race} · ${JOBS[u.job].name} Lv${u.lv}</small>
+    <div class="rc-tx"><b>${esc(u.name)}</b><small>${u.race} · ${JOBS[u.job].name} Lv${u.lv} · ${aptText(u)}</small>
     <div class="tags"><span class="tag">${traitOf(u, "personality").name}</span><span class="tag">${traitOf(u, "hobby").name}</span>${u.traits.quirk ? `<span class="tag gold">${traitOf(u, "quirk").name}</span>` : ""}</div>
-    <small>고용 💰${u.price} · 일당 ${u.wage}</small></div>
-    <button class="btn sm gold" data-act="hire" data-arg="${from}:${i}">고용</button></div>`;
+    <small>${u.price ? `맞이하기 💰${u.price} · ` : ""}마을 사람 1명</small></div>
+    <button class="btn sm gold" data-act="hire" data-arg="${from}:${i}">합류</button></div>`;
 }
 
 function renderShop() {
@@ -343,15 +349,20 @@ function renderForm() {
 
 function renderExpe() {
   const tp = formUnits().reduce((a, f) => a + power(f.unit), 0);
-  return Object.entries(DUNGEONS).map(([id, d]) => {
+  const open = Object.entries(DUNGEONS).filter(([id, d]) => !d.unlock || (typeof d.unlock === "function" ? d.unlock(G) : G.chapter >= d.unlock) || G.dungeon[id]).reverse();
+  return open.map(([id, d]) => {
     const cleared = G.dungeon[id] || 0;
-    const nodes = d.floors.map((f, i) => {
+    const lo = Math.max(0, cleared - 4);
+    const idx = d.endless ? Array.from({ length: cleared - lo + 1 }, (_, k) => lo + k) : d.floors.map((f, i) => i);
+    const nodes = idx.map((i) => {
+      const f = floorOf(id, i);
       const lock = i > cleared;
       const lv = f.boss ? f.lv + 3 : f.lv + 1;
       return `<button class="node ${lock ? "lock" : i < cleared ? "done" : "next"} ${f.boss ? "boss" : ""}" data-act="expe" data-arg="${id}:${i}" ${lock ? "disabled" : ""}>
         <span class="node-ic">${lock ? ic("lock", "sm") : f.boss ? ic("boss") : i + 1}</span><small>Lv${lv}</small></button>`;
     }).join(`<i class="path"></i>`);
-    return `<section class="dun"><div class="dun-art">${scenery(d.bg)}<h3>${d.name}</h3></div>
+    const done = !d.endless && cleared >= d.floors.length;
+    return `<section class="dun ${done ? "cleared" : ""}"><div class="dun-art">${scenery(d.bg)}<h3>${d.name}${done ? " ✓" : ""}${d.endless ? ` · 최고 ${cleared}층` : ""}</h3></div>
       <div class="nodes">${nodes}</div>
       <p class="hint">원정은 하루가 걸려요. 일반 층은 3연전(체력 유지), 보스 층은 1전. 전투 사이에 돌아올 수 있어요.</p></section>`;
   }).join("") + panel("출전 파티", `<div class="mini-party">${formUnits().map((f) => `<div class="mp"><div class="mp-art" style="--lc:${LINES[f.unit.line].color}">${unitSprite(f.unit)}</div><small>${esc(f.unit.name)} ${f.unit.lv}${f.unit.fatigue >= 3 ? " 💤" : ""}</small></div>`).join("") || '<p class="dim">편성된 동료가 없어요.</p>'}</div>`, `전투력 ${fmt(tp)}`);
@@ -371,7 +382,7 @@ function showDetail(u, hireFrom) {
     <div class="dt-hero" style="--lc:${LINES[u.line].color}">
       <button class="x" data-act="close">✕</button>
       <div class="dt-art">${unitSprite(u)}</div>
-      <div class="dt-id"><h2>${esc(u.name)}</h2><p>${u.race} · ${u.gender === "m" ? "남" : "여"}</p>
+      <div class="dt-id"><h2>${esc(u.name)}</h2><p>${u.race} · ${u.gender === "m" ? "남" : "여"}${u.job === "villager" ? " · " + aptText(u) : ""}</p>
         <div class="job">${J.name}<small>${J.role}</small></div>
         <p class="lvl">Lv <b>${u.lv}</b> <small>${u.exp}/${expNeed(u.lv)}</small></p><div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div>
         <small>전투력 ${fmt(power(u))} · 전투 ${u.battles} · 처치 ${u.kills}</small></div>
@@ -385,9 +396,11 @@ function showDetail(u, hireFrom) {
 function statBar(label, v, max, icon) { return `<div class="sbar"><span>${ic(icon, "sm")}${label}</span><div class="mbar"><i style="width:${Math.min(100, (v / max) * 100)}%"></i></div><b>${v}</b></div>`; }
 function detailStats(u, d) {
   const top = Math.max(...STATS.map((k) => u.st[k]), 20);
+  const reb = typeof canRebirth === "function" && G.bld.spring && G.roster.includes(u)
+    ? (canRebirth(u) ? `<button class="btn gold wide" data-act="rebirth" data-arg="${u.id}">💧 환생 · 💰${rebirthCost(u)}${u.reb ? ` · 현재 ${u.reb}회` : ""}</button>` : `<p class="dim">Lv20부터 윤회의 샘에서 환생할 수 있어요.${u.reb ? ` (환생 ${u.reb}회)` : ""}</p>`) : "";
   const rows = STATS.map((k) => `<div class="srow"><span>${STAT_NAME[k]}</span><div class="mbar"><i style="width:${(u.st[k] / top) * 100}%"></i></div><b>${u.st[k]}</b><span class="pot g${revealLevel(u, k) >= 2 ? u.pot[k] : "x"}">${potText(u, k)}</span></div>`).join("");
   const big = Math.max(d.atk, d.mag, d.heal, d.def, 30);
-  return `<h4 class="sub">기본 능력 <small>잠재력</small></h4>${rows}
+  return `<h4 class="sub">기본 능력 <small>잠재력</small></h4>${rows}${reb}
     <p class="dim">개화: ${revealLevel(u, "int") >= 3 || u.hero ? BLOOM[u.bloom].name : "???"}${heroU() && JOBS[heroU().job].tier === 0 && !u.hero ? " · 세진의 「인물 파악」이 성장하면 잠재력이 보여요." : ""}</p>
     <h4 class="sub">전투 능력</h4>
     ${statBar("HP", d.hp, Math.max(d.hp, 200), "hp")}${statBar("공격", d.atk, big, "atk")}${statBar("마공", d.mag, big, "mag")}${statBar("회복", d.heal, big, "mag")}${statBar("방어", d.def, big, "def")}${statBar("저항", d.res, big, "def")}
@@ -411,7 +424,13 @@ function detailGear(u, hireFrom) {
 function detailSkills(u, hireFrom) {
   const J = JOBS[u.job];
   const sk = unitSkills(u).map((id) => { const s = SKILLS[id]; return `<div class="skc"><b>${s.name}</b><span class="tag ${s.kind === "passive" ? "" : "gold"}">${s.kind === "passive" ? "패시브" : "쿨 " + s.cd}</span>${s.desc ? `<small>${s.desc}</small>` : ""}</div>`; }).join("") || '<p class="dim">아직 익힌 기술이 없어요.</p>';
-  const promo = canPromote(u) && !hireFrom ? `<h4 class="sub">전직</h4><div class="promo">${J.next.map((j) => `<button class="btn gold" data-act="promote" data-arg="${u.id}:${j}"><b>${JOBS[j].name}</b><small>${JOBS[j].role} · ${JOBS[j].skills.map((s) => SKILLS[s].name).join(", ")}</small></button>`).join("")}</div>` : J.next.length ? `<p class="dim">Lv${J.lv}에 전직: ${J.next.map((j) => JOBS[j].name).join(" / ")}</p>` : "";
+  const nx = nextJobs(u);
+  const shown = (j) => u.job !== "villager" || aptKnown(u);
+  const promo = !nx.length || hireFrom ? "" : `<h4 class="sub">전직</h4><div class="promo">${nx.map((j) => {
+    if (!shown(j)) return `<p class="dim">Lv3이 되면 이 사람의 적성이 드러나요.</p>`;
+    const why = promoteBlock(u, j);
+    return `<button class="btn ${why ? "" : "gold"}" ${why ? "disabled" : ""} data-act="promote" data-arg="${u.id}:${j}"><b>${JOBS[j].name}</b><small>${why ? why + " · " : ""}${JOBS[j].role} · ${JOBS[j].skills.map((s) => SKILLS[s].name).join(", ")}</small></button>`;
+  }).join("")}</div>`;
   return sk + promo;
 }
 function closeModal(silent) { document.querySelectorAll(".modal").forEach((m) => m.remove()); }

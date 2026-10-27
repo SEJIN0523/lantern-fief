@@ -8,7 +8,13 @@ const MON_ART = {
 const HERO_ART = { stranger: 2, tactician: 3, strategist: 4, lord: 5 };
 
 function artKey(u) {
+  if (u.art) return u.art;
   if (u.hero) return "sejin_" + (HERO_ART[u.job] || 2);
+  // 마을 주민: 평민 복장 시트(civ_계열)가 있으면 그것, 없으면 적성 계열의 1차 직업 그림
+  if (u.job === "villager" && FIRST_JOB[u.line]) {
+    const civ = `civ_${u.line}_${u.slot + 1}`;
+    return typeof ART !== "undefined" && ART[civ] ? civ : `${FIRST_JOB[u.line]}_${u.slot + 1}`;
+  }
   return `${u.job}_${u.slot + 1}`;
 }
 function unitSprite(u, cls = "") {
@@ -21,7 +27,7 @@ function unitSprite(u, cls = "") {
 }
 function monSprite(id, cls = "") {
   const k = MON_ART[id];
-  if (typeof ART !== "undefined" && ART[k]) return `<img class="spr ${cls}" src="${ART[k]}" alt="">`;
+  if (typeof ART !== "undefined" && ART[k]) return `<img class="spr ${cls}${MONSTERS[id].flip ? " flipx" : ""}" src="${ART[k]}" alt="">`;
   return `<div class="mon ${cls}${MONSTERS[id].boss ? " boss" : ""}">${MONSTERS[id].icon}</div>`;
 }
 

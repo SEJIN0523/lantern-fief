@@ -25,15 +25,17 @@ function tutorialBattle() {
 async function runExpedition(did, fi) {
   const party = formUnits();
   if (!party.length) return toast("편성된 동료가 없어요");
-  const D = DUNGEONS[did], F = D.floors[fi];
-  const total = F.boss ? 1 : 3;
+  const D = DUNGEONS[did], F = floorOf(did, fi);
+  const total = F.phases ? F.phases.length : F.boss ? 1 : 3;
+  const fname = D.endless ? `${fi + 1}층` : F.boss ? "보스" : fi + 1 + "층";
+  let after = [];
   const carry = {};
   let won = 0, gold = 0;
   for (let n = 0; n < total; n++) {
     const alive = formUnits().filter((f) => carry[f.unit.id] == null || carry[f.unit.id] > 0);
     if (!alive.length) break;
-    const B = createBattle(alive, floorEnemies(did, fi), { carry, forest: D.bg === "forest" });
-    await playBattle(B, { title: `${D.name} ${F.boss ? "보스" : fi + 1 + "층"} (${n + 1}/${total})`, bg: D.bg });
+    const B = createBattle(alive, floorEnemies(did, fi, n), { carry, forest: D.bg === "forest" });
+    await playBattle(B, { title: `${D.name} ${F.phases ? `최종전 ${n + 1}단계` : fname} (${n + 1}/${total})`, bg: D.bg });
     const rw = battleRewards(B);
     LOVE_Q.push(...romanceAfterBattle(B));
     gold += rw.gold;
@@ -45,18 +47,23 @@ async function runExpedition(did, fi) {
     }
     won++;
     if (n < total - 1) {
-      const go = await new Promise((r) => showResult(`승리! (${n + 1}/${total})`, [...rewardLines(B, rw), "다음 전투로 갈까요? 체력은 회복되지 않아요."], [{ label: "계속 전진", fn: () => r(true) }, { label: "돌아가기", ghost: true, fn: () => r(false) }]));
+      const msg = F.phases ? "문지기가 다시 일어선다! 체력은 회복되지 않아요." : "다음 전투로 갈까요? 체력은 회복되지 않아요.";
+      const go = await new Promise((r) => showResult(`승리! (${n + 1}/${total})`, [...rewardLines(B, rw), msg], [{ label: "계속 전진", fn: () => r(true) }, { label: "돌아가기", ghost: true, fn: () => r(false) }]));
       if (!go) break;
     } else {
-      if (fi >= (G.dungeon[did] || 0)) G.dungeon[did] = fi + 1;
-      const first = F.boss && !G.flags.ch1clear;
-      await new Promise((r) => showResult(F.boss ? "보스 토벌!" : `${fi + 1}층 돌파!`, [...rewardLines(B, rw), fi + 1 < D.floors.length && !F.boss ? `${fi + 2}층이 열렸어요.` : ""], [{ label: "마을로", fn: r }]));
-      if (first) { G.flags.ch1clear = true; await new Promise((r) => playScenes(["ch1clear"], r)); }
+      after = onFloorClear(did, fi);
+      const more = D.endless || fi + 1 < D.floors.length;
+      await new Promise((r) => showResult(F.boss ? "보스 토벌!" : `${fname} 돌파!`, [...rewardLines(B, rw), more && !F.boss ? `다음 층이 열렸어요.` : ""], [{ label: "마을로", fn: r }]));
+      if (after.length) await new Promise((r) => playScenes(after, r));
+      if (F.abyssBoss === "mirror_sejin" && !G.seen.mirror) { G.seen.mirror = true; await new Promise((r) => playScenes(["mirror"], r)); }
     }
   }
   for (const f of party) { f.unit.busyToday = true; f.unit.fatigue += 1; }
-  log(`${D.name} ${F.boss ? "보스" : fi + 1 + "층"} 원정: ${won}승, 💰${gold}`);
-  night();
+  log(`${D.name} ${fname} 원정: ${won}승, 💰${gold}`);
+  if (won) G.fame += 1;
+  // 장 진행(다음 장, 선택지, 엔딩)이 끝나면 밤으로
+  if (after.includes("final")) return endingChoice(night);
+  afterScenes(after, night);
 }
 
 // 밤: 습격 판정 → 하루 마감 → 다음 날 이벤트
@@ -64,17 +71,36 @@ async function night() {
   await new Promise((r) => playLoveScenes(LOVE_Q.splice(0), r));
   const raid = raidTonight();
   if (raid) {
-    G.seen["raid" + raid.day] = true;
+    G.seen[raidKey(raid)] = true;
     const { party, carry } = raidParty();
     let win = false;
-    if (party.length) {
-      const B = createBattle(party, rollEnemies(raid.pool, raid.n, raid.lv), { night: true, wall: G.bld.palisade * 0.08, carry });
-      await playBattle(B, { title: "🌙 밤 습격", bg: "village_wall" });
+    if (raid.siege) await new Promise((r) => playScenes(["siege"], r));
+    const waves = raid.siege ? raid.waves : [raid];
+    for (let w = 0; w < waves.length && party.length; w++) {
+      const W = waves[w];
+      const foes = W.boss ? W.boss.map(([id, col, lane]) => ({ id, lv: W.lv, col, lane })) : rollEnemies(W.pool, W.n, W.lv);
+      const alive = party.filter((f) => carry[f.unit.id] == null || carry[f.unit.id] > 0);
+      if (!alive.length) break;
+      const B = createBattle(alive, foes, { night: true, wall: G.bld.palisade * 0.08, carry });
+      await playBattle(B, { title: raid.siege ? `🔥 오크 대공세 ${w + 1}/${waves.length}` : "🌙 밤 습격", bg: "village_wall" });
       const rw = battleRewards(B);
       LOVE_Q.push(...romanceAfterBattle(B));
       G.res.gold += rw.gold;
+      for (const c of B.units.filter((x) => x.side === "A")) carry[c.unit.id] = c.alive ? c.hp / c.maxHp : 0;
       win = B.win;
-      await new Promise((r) => showResult(win ? "습격 격퇴!" : "습격을 막지 못했어요", rewardLines(B, rw), [{ label: "확인", fn: r }]));
+      await new Promise((r) => showResult(win ? (raid.siege && w < waves.length - 1 ? `${w + 1}번째 물결 격퇴!` : "습격 격퇴!") : "습격을 막지 못했어요", rewardLines(B, rw), [{ label: "확인", fn: r }]));
+      if (!win) break;
+    }
+    if (raid.siege) {
+      if (win) {
+        G.seen.siegeDone = true;
+        await new Promise((r) => playScenes(G.flags.duelwon ? ["ch3clear", "aldricjoin"] : ["ch3clear"], r));
+        startChapter(4);
+        await new Promise((r) => playScenes(["ch4intro"], r));
+      } else {
+        G.siegeRetry = (G.siegeRetry || 0) + 5; delete G.seen[raidKey(raid)];
+        await new Promise((r) => playScenes(["siegelose"], r));
+      }
     }
     if (win) { G.morale = Math.min(100, G.morale + 6); G.fame += 5; log("밤 습격을 막아냈다"); }
     else {
@@ -88,7 +114,8 @@ async function night() {
   }
   endDay();
   const evs = dayEvents();
-  if (evs.length) playScenes(evs, showHub); else showHub();
+  const done = () => (evs.includes("valtor") ? choiceValtor(showHub) : showHub());
+  if (evs.length) playScenes(evs, done); else showHub();
 }
 
 // 버튼
@@ -108,12 +135,12 @@ const ACT = {
   },
   hire(arg) {
     const [from, i] = arg.split(":");
-    const u = (from === "guild" ? G.offers : G.volunteers)[+i];
+    const u = (from === "mig" ? G.migrants : G.volunteers)[+i];
     const err = hire(u, from);
     if (err) return toast(err);
     save(); closeModal(); showHub();
   },
-  peek(arg) { const [from, i] = arg.split(":"); PEEK = (from === "guild" ? G.offers : G.volunteers)[+i]; DTAB = "stat"; showDetail(PEEK, from); },
+  peek(arg) { const [from, i] = arg.split(":"); PEEK = (from === "mig" ? G.migrants : G.volunteers)[+i]; DTAB = "stat"; showDetail(PEEK, from); },
   sub(k) { SUB = k; showHub(); },
   dtab(arg) { const [k, id, from] = arg.split(":"); DTAB = k; showDetail(from ? PEEK : unitById(id), from); },
   vol() { refreshVolunteers(); save(); showHub(); },
@@ -148,6 +175,7 @@ const ACT = {
   promote(arg) {
     const [id, to] = arg.split(":");
     const u = unitById(id);
+    if (promoteBlock(u, to)) return toast(promoteBlock(u, to));
     if (!confirm(`${u.name}을(를) ${JOBS[to].name}(으)로 전직할까요?`)) return;
     promote(u, to); log(`${u.name} → ${JOBS[to].name} 전직`); save(); closeModal(); showDetail(u);
   },
@@ -165,7 +193,7 @@ const ACT = {
     const u = unitById(id);
     if (!confirm(`${u.name}을(를) 내보낼까요? 되돌릴 수 없어요.`)) return;
     G.roster = G.roster.filter((x) => x !== u); G.form = G.form.filter((f) => f.id !== id);
-    if (u.line === "villager" || u.line === "soldier") G.pop++;
+    G.pop++;
     save(); closeModal(); showHub();
   },
   pickunit(id) { SEL = SEL === id ? null : id; showHub(); },
@@ -195,6 +223,16 @@ const ACT = {
     toast(g.name + " 구입"); save(); showHub();
   },
   expe(arg) { const [did, fi] = arg.split(":"); runExpedition(did, +fi); },
+  rebirth(id) {
+    const u = unitById(id), c = rebirthCost(u);
+    if (G.res.gold < c) return toast("금화가 부족해요");
+    if (!confirm(`${u.name}을(를) 환생시킬까요? Lv1로 돌아가지만 능력 일부가 남고 잠재력 하나가 오릅니다. (💰${c})`)) return;
+    G.res.gold -= c;
+    const k = rebirth(u);
+    log(`${u.name} ${u.reb}번째 환생`);
+    toast(`환생 완료! ${k ? STAT_NAME[k] + " 잠재력 상승" : ""}`);
+    save(); closeModal(); showDetail(u);
+  },
 };
 
 document.addEventListener("click", (e) => {

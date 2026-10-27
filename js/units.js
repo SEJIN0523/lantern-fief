@@ -17,16 +17,29 @@ function weightedGrade(bonus = 0, wide = false) {
 }
 
 let UID = 1;
+// 동료·후보와 겹치지 않는 이름
+function freshName(gender) {
+  const used = typeof G !== "undefined" && G ? new Set([...G.roster, ...(G.volunteers || []), ...(G.migrants || [])].map((u) => u.name)) : new Set();
+  const free = NAMES[gender].filter((n) => !used.has(n));
+  return pick(free.length ? free : NAMES[gender]);
+}
 function newUnit(opts = {}) {
   const job = opts.job || "warrior";
   const J = JOBS[job];
-  const lineId = opts.line || J.line;
-  const line = LINES[lineId];
-  const slot = opts.slot ?? rint(0, line.slots.length - 1);
+  // 마을 주민은 숨은 적성 계열의 인물(계열+칸)로 태어난다
+  let lineId = opts.line || J.line;
+  if (job === "villager" && lineId === "villager") lineId = pick(Object.keys(FIRST_JOB));
+  let line = LINES[lineId];
+  let slot = opts.slot;
+  if (slot == null) {
+    const ok = line.slots.map((s, i) => i).filter((i) => !opts.race || line.slots[i][1] === opts.race);
+    if (!ok.length) { lineId = pick(Object.keys(FIRST_JOB)); line = LINES[lineId]; }
+    slot = pick(ok.length ? ok : line.slots.map((s, i) => i));
+  }
   const [gender, race] = line.slots[slot];
   const u = {
     id: opts.id || "u" + Date.now().toString(36) + (UID++),
-    name: opts.name || pick(NAMES[gender]),
+    name: opts.name || freshName(gender),
     gender, race, line: lineId, slot, job,
     jobs: [job], lv: 1, exp: 0,
     st: {}, pot: {}, revealed: {},
@@ -159,9 +172,28 @@ function unitSkills(u) {
   return s;
 }
 
-function canPromote(u) {
+// 다음 직업 후보. 마을 주민은 적성 계열의 1차 직업 하나
+function nextJobs(u) {
+  if (u.hero) return [];
+  if (u.job === "villager") return FIRST_JOB[u.line] ? [FIRST_JOB[u.line]] : [];
+  return JOBS[u.job].next;
+}
+// 전직을 막는 이유(없으면 null)
+function promoteBlock(u, to) {
   const J = JOBS[u.job];
-  return J.next.length && u.lv >= J.lv;
+  if (u.lv < J.lv) return `Lv${J.lv} 필요`;
+  const b = JOBS[to].bld;
+  if (b && typeof G !== "undefined" && G && !G.bld[b]) return `${BUILDINGS[b].name} 필요`;
+  return null;
+}
+function canPromote(u) {
+  return nextJobs(u).some((j) => !promoteBlock(u, j));
+}
+// 적성은 Lv3이 되거나 세진이 통솔자 이상이면 보인다
+function aptKnown(u) {
+  if (u.job !== "villager") return true;
+  const h = typeof heroU === "function" ? heroU() : null;
+  return u.lv >= 3 || (h && JOBS[h.job].tier >= 1);
 }
 function promote(u, to) {
   u.job = to;
@@ -173,7 +205,9 @@ function promote(u, to) {
     const [s, i] = pick(opts);
     u.line = line; u.slot = i; u.race = s[1];
   }
-  for (const k of STATS) u.st[k] += Math.round(2 * JOBS[to].mods[STATS.indexOf(k)]);
+  // 전직 보너스: 마을 주민에서 1차로 갈 때 크게
+  const bonus = JOBS[to].tier === 1 ? 4 : 2;
+  for (const k of STATS) u.st[k] += Math.round(bonus * JOBS[to].mods[STATS.indexOf(k)]);
 }
 
 // 잠재력 공개 단계: 0 ??? / 1 대략 / 2 등급 / 3 정확
