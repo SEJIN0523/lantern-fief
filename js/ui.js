@@ -6,6 +6,7 @@ let TAB = "village";
 let SUB = "build"; // 마을 탭 안의 하위 메뉴
 let DTAB = "stat"; // 동료 상세 탭
 let SEL = null; // 편성에서 고른 동료
+let HUB_VIEW = ""; // Preserve scroll only while refreshing the same menu.
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const fmt = (n) => (n >= 1e9 ? (n / 1e9).toFixed(2) + "B" : n >= 1e6 ? (n / 1e6).toFixed(2) + "M" : n >= 1e4 ? (n / 1e3).toFixed(1) + "K" : String(Math.round(n)));
@@ -24,15 +25,17 @@ const ICON = {
   weapon: ["ui_icons_b_20", "🗡️"], status: ["ui_icons_b_21", "🔷"], rest: ["ui_icons_b_24", "🔥"], shop: ["ui_icons_a_24", "🛍️"],
   recruit: ["ui_icons_b_12", "🤝"], log: ["ui_icons_a_21", "📜"], worker: ["ui_icons_a_5", "👷"],
 };
+const UI_GLYPHS = {"gold": "M12 3 3 8v8l9 5 9-5V8ZM3 8l9 5 9-5M12 13v8", "food": "M6 11c-5-6 3-10 6-6 4-4 11 0 6 6v9H6ZM9 13v4m6-4v4", "wood": "m5 19 14-14m-9 0 9 9M4 15l5 5M4 15l-1 6 6-1M14 4l6 6", "stone": "m3 17 4-10 9-3 5 10-6 7H6ZM7 7l5 8 9-1M12 15l3 6", "pop": "M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-6 8v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6m0 3a5 5 0 0 1 5 5v1", "morale": "M5 22V3m0 1h14l-3 4 3 4H5", "village": "m2 11 10-8 10 8M5 9v12h14V9M10 21v-7h4v7", "party": "M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6ZM12 7v9m-4-5h8", "form": "m4 3 12 12m4-12L8 15M2 18l4 4m12 0 4-4M4 20l5-5m6 0 5 5M4 3v5h5m11-5v5h-5", "expe": "m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2ZM9 3v16m6-14v16", "moon": "M20 16A9 9 0 0 1 8 4a9 9 0 1 0 12 12Z", "build": "m14 3 7 7-4 4-4-4-9 11-3-3 11-9-3-3Z", "worker": "M3 11h18M5 11V9a7 7 0 0 1 14 0v2M8 4v4m8-4v4M6 14a6 6 0 0 0 12 0", "recruit": "M9 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM2 21v-2a7 7 0 0 1 14 0v2m3-13v8m-4-4h8", "shop": "M4 9h16l-1 12H5ZM8 9V7a4 4 0 0 1 8 0v2", "log": "M5 3h14v18H5ZM8 7h8m-8 5h8m-8 5h5", "quest": "M5 3h14v18H5ZM9 7h6m-6 4h6m-6 4h3", "bell": "M4 17h16l-2-4V9a6 6 0 0 0-12 0v4Zm6 3h4", "lock": "M5 10h14v11H5ZM8 10V7a4 4 0 0 1 8 0v3m-4 5v2", "boss": "m3 6 4 4 5-7 5 7 4-4-2 14H5Z", "lantern": "M9 4a3 3 0 0 1 6 0M7 6h10l3 5-2 10H6L4 11ZM4 11h16M10 11l-1 10m5-10 1 10"};
 function ic(name, cls = "") {
   const [k, e] = ICON[name] || ["", name];
   if (typeof ART !== "undefined" && ART[k]) return `<img class="ic ${cls}" src="${ART[k]}" alt="">`;
-  return `<span class="ic ${cls}">${e}</span>`;
+  if (UI_GLYPHS[name]) return `<svg class="ic glyph ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${UI_GLYPHS[name]}"/></svg>`;
+  return `<span class="ic ${cls}" aria-hidden="true">${e}</span>`;
 }
 
 function toast(msg) {
   const t = document.createElement("div");
-  t.className = "toast"; t.textContent = msg;
+  t.setAttribute("role", "status"); t.className = "toast"; t.textContent = msg;
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 1800);
 }
@@ -42,6 +45,8 @@ function scenery(kind) {
   const villageLv = Math.min(5, Math.max(1, G ? G.bld.hall : 1));
   const key = kind === "village" ? "village_" + villageLv : typeof ART !== "undefined" && ART["bg_" + kind] ? "bg_" + kind : kind;
   if (typeof ART !== "undefined" && ART[key]) return `<img class="scn-img" src="${ART[key]}" alt="">`;
+  if (kind === "forest") return `<img class="scn-img forest-landscape" src="art/ui/forest-clearing.webp" alt="고요한 숲의 공터">`;
+  if (kind === "village" || kind === "dusk") return `<img class="scn-img village-landscape" src="art/ui/lantern-village.webp" alt="등불이 켜진 산골 마을">`;
   return `<div class="scn scn-${kind}"><i class="m1"></i><i class="m2"></i><i class="m3"></i>${kind === "village" ? `<i class="houses" style="--n:${villageLv}"></i>` : ""}</div>`;
 }
 
@@ -49,12 +54,12 @@ function scenery(kind) {
 function showTitle() {
   const art = typeof ART !== "undefined" && ART.story_08_title ? `<img class="title-bg" src="${ART.story_08_title}" alt="">` : `<div class="title-bg">${scenery("dusk")}</div>`;
   app.innerHTML = `<div class="title">${art}<div class="title-shade"></div>
-    <div class="title-logo"><div class="lantern">${ic("lantern")}</div><h1>등불 영지</h1><h2>— 이계의 영주 —</h2></div>
+    <div class="title-logo"><div class="title-kicker">작은 불빛에서 시작되는 이야기</div><div class="title-seal">${ic("lantern")}</div><h1>등불 영지</h1><h2>이계의 영주</h2><div class="title-rule" aria-hidden="true">◆</div></div><p class="title-copy">낯선 세계의 작은 마을,<br>당신이 지켜 갈 하나의 등불.</p>
     <div class="title-btns">
-      ${hasSave() ? `<button class="btn gold big" data-act="continue">이어하기</button>` : ""}
-      <button class="btn ${hasSave() ? "" : "gold"} big" data-act="newgame">새 게임</button>
+      ${hasSave() ? `<button class="btn gold big" data-act="continue"><span>이야기 이어가기</span><span aria-hidden="true">→</span></button>` : ""}
+      <button class="btn ${hasSave() ? "" : "gold"} big" data-act="newgame"><span>새로운 이야기</span><span aria-hidden="true">→</span></button>
     </div>
-    <p class="ver">v0.2 · 1장 체험판</p></div>`;
+    <p class="title-save">진행 상황은 이 기기에 자동 저장됩니다</p><p class="ver">CHAPTER 01 <span>◆</span> v0.2 · 체험판</p></div>`;
 }
 
 // ---------- 대화 ----------
@@ -103,18 +108,21 @@ function showHub() {
   if (!G.form.length) autoForm();
   const r = G.res, inc = dailyIncome();
   const soon = raidSoon(), tonight = raidTonight();
-  const res = (k) => `<div class="res"><span class="res-ic">${ic(k)}</span><b>${fmt(r[k])}</b><small class="${inc[k] < 0 ? "neg" : "pos"}">${sign(inc[k])}</small></div>`;
-  const scroll = document.querySelector(".tab-body")?.scrollTop || 0;
+  const resNames = { gold: "금화", food: "식량", wood: "목재", stone: "석재" };
+  const res = (k) => `<div class="res" aria-label="${resNames[k]} ${fmt(r[k])}, 하루 ${sign(inc[k])}"><span class="res-ic">${ic(k)}</span><span class="res-name">${resNames[k]}</span><b>${fmt(r[k])}</b><small class="${inc[k] < 0 ? "neg" : "pos"}">${sign(inc[k])}<span>/일</span></small></div>`;
+  const view = TAB + (TAB === "village" ? ":" + SUB : "");
+  const scroll = HUB_VIEW === view ? document.querySelector(".tab-body")?.scrollTop || 0 : 0;
+  HUB_VIEW = view;
   app.innerHTML = `<div class="hub">
     <header class="banner-v">${scenery("village")}
-      <div class="plaque"><b>${G.day}</b><span>일째</span></div>
+      <div class="village-heading"><small>등불 영지 · ${G.chapter ? "제" + G.chapter + "장" : "프롤로그"}</small><h1>우리의 작은 영지</h1></div><div class="plaque"><span>DAY</span><b>${G.day}</b><span>일째</span></div>
       <div class="chap">${G.chapter ? `제${G.chapter}장 · 고블린의 숲` : "프롤로그"}</div>
-      <div class="vstat"><span>${ic("pop")} ${G.pop}</span><span>${ic("morale")} ${G.morale}</span></div>
+      <div class="vstat"><span>${ic("pop")} 주민 <b>${G.pop}</b></span><span>${ic("morale")} 사기 <b>${G.morale}</b></span></div>
     </header>
     <div class="resbar">${res("gold")}${res("food")}${res("wood")}${res("stone")}</div>
     ${tonight ? `<div class="alert red">${ic("bell")} 오늘 밤 습격이 옵니다! 편성을 확인하세요.</div>` : soon ? `<div class="alert">${ic("bell")} 척후 보고: ${soon.day - G.day}일 뒤 밤, 몬스터 습격 (Lv${soon.lv} 정도)</div>` : ""}
-    <main class="tab-body">${renderTab()}</main>
-    <nav class="tabs">
+    <main class="tab-body" aria-label="${({village:"마을 운영",party:"동료 목록",form:"출전 편성",expe:"원정 지도"})[TAB]}">${renderTab()}</main>
+    <nav class="tabs" aria-label="주 메뉴">
       ${tabBtn("village", "마을")}${tabBtn("party", "동료")}
       <button data-act="endday" class="moon"><span class="moon-ic">${ic("moon")}</span><span>하루 마치기</span></button>
       ${tabBtn("form", "편성")}${tabBtn("expe", "원정")}
@@ -123,7 +131,7 @@ function showHub() {
   const tb = document.querySelector(".tab-body");
   if (tb) tb.scrollTop = scroll;
 }
-function tabBtn(k, n) { return `<button data-tab="${k}" class="${TAB === k ? "on" : ""}">${ic(k)}<span>${n}</span></button>`; }
+function tabBtn(k, n) { return `<button data-tab="${k}" aria-current="${TAB === k ? "page" : "false"}" class="${TAB === k ? "on" : ""}">${ic(k)}<span>${n}</span></button>`; }
 
 function renderTab() {
   if (TAB === "village") return renderVillage();
@@ -136,9 +144,9 @@ function renderTab() {
 function panel(title, body, extra = "") { return `<section class="panel"><h3 class="ptitle">${title}${extra ? `<small>${extra}</small>` : ""}</h3>${body}</section>`; }
 
 function renderVillage() {
-  const goal = G.chapter === 1 && !G.flags.ch1clear ? `<div class="goal">${ic("quest")}<div><b>고블린 왕 토벌</b><small>30일째까지 · ${Math.max(0, 31 - G.day)}일 남음</small>${G.seen.tax && !G.seen.taxdone ? `<small>세금 💰150 · 20일째까지</small>` : ""}</div></div>` : "";
+  const goal = G.chapter === 1 && !G.flags.ch1clear ? `<div class="goal">${ic("quest")}<div><span class="eyebrow">현재 목표 · 제1장</span><b>고블린 왕 토벌</b><small>30일째까지 · ${Math.max(0, 31 - G.day)}일 남음</small>${G.seen.tax && !G.seen.taxdone ? `<small>세금 💰150 · 20일째까지</small>` : ""}</div></div>` : "";
   const subs = [["build", "건설", "build"], ["work", "일꾼", "worker"], ["recruit", "모집", "recruit"], ["shop", "상점", "shop"], ["log", "기록", "log"]];
-  const seg = `<div class="seg">${subs.map(([k, n, i]) => `<button data-act="sub" data-arg="${k}" class="${SUB === k ? "on" : ""}">${ic(i, "sm")}${n}</button>`).join("")}</div>`;
+  const seg = `<div class="seg">${subs.map(([k, n, i]) => `<button data-act="sub" aria-pressed="${SUB === k}" data-arg="${k}" class="${SUB === k ? "on" : ""}">${ic(i, "sm")}${n}</button>`).join("")}</div>`;
   let body = "";
   if (SUB === "build") body = renderBuild();
   if (SUB === "work") body = renderWork();
@@ -148,19 +156,26 @@ function renderVillage() {
   return goal + seg + body;
 }
 
+function uiCost(cost) {
+  return Object.entries(cost).filter(([, v]) => v > 0).map(([k, v]) => `<span class="cost-part ${G.res[k] < v ? "neg" : ""}">${ic(k, "sm")}${fmt(v)}</span>`).join("");
+}
+function buildingGlyph(id) {
+  const symbol = {hall:"village",palisade:"party",lodging:"village",farm:"food",lumber:"wood",quarry:"stone",guild:"quest",barracks:"form",smithy:"build",church:"lantern",tavern:"shop"}[id];
+  return `<div class="bld-crest bld-${id}">${ic(symbol)}</div>`;
+}
 function renderBuild() {
   const tiles = Object.entries(BUILDINGS).map(([id, b]) => {
     const lv = G.bld[id];
     const why = canBuild(id);
     const max = lv >= b.max;
     const pips = Array.from({ length: b.max }, (_, i) => `<i class="${i < lv ? "on" : ""}"></i>`).join("");
-    const art = typeof ART !== "undefined" && ART[`bld_${id}_${Math.max(1, lv)}`] ? `<img src="${ART[`bld_${id}_${Math.max(1, lv)}`]}" alt="">` : `<span>${b.icon}</span>`;
+    const art = typeof ART !== "undefined" && ART[`bld_${id}_${Math.max(1, lv)}`] ? `<img src="${ART[`bld_${id}_${Math.max(1, lv)}`]}" alt="">` : `<span>${buildingGlyph(id)}</span>`;
     return `<div class="tile ${lv ? "" : "unbuilt"} ${!why ? "ready" : ""}">
-      <div class="tile-art">${art}</div>
+      <span class="tile-level">${lv ? "Lv." + lv : "미건설"}</span><div class="tile-art">${art}</div>
       <b>${b.name}</b><div class="pips">${pips}</div>
       <p>${b.desc}</p>
-      ${max ? `<div class="tile-max">최대</div>` : `<div class="cost">${costText(buildCost(id))}</div>
-      <button class="btn sm ${why ? "" : "gold"}" data-act="build" data-arg="${id}" ${why ? "disabled" : ""}>${lv ? "증축" : "건설"}</button>
+      ${max ? `<div class="tile-max">◆ 최대 레벨</div>` : `<div class="cost">${uiCost(buildCost(id))}</div>
+      <button class="btn sm ${why ? "" : "gold"}" data-act="build" data-arg="${id}" ${why ? "disabled" : ""}>${lv ? "증축하기" : "건설하기"}</button>
       ${why && why !== "자원 부족" ? `<small class="why">${why}</small>` : ""}`}
     </div>`;
   }).join("");
@@ -184,7 +199,7 @@ function renderRecruit() {
     (G.bld.barracks ? panel("병영", `<button class="btn" data-act="barracks">창병 모집 · 💰20 · 마을 사람 1명</button>`) : "");
 }
 function recruitCard(u, from, i) {
-  return `<div class="rc" data-act="peek" data-arg="${from}:${i}"><div class="por" style="--lc:${LINES[u.line].color}">${unitSprite(u, "mini")}</div>
+  return `<div class="rc" role="group" data-act="peek" data-arg="${from}:${i}"><div class="por" style="--lc:${LINES[u.line].color}">${unitSprite(u, "mini")}</div>
     <div class="rc-tx"><b>${esc(u.name)}</b><small>${u.race} · ${JOBS[u.job].name} Lv${u.lv}</small>
     <div class="tags"><span class="tag">${traitOf(u, "personality").name}</span><span class="tag">${traitOf(u, "hobby").name}</span>${u.traits.quirk ? `<span class="tag gold">${traitOf(u, "quirk").name}</span>` : ""}</div>
     <small>고용 💰${u.price} · 일당 ${u.wage}</small></div>
@@ -209,7 +224,7 @@ function renderParty() {
   const cards = G.roster.map((u) => {
     const st = u.injured ? `<span class="tag red">${ic("injury", "sm")}부상 ${u.injured}일</span>` : u.fatigue >= 3 ? `<span class="tag">${ic("tired", "sm")}지침</span>` : "";
     const promo = canPromote(u) ? `<span class="tag gold">${ic("lvup", "sm")}전직</span>` : "";
-    return `<div class="cc" data-act="detail" data-arg="${u.id}">
+    return `<div class="cc" role="button" tabindex="0" data-act="detail" data-arg="${u.id}">
       <div class="cc-art" style="--lc:${LINES[u.line].color}">${unitSprite(u)}<span class="lv">Lv${u.lv}</span></div>
       <div class="cc-tx"><b>${esc(u.name)}</b><small>${JOBS[u.job].name}</small>
       <div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div>
@@ -225,7 +240,7 @@ function renderForm() {
     for (const col of [1, 0]) {
       const f = at(col, lane);
       const u = f && unitById(f.id);
-      grid += `<div class="cell ${col === 0 ? "front" : "back"} ${u && SEL === u.id ? "sel" : ""} ${u ? "full" : ""}" data-act="cell" data-arg="${col}:${lane}">${u ? `<div class="cell-u">${unitSprite(u)}</div><small>${esc(u.name)}</small>${u.injured ? `<em>${ic("injury", "sm")}</em>` : ""}` : `<span class="plus">＋</span>`}</div>`;
+      grid += `<div role="button" tabindex="0" aria-label="${col === 0 ? '전열' : '후열'} ${lane + 1}줄 ${u ? esc(u.name) : '빈 칸'}" class="cell ${col === 0 ? "front" : "back"} ${u && SEL === u.id ? "sel" : ""} ${u ? "full" : ""}" data-act="cell" data-arg="${col}:${lane}">${u ? `<div class="cell-u">${unitSprite(u)}</div><small>${esc(u.name)}</small>${u.injured ? `<em>${ic("injury", "sm")}</em>` : ""}` : `<span class="plus">＋</span>`}</div>`;
     }
   }
   const bench = G.roster.filter((u) => !G.form.some((f) => f.id === u.id)).map((u) => `<button class="bc ${SEL === u.id ? "on" : ""}" data-act="pickunit" data-arg="${u.id}"><div class="bc-art" style="--lc:${LINES[u.line].color}">${unitSprite(u)}</div><b>${esc(u.name)}</b><small>${JOBS[u.job].name} ${u.lv}</small></button>`).join("");
@@ -258,7 +273,7 @@ function showDetail(u, hireFrom) {
   const d = derived(u);
   const J = JOBS[u.job];
   const m = document.createElement("div");
-  m.className = "modal";
+  m.className = "modal"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true"); m.setAttribute("aria-label", "동료 상세");
   m.dataset.uid = u.id;
   const tabs = [["stat", "능력"], ["trait", "특성"], ["gear", "장비"], ["skill", "기술"]];
   const body = DTAB === "stat" ? detailStats(u, d) : DTAB === "trait" ? detailTraits(u) : DTAB === "gear" ? detailGear(u, hireFrom) : detailSkills(u, hireFrom);
@@ -314,7 +329,7 @@ function closeModal(silent) { document.querySelectorAll(".modal").forEach((m) =>
 function showEquipPicker(u, slot, i) {
   const own = Object.entries(G.inv).filter(([id, n]) => n > 0 && ITEMS[id] && ITEMS[id].slot === slot);
   const m = document.createElement("div");
-  m.className = "modal";
+  m.className = "modal"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true"); m.setAttribute("aria-label", "동료 상세");
   m.innerHTML = `<div class="sheet small"><button class="x" data-act="close">✕</button><h3 class="ptitle">${slot === "armor" ? "방어구" : "장신구"} 고르기</h3>
     <button class="btn wide" data-act="equipset" data-arg="${u.id}:${slot}:${i}:">빼기</button>
     ${own.map(([id, n]) => `<button class="btn wide" data-act="equipset" data-arg="${u.id}:${slot}:${i}:${id}">${ITEMS[id].name} ×${n} <small>${itemStatText(ITEMS[id])}</small></button>`).join("") || '<p class="dim">가진 장비가 없어요. 마을 → 상점에서 살 수 있어요.</p>'}</div>`;
@@ -343,3 +358,9 @@ function rewardLines(B, rw) {
   if (rw.injured.length) out.push(`${ic("injury", "sm")} 부상: ${rw.injured.map((id) => esc(unitById(id).name)).join(", ")}`);
   return out;
 }
+
+// Keyboard activation follows the same click delegation as touch.
+document.addEventListener("keydown", (e) => {
+  const t = e.target.closest('[role="button"][data-act]');
+  if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); t.click(); }
+});

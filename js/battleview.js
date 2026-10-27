@@ -49,7 +49,7 @@ function renderField(B, opts) {
 }
 function bgArt(bg) {
   const k = "bg_" + (bg || "forest");
-  return typeof ART !== "undefined" && ART[k] ? `<img class="field-bg" src="${ART[k]}" alt="">` : "";
+  return typeof ART !== "undefined" && ART[k] ? `<img class="field-bg" src="${ART[k]}" alt="">` : `<div class="battle-scenery">${scenery(bg || "forest")}</div>`;
 }
 
 function updateBars(B) {
@@ -242,12 +242,12 @@ function playBattle(B, opts) {
     B.tactic = G.tactic;
     const cmdBtns = B.hero ? Object.entries(COMMANDS).map(([id, c]) => `<button class="cmd-btn" data-cmd="${id}" disabled><b>${c.name}</b><small>${c.desc}</small></button>`).join("") : "";
     app.innerHTML = `<div class="battle">
-      <div class="b-top"><span class="b-title">${opts.title || "전투"}</span><span class="b-spd">${[1, 2, 4].map((s) => `<button data-spd="${s}" class="${BV.speed === s ? "on" : ""}">${s}x</button>`).join("")}<button data-skip="1">결과 ▶▶</button></span></div>
-      <div class="order" id="order"></div>
+      <div class="b-top"><span class="b-title"><small>영지를 위한 전투</small>${esc(opts.title || "전투")}</span><span class="b-spd">${[1, 2, 4].map((s) => `<button data-spd="${s}" class="${BV.speed === s ? "on" : ""}">${s}x</button>`).join("")}<button data-skip="1">결과 ▶▶</button></span></div>
+      <div class="order-label"><span>행동 순서</span><span>AUTO BATTLE</span></div><div class="order" id="order" aria-label="행동 순서"></div>
       ${renderField(B, opts)}
       <div class="b-ctl">
-        ${B.hero ? `<div class="cmd"><div class="cmd-head"><span>세진의 지휘</span><div class="cmd-bar"><i id="cmdg"></i></div></div><div class="cmd-row">${cmdBtns}</div></div>` : `<div class="hint">세진이 파티에 없으면 지휘를 쓸 수 없어요.</div>`}
-        <div class="seg tac">${[["all", "전원 공격"], ["boss", "강적 집중"], ["safe", "생존 우선"], ["save", "기술 아끼기"]].map(([k, n]) => `<button data-tac="${k}" class="${B.tactic === k ? "on" : ""}">${n}</button>`).join("")}</div>
+        ${B.hero ? `<div class="cmd"><div class="cmd-head"><span>${ic("lantern", "sm")} 세진의 지휘</span><div class="cmd-bar"><i id="cmdg"></i></div></div><div class="cmd-row">${cmdBtns}</div></div>` : `<div class="hint">세진이 파티에 없으면 지휘를 쓸 수 없어요.</div>`}
+        <div class="tactic-label">전투 방침</div><div class="seg tac">${[["all", "전원 공격"], ["boss", "강적 집중"], ["safe", "생존 우선"], ["save", "기술 아끼기"]].map(([k, n]) => `<button data-tac="${k}" class="${B.tactic === k ? "on" : ""}">${n}</button>`).join("")}</div>
       </div>
     </div>`;
     const root = app.querySelector(".battle");
