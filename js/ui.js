@@ -115,8 +115,7 @@ function showHub() {
   HUB_VIEW = view;
   app.innerHTML = `<div class="hub">
     <header class="banner-v">${scenery("village")}
-      <div class="village-heading"><small>등불 영지 · ${G.chapter ? "제" + G.chapter + "장" : "프롤로그"}</small><h1>우리의 작은 영지</h1></div><div class="plaque"><span>DAY</span><b>${G.day}</b><span>일째</span></div>
-      <div class="chap">${G.chapter ? `제${G.chapter}장 · 고블린의 숲` : "프롤로그"}</div>
+      <div class="village-heading"><small>등불 영지</small><h1>${G.chapter ? "제" + G.chapter + "장 · 고블린의 숲" : "프롤로그"}</h1></div><div class="plaque"><b>${G.day}</b><span>일째</span></div>
       <div class="vstat"><span>${ic("pop")} 주민 <b>${G.pop}</b></span><span>${ic("morale")} 사기 <b>${G.morale}</b></span></div>
     </header>
     <div class="resbar">${res("gold")}${res("food")}${res("wood")}${res("stone")}</div>
@@ -144,16 +143,16 @@ function renderTab() {
 function panel(title, body, extra = "") { return `<section class="panel"><h3 class="ptitle">${title}${extra ? `<small>${extra}</small>` : ""}</h3>${body}</section>`; }
 
 function renderVillage() {
-  const goal = G.chapter === 1 && !G.flags.ch1clear ? `<div class="goal">${ic("quest")}<div><span class="eyebrow">현재 목표 · 제1장</span><b>고블린 왕 토벌</b><small>30일째까지 · ${Math.max(0, 31 - G.day)}일 남음</small>${G.seen.tax && !G.seen.taxdone ? `<small>세금 💰150 · 20일째까지</small>` : ""}</div></div>` : "";
+  const goal = G.chapter === 1 && !G.flags.ch1clear ? `<div class="goal">${ic("quest")}<div><span class="eyebrow">현재 목표</span><b>고블린 왕 토벌</b><small>30일째까지 · ${Math.max(0, 31 - G.day)}일 남음</small>${G.seen.tax && !G.seen.taxdone ? `<small>세금 💰150 · 20일째까지</small>` : ""}</div></div>` : "";
   const subs = [["build", "건설", "build"], ["work", "일꾼", "worker"], ["recruit", "모집", "recruit"], ["shop", "상점", "shop"], ["log", "기록", "log"]];
-  const seg = `<div class="seg">${subs.map(([k, n, i]) => `<button data-act="sub" aria-pressed="${SUB === k}" data-arg="${k}" class="${SUB === k ? "on" : ""}">${ic(i, "sm")}${n}</button>`).join("")}</div>`;
+  const seg = `<div class="seg village-seg">${subs.map(([k, n, i]) => `<button data-act="sub" aria-pressed="${SUB === k}" data-arg="${k}" class="${SUB === k ? "on" : ""}">${ic(i, "sm")}${n}</button>`).join("")}</div>`;
   let body = "";
   if (SUB === "build") body = renderBuild();
   if (SUB === "work") body = renderWork();
   if (SUB === "recruit") body = renderRecruit();
   if (SUB === "shop") body = renderShop();
   if (SUB === "log") body = panel("마을 기록", `<div class="log">${G.log.slice(0, 20).map((l) => `<p><small>${l.d}일</small>${esc(l.m)}</p>`).join("") || `<p class="dim">아직 기록이 없어요.</p>`}</div>`);
-  return goal + seg + body;
+  return seg + goal + body;
 }
 
 function uiCost(cost) {
@@ -171,12 +170,10 @@ function renderBuild() {
     const pips = Array.from({ length: b.max }, (_, i) => `<i class="${i < lv ? "on" : ""}"></i>`).join("");
     const art = typeof ART !== "undefined" && ART[`bld_${id}_${Math.max(1, lv)}`] ? `<img src="${ART[`bld_${id}_${Math.max(1, lv)}`]}" alt="">` : `<span>${buildingGlyph(id)}</span>`;
     return `<div class="tile ${lv ? "" : "unbuilt"} ${!why ? "ready" : ""}">
-      <span class="tile-level">${lv ? "Lv." + lv : "미건설"}</span><div class="tile-art">${art}</div>
-      <b>${b.name}</b><div class="pips">${pips}</div>
-      <p>${b.desc}</p>
-      ${max ? `<div class="tile-max">◆ 최대 레벨</div>` : `<div class="cost">${uiCost(buildCost(id))}</div>
-      <button class="btn sm ${why ? "" : "gold"}" data-act="build" data-arg="${id}" ${why ? "disabled" : ""}>${lv ? "증축하기" : "건설하기"}</button>
-      ${why && why !== "자원 부족" ? `<small class="why">${why}</small>` : ""}`}
+      <div class="tile-art">${art}</div>
+      <div class="tile-info"><div class="tile-heading"><b>${b.name}</b><span class="tile-level">${lv ? "Lv." + lv : "미건설"}</span></div><div class="pips" aria-hidden="true">${pips}</div><p>${b.desc}</p></div>
+      <div class="tile-action">${max ? `<div class="tile-max">최대 레벨</div>` : `<div class="cost">${uiCost(buildCost(id))}</div><button class="btn sm ${why ? "" : "gold"}" data-act="build" data-arg="${id}" ${why ? "disabled" : ""} aria-label="${b.name} ${lv ? "증축" : "건설"}">${lv ? "증축" : "건설"}</button>`}</div>
+      ${why && why !== "자원 부족" && !max ? `<small class="why">${why}</small>` : ""}
     </div>`;
   }).join("");
   return panel("건물", `<div class="tiles">${tiles}</div>`, "하루에 한 번 공사");

@@ -1,4 +1,4 @@
-This task makes ALL the art for a fantasy village-building + auto-battle dungeon mobile game. Story: Sejin, a tired Korean office worker in his 30s, is hit by a car and wakes in a fantasy forest, saves a village child from goblins, and ends up developing a poor mountain village of a kingdom while exploring dungeons to find his way home.
+This task makes ALL the art for a fantasy village-building + auto-battle dungeon mobile game. Story: Sejin, a tired young Korean office worker in his late 20s, is hit by a car and wakes in a fantasy forest, saves a village child from goblins, and ends up developing a poor mountain village of a kingdom while exploring dungeons to find his way home.
 
 Use the attached image as the strict style reference for EVERY image in this task: chunky pixel art, dark 1px outline, flat shading with 2-3 tones per color, warm earthy palette. Characters: chibi-ish proportions (about 1:3.5 head to body), full body, 3/4 view, standing combat-ready pose, same scale and framing as the reference. Scenes and backgrounds use the same pixel density, outline and palette so characters fit on them.
 
@@ -159,13 +159,13 @@ HIDDEN CLASSES (one sheet each, 6 different people per sheet, slots 1-2 men and 
 
 ==================================================
 MAIN HERO — SEJIN (one sheet, the SAME single person in all 6 cells)
-- sejin.png — Korean man in his mid-30s, average build, short neat black hair slightly messy, thin black-rimmed rectangular glasses, light stubble, calm tired eyes, ordinary office worker look; a leader, not a muscular warrior. Face, hair and body identical in all 6 cells:
+- sejin.png — Korean man in his late 20s (about 28), youthful handsome face, NO glasses, clean-shaven, short neat black hair slightly messy, calm sharp eyes with a hint of tiredness, slim average build, ordinary young office worker look; a leader, not a muscular warrior. Face, hair and body identical in all 6 cells:
   1. Modern office worker just after a car accident: dark navy business suit, loosened tie, white shirt, dusty and slightly torn, no weapon.
   2. Wounded in the village: bandages on head and arm, plain linen village shirt and trousers, suit jacket draped over the shoulder.
   3. Tactician (tier 1): linen shirt with leather vest, belt pouches, notebook and pencil in one hand, simple short sword at the hip.
   4. Strategist (tier 2): long dark green field coat, map case on the back, short sword, wooden command baton in hand.
   5. Lord (tier 3): dark blue noble coat with light gold trim, cape bearing a simple village emblem (a mountain and a lantern), longsword at the hip, confident stance.
-  6. Otherworld Pioneer (hidden): the lord's coat traced with faint glowing cyan geometric lines like a digital interface, glasses lenses glowing softly cyan, small translucent square panels floating near one hand.
+  6. Otherworld Pioneer (hidden): the lord's coat traced with faint glowing cyan geometric lines like a digital interface, his eyes glowing softly cyan, small translucent square panels floating near one hand.
 
 ==================================================
 PART 2 — STORY NPCs (3 sheets, saved as output/npc/<file>.png, same sheet format, facing right)
@@ -248,9 +248,9 @@ Side-view battle stages: flat walkable ground across the lower 45% of the image 
 
 ==================================================
 PART 7 — STORY SCENES (11 images, saved as output/story/<file>.png, canvas 1024x1536 portrait, cinematic pixel art illustrations with characters, no text)
-Sejin looks exactly like on sejin.png (mid-30s Korean man, short black hair, black-rimmed rectangular glasses, stubble). Lina looks exactly like on npc_a.png.
+Sejin looks exactly like on sejin.png (Korean man in his late 20s, short black hair, no glasses, clean-shaven). Lina looks exactly like on npc_a.png.
 - story_01_accident.png — Rainy night in a Korean city, Sejin in his suit and tie walking across a crosswalk, tired, looking at his phone, blinding truck headlights approaching from the side.
-- story_02_forest.png — Sejin waking up lying on moss in a sunlit fantasy forest, dirty suit, glasses crooked, confused, strange glowing flowers around.
+- story_02_forest.png — Sejin waking up lying on moss in a sunlit fantasy forest, dirty suit, hair messy, confused, strange glowing flowers around.
 - story_03_goblins.png — Little Lina cornered against a tree by three goblins with clubs, scared; Sejin running in from the side.
 - story_04_shield.png — Sejin shielding Lina with his body, hit on the back by a goblin club, the goblins startled, a sharp moment of impact (no gore).
 - story_05_wake.png — Sejin waking in a simple wooden village bed with bandages, Lina and her mother Marta beside him, warm morning light through a small window.

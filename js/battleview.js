@@ -17,7 +17,7 @@ function unitSprite(u, cls = "") {
   const color = LINES[u.line]?.color || "#777";
   const skin = { "다크엘프": "#7b86a8", "곰 수인": "#b5875a" }[u.race] || "#f0c9a0";
   const hair = u.hero ? "#222" : ["#6b4426", "#222", "#c8502a", "#e8c050", "#ddd", "#888"][u.slot % 6];
-  return `<div class="ph ${cls}" style="--c:${color};--s:${skin};--h:${hair}"><i class="ph-b"></i><i class="ph-h"></i><b class="ph-w">${WEAPON_ICON[JOBS[u.job].weapon] || ""}</b>${u.hero ? '<i class="ph-g"></i>' : ""}</div>`;
+  return `<div class="ph ${cls}" style="--c:${color};--s:${skin};--h:${hair}"><i class="ph-b"></i><i class="ph-h"></i><b class="ph-w">${WEAPON_ICON[JOBS[u.job].weapon] || ""}</b></div>`;
 }
 function monSprite(id, cls = "") {
   const k = MON_ART[id];
