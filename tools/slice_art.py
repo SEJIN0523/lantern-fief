@@ -21,6 +21,9 @@ OUT = ROOT / "art"
 # 재생성 대기 중이라 아직 쓰지 않는 시트 ("시트" 전체 또는 "시트#칸")
 SKIP = set()
 
+# 다른 칸보다 작게 그려진 인물 보정: "시트#칸": 배율
+CELL_SCALE = {"jobs/civ_soldier#6": 1.29}
+
 # 건물 시트 → 게임 건물 id (위 줄 A, 아래 줄 B)
 BUILDINGS = {
     "bld_01": ("hall", "lodging"), "bld_02": ("smithy", "tavern"), "bld_03": ("church", "guild"),
@@ -175,6 +178,12 @@ def sheet(cat, name, mode, cols, rows, size, keyfn, faces=False):
         key = keyfn(n)
         if key is None:
             continue
+        k = CELL_SCALE.get(f"{cat}/{name}#{n}")
+        if k:
+            # 발 기준으로 키운 뒤 같은 크기로 다시 자른다
+            w, h = cell.size
+            big = cell.resize((round(w * k), round(h * k)), Image.NEAREST)
+            cell = big.crop(((big.width - w) // 2, big.height - h, (big.width - w) // 2 + w, big.height))
         out = foot_anchor(cell, size) if mode == "foot" else centered(cell, size)
         if out is not None:
             save(out, f"{cat}/{key}.webp", key)
