@@ -61,6 +61,11 @@ function updateBars(B) {
     el.classList.toggle("dead", !c.alive);
     el.classList.toggle("taunt", c.taunt > 0);
   }
+  const ord = document.getElementById("order");
+  if (ord && !BV.skip) {
+    const q = B.units.filter((c) => c.alive).sort((a, b) => a.ct - b.ct).slice(0, 8);
+    ord.innerHTML = q.map((c, i) => `<div class="oi ${c.side === "E" ? "foe" : ""} ${i === 0 ? "now" : ""}">${c.side === "A" ? unitSprite(c.unit) : monSprite(c.mon)}</div>`).join("");
+  }
   const g = document.getElementById("cmdg");
   if (g) {
     g.style.width = B.cmd + "%";
@@ -235,13 +240,14 @@ function playBattle(B, opts) {
   return new Promise((resolve) => {
     BV.skip = false; BV.pendingCmd = null;
     B.tactic = G.tactic;
-    const cmdBtns = B.hero ? Object.entries(COMMANDS).map(([id, c]) => `<button class="cmd-btn" data-cmd="${id}" disabled>${c.name}</button>`).join("") : "";
+    const cmdBtns = B.hero ? Object.entries(COMMANDS).map(([id, c]) => `<button class="cmd-btn" data-cmd="${id}" disabled><b>${c.name}</b><small>${c.desc}</small></button>`).join("") : "";
     app.innerHTML = `<div class="battle">
-      <div class="b-top"><span>${opts.title || "전투"}</span><span class="b-spd">${[1, 2, 4].map((s) => `<button data-spd="${s}" class="${BV.speed === s ? "on" : ""}">${s}x</button>`).join("")}<button data-skip="1">⏭</button></span></div>
+      <div class="b-top"><span class="b-title">${opts.title || "전투"}</span><span class="b-spd">${[1, 2, 4].map((s) => `<button data-spd="${s}" class="${BV.speed === s ? "on" : ""}">${s}x</button>`).join("")}<button data-skip="1">결과 ▶▶</button></span></div>
+      <div class="order" id="order"></div>
       ${renderField(B, opts)}
       <div class="b-ctl">
-        ${B.hero ? `<div class="cmd"><div class="cmd-bar"><i id="cmdg"></i></div><div class="cmd-row">${cmdBtns}</div></div>` : `<div class="hint">세진이 파티에 없으면 지휘를 쓸 수 없어요.</div>`}
-        <div class="tac">작전: ${[["all", "전원 공격"], ["boss", "강적 집중"], ["safe", "생존 우선"], ["save", "기술 아끼기"]].map(([k, n]) => `<button data-tac="${k}" class="${B.tactic === k ? "on" : ""}">${n}</button>`).join("")}</div>
+        ${B.hero ? `<div class="cmd"><div class="cmd-head"><span>세진의 지휘</span><div class="cmd-bar"><i id="cmdg"></i></div></div><div class="cmd-row">${cmdBtns}</div></div>` : `<div class="hint">세진이 파티에 없으면 지휘를 쓸 수 없어요.</div>`}
+        <div class="seg tac">${[["all", "전원 공격"], ["boss", "강적 집중"], ["safe", "생존 우선"], ["save", "기술 아끼기"]].map(([k, n]) => `<button data-tac="${k}" class="${B.tactic === k ? "on" : ""}">${n}</button>`).join("")}</div>
       </div>
     </div>`;
     const root = app.querySelector(".battle");

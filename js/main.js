@@ -1,6 +1,8 @@
 // 흐름 제어: 버튼 동작, 원정, 밤과 습격
 "use strict";
 
+let PEEK = null; // 영입 전에 들여다보는 동료
+
 function startNewGame() {
   newGame();
   playScenes(["p1", "p2", "p3", "p4", "p5", "p6", "p7"], tutorialBattle);
@@ -106,7 +108,9 @@ const ACT = {
     if (err) return toast(err);
     save(); closeModal(); showHub();
   },
-  peek(arg) { const [from, i] = arg.split(":"); showDetail((from === "guild" ? G.offers : G.volunteers)[+i], from); },
+  peek(arg) { const [from, i] = arg.split(":"); PEEK = (from === "guild" ? G.offers : G.volunteers)[+i]; DTAB = "stat"; showDetail(PEEK, from); },
+  sub(k) { SUB = k; showHub(); },
+  dtab(arg) { const [k, id, from] = arg.split(":"); DTAB = k; showDetail(from ? PEEK : unitById(id), from); },
   vol() { refreshVolunteers(); save(); showHub(); },
   barracks() {
     const u = barracksRecruit();
@@ -120,7 +124,7 @@ const ACT = {
     G.res.gold -= it.price; G.inv[id] = (G.inv[id] || 0) + 1;
     toast(it.name + " 구입"); save(); showHub();
   },
-  detail(id) { showDetail(unitById(id)); },
+  detail(id) { DTAB = "stat"; showDetail(unitById(id)); },
   close() { closeModal(); showHub(); },
   forge(id) {
     const u = unitById(id), c = forgeCost(u);
