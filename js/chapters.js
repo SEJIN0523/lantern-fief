@@ -102,8 +102,8 @@ Object.assign(JOBS, {
   riftwatcher: { name: "균열 감시자", line: "warrior", tier: 3, role: "근딜/마딜", range: "melee", weapon: "sword", mods: [1.5, 1.2, 1.3, 1.4, 1.2, 1.1], skills: ["riftblade", "counter"], next: [], lv: 0 },
 });
 if (typeof HERO_ART !== "undefined") HERO_ART.pioneer = 6;
-ITEMS.phone = { name: "금 간 스마트폰", slot: "acc", spd: 3, crit: 8, res: 8, price: 0, otherworld: true };
-ITEMS.notebook = { name: "현자의 수첩", slot: "acc", mag: 14, res: 10, price: 0, otherworld: true };
+ITEMS.phone = { name: "금 간 스마트폰", slot: "acc", spd: 3, crit: 8, res: 8, price: 0, otherworld: true, grade: 5 };
+ITEMS.notebook = { name: "현자의 수첩", slot: "acc", mag: 14, res: 10, price: 0, otherworld: true, grade: 5 };
 
 // ---------- 던전 ----------
 const fl = (lv, pool, n = [3, 4]) => ({ lv, pool, n });

@@ -230,14 +230,14 @@ function potText(u, k) {
 
 // 방어구·장신구
 const ITEMS = {
-  leather: { name: "가죽 갑옷", slot: "armor", def: 4, price: 40 },
-  chain: { name: "사슬 갑옷", slot: "armor", def: 9, eva: -2, price: 120 },
-  robe: { name: "마법사 로브", slot: "armor", def: 2, res: 6, mag: 3, price: 80 },
-  plate: { name: "판금 갑옷", slot: "armor", def: 16, spd: -2, price: 300 },
-  ring_str: { name: "구리 반지", slot: "acc", atk: 4, price: 50 },
-  amulet: { name: "사파이어 부적", slot: "acc", res: 5, mag: 3, price: 70 },
-  charm: { name: "깃털 부적", slot: "acc", eva: 4, spd: 1, price: 60 },
-  coin: { name: "행운의 동전", slot: "acc", crit: 5, price: 80 },
-  belt: { name: "튼튼한 허리띠", slot: "acc", hp: 30, price: 60 },
-  pen: { name: "이계의 볼펜", slot: "acc", atk: 10, mag: 10, crit: 5, price: 0, otherworld: true },
+  leather: { name: "가죽 갑옷", slot: "armor", def: 4, price: 40, grade: 0 },
+  chain: { name: "사슬 갑옷", slot: "armor", def: 9, eva: -2, price: 120, grade: 2 },
+  robe: { name: "마법사 로브", slot: "armor", def: 2, res: 6, mag: 3, price: 80, grade: 1 },
+  plate: { name: "판금 갑옷", slot: "armor", def: 16, spd: -2, price: 300, grade: 3 },
+  ring_str: { name: "구리 반지", slot: "acc", atk: 4, price: 50, grade: 0 },
+  amulet: { name: "사파이어 부적", slot: "acc", res: 5, mag: 3, price: 70, grade: 1 },
+  charm: { name: "깃털 부적", slot: "acc", eva: 4, spd: 1, price: 60, grade: 1 },
+  coin: { name: "행운의 동전", slot: "acc", crit: 5, price: 80, grade: 1 },
+  belt: { name: "튼튼한 허리띠", slot: "acc", hp: 30, price: 60, grade: 1 },
+  pen: { name: "이계의 볼펜", slot: "acc", atk: 10, mag: 10, crit: 5, price: 0, otherworld: true, grade: 5 },
 };
