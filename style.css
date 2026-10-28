@@ -1123,3 +1123,9 @@ small, .dim, .hint { color:var(--dim); }
 .wshop-row { display:grid; grid-template-columns:52px minmax(0,1fr); align-items:center; gap:6px; }
 .wshop-row > b { margin:0; }
 .wcard .btn.sm { min-height:30px; padding:3px 12px; }
+/* 데이트 · 연인들 사이 */
+.date-row { display:flex; flex-direction:column; gap:4px; }
+.date-btns { display:flex; flex-wrap:wrap; gap:5px; }
+.date-btns .btn { min-height:34px; font-size:12px; }
+.harm { padding:4px 8px; border-radius:4px; background:#0c1d26; }
+.harm.h-high { color:#8fe08a; } .harm.h-mid { color:#f0d49b; } .harm.h-low { color:#ff8a8a; }

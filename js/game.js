@@ -309,7 +309,7 @@ function resolveDispatch() {
     if (gap > 0 && chance(Math.min(0.6, gap * 0.08))) { u.injured = Math.max(u.injured, 2); hurt.push(u.name); }
   }
   G.res.gold += gold;
-  const msg = `파견대 귀환 (${us.map((u) => u.name).join(", ")}): 경험치 +${exp}, 💰${gold}${hurt.length ? ` · 부상 ${hurt.join(", ")}` : ""}`;
+  const msg = `파견대 귀환 (${us.map((u) => u.name).join(", ")}): 경험치 +${exp}, 금화 ${gold}${hurt.length ? ` · 부상 ${hurt.join(", ")}` : ""}`;
   log(msg);
   if (typeof toast === "function") toast(msg);
 }

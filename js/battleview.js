@@ -356,7 +356,7 @@ async function showHits(B, hits, attackerSide) {
       continue;
     }
     popText(h.id, (h.crit ? "✦" : "") + h.dmg, h.crit ? "crit" : "dmg");
-    if (h.absorbed) { popText(h.id, "🛡" + h.absorbed, "shield"); fxAt(h.id, "block", { size: 0.8 }); }
+    if (h.absorbed) { popText(h.id, "막음 " + h.absorbed, "shield"); fxAt(h.id, "block", { size: 0.8 }); }
     tasks.push(fxAt(h.id, h.crit ? "crit" : "hit", { size: h.crit ? 1.3 : 0.8 }));
     // 하얗게 번쩍 + 넉백: 9px 두 번 흔들림 → 13px 밀림 → 제자리
     const k = h.crit ? 1.5 : 1;
@@ -471,7 +471,7 @@ async function playEvent(B, ev) {
     updateBars(B); await wait(320);
   } else if (ev.kind === "shield") {
     await magicCircle(ev.actor, "barrier");
-    for (const s of ev.shields) { fxAt(s.id, "barrier", { size: 1.1, ms: 600 }); popText(s.id, "🛡" + s.amt, "shield"); }
+    for (const s of ev.shields) { fxAt(s.id, "barrier", { size: 1.1, ms: 600 }); popText(s.id, "보호막 " + s.amt, "shield"); }
     updateBars(B); await wait(350);
   } else if (ev.kind === "buff") {
     await anim(el, [{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }], 300);
@@ -505,7 +505,7 @@ function playBattle(B, opts) {
     B.tactic = G.tactic;
     const cmdBtns = B.hero ? Object.entries(COMMANDS).map(([id, c]) => `<button class="cmd-btn" data-cmd="${id}" disabled><b>${c.name}</b><small>${c.desc}</small></button>`).join("") : "";
     app.innerHTML = `<div class="battle">
-      <div class="b-top"><span class="b-title"><small>영지를 위한 전투</small>${esc(opts.title || "전투")}</span><span class="b-spd">${[1, 2, 4].map((s) => `<button data-spd="${s}" class="${BV.speed === s ? "on" : ""}">${s}x</button>`).join("")}<button data-sfx="1" class="${SFX.on ? "on" : ""}" aria-label="효과음">${SFX.on ? "🔊" : "🔇"}</button><button data-skip="1">결과 ▶▶</button></span></div>
+      <div class="b-top"><span class="b-title"><small>영지를 위한 전투</small>${esc(opts.title || "전투")}</span><span class="b-spd">${[1, 2, 4].map((s) => `<button data-spd="${s}" class="${BV.speed === s ? "on" : ""}">${s}x</button>`).join("")}<button data-sfx="1" class="${SFX.on ? "on" : ""}" aria-label="효과음">${SFX.on ? "소리 켬" : "소리 끔"}</button><button data-skip="1">결과 ▶▶</button></span></div>
       <div class="order-label"><span>행동 순서</span><span class="b-tog"><button data-pause="1">⏸ 정지</button><button data-auto="1" class="${BV.auto ? "on" : ""}">${BV.auto ? "자동 진행 ON" : "자동 진행 OFF"}</button></span></div><div class="order" id="order" aria-label="행동 순서"></div>
       ${renderField(B, opts)}
       <div class="b-ctl">
@@ -525,7 +525,7 @@ function playBattle(B, opts) {
         try { localStorage.setItem("fief_auto", BV.auto ? "1" : "0"); } catch (e) {}
       }
       if (t.dataset.sfx) {
-        SFX.on = !SFX.on; t.textContent = SFX.on ? "🔊" : "🔇"; t.classList.toggle("on", SFX.on);
+        SFX.on = !SFX.on; t.textContent = SFX.on ? "소리 켬" : "소리 끔"; t.classList.toggle("on", SFX.on);
         try { localStorage.setItem("fief_sfx", SFX.on ? "1" : "0"); } catch (e) {}
         SND.cmd();
       }

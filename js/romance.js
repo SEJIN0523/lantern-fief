@@ -251,16 +251,17 @@ function detailProfile(u, hireFrom) {
     <div class="love-bar"><i style="width:${u.love}%"></i></div>
     <small>${next ? `다음 「${next.name}」 ${next.at}` : "서약을 맺었어요"} · 출전하면 능력 +${Math.round(st.bonus * 100)}%${REL[p.rel].gain ? ` · ${REL[p.rel].name}라 마음이 쉽게 열리지 않아요` : ""}</small>
     <div class="love-acts">
-      <button class="btn ${talked ? "" : "gold"}" ${talked ? "disabled" : ""} data-act="lovetalk" data-arg="${u.id}">💬 ${talked ? "오늘 대화함" : "대화하기"}</button>
-      ${u.loveStage === 3 && u.love >= 84 ? `<button class="btn gold" data-act="loveconfess" data-arg="${u.id}">💌 고백하기</button>` : ""}
-      ${u.loveStage === 4 && u.love >= 100 ? `<button class="btn gold" data-act="loveoath" data-arg="${u.id}">💍 서약하기 ${G.inv.ring ? "" : "(반지 필요)"}</button>` : ""}
+      <button class="btn ${talked ? "" : "gold"}" ${talked ? "disabled" : ""} data-act="lovetalk" data-arg="${u.id}">${talked ? "오늘 대화함" : "대화하기"}</button>
+      ${u.loveStage === 3 && u.love >= 84 ? `<button class="btn gold" data-act="loveconfess" data-arg="${u.id}">고백하기</button>` : ""}
+      ${u.loveStage === 4 && u.love >= 100 ? `<button class="btn gold" data-act="loveoath" data-arg="${u.id}">서약하기 ${G.inv.ring ? "" : "(반지 필요)"}</button>` : ""}
     </div>
     <div class="gift-row">${gifted ? '<small>오늘은 선물을 줬어요.</small>' : gifts.length ? gifts.map((g) => `<button class="btn sm" data-act="lovegift" data-arg="${u.id}:${g}">${giftIc(g)} ${GIFTS[g].name} ×${G.inv[g]}</button>`).join("") : '<small>가진 선물이 없어요 (마을 → 상점)</small>'}</div>
+    ${typeof romanceExtras === "function" ? romanceExtras(u) : ""}
     <small>좋아하는 선물: ${likeTxt}</small>
   </div>`;
   return love + prof;
 }
 function renderGiftShop() {
   return Object.entries(GIFTS).filter(([, g]) => !g.oath || G.bld.hall >= 2).map(([id, g]) => `
-    <div class="shop-it"><span class="shop-ic">${giftIc(id)}</span><div><b>${g.name}</b><small>${g.oath ? "연인에게 서약을 청할 때 필요해요" : "선물"}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buygift" data-arg="${id}">💰${g.price}</button></div>`).join("");
+    <div class="shop-it"><span class="shop-ic">${giftIc(id)}</span><div><b>${g.name}</b><small>${g.oath ? "연인에게 서약을 청할 때 필요해요" : "선물"}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buygift" data-arg="${id}">금화 ${g.price}</button></div>`).join("");
 }

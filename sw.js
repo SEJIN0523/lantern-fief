@@ -1,8 +1,8 @@
 // 오프라인 실행용 캐시. 코드가 바뀌면 VERSION을 올린다. 그림(art/)은 처음 볼 때 캐시한다.
-const VERSION = "fief-v39";
+const VERSION = "fief-v41";
 const FILES = [
   "./", "index.html", "style.css", "manifest.webmanifest",
-  "js/art.js", "js/data.js", "js/units.js", "js/battle.js", "js/game.js", "js/story.js", "js/battleview.js", "js/chapters.js", "js/ui.js", "js/romance.js", "js/main.js",
+  "js/art.js", "js/data.js", "js/units.js", "js/battle.js", "js/game.js", "js/story.js", "js/battleview.js", "js/chapters.js", "js/ui.js", "js/romance.js", "js/romance2.js", "js/main.js",
   "fonts/Galmuri11.woff2", "icons/icon-192.png", "icons/icon-512.png",
 ];
 

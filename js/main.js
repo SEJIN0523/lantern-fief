@@ -61,7 +61,7 @@ async function runExpedition(did, fi) {
     }
   }
   for (const f of party) { f.unit.busyToday = true; f.unit.fatigue += 1; }
-  log(`${D.name} ${fname} 원정: ${won}승, 💰${gold}`);
+  log(`${D.name} ${fname} 원정: ${won}승, 금화 ${gold}`);
   if (won) G.fame += 1;
   // 장 진행(다음 장, 선택지, 엔딩)이 끝나면 밤으로
   if (after.includes("final")) return endingChoice(night);
@@ -71,6 +71,7 @@ async function runExpedition(did, fi) {
 // 밤: 습격 판정 → 하루 마감 → 다음 날 이벤트
 async function night() {
   await new Promise((r) => playLoveScenes(LOVE_Q.splice(0), r));
+  await new Promise((r) => romanceNight(r));
   const raid = raidTonight();
   if (raid) {
     G.seen[raidKey(raid)] = true;
@@ -84,7 +85,7 @@ async function night() {
       const alive = party.filter((f) => carry[f.unit.id] == null || carry[f.unit.id] > 0);
       if (!alive.length) break;
       const B = createBattle(alive, foes, { night: true, wall: G.bld.palisade * 0.08, carry });
-      await playBattle(B, { title: raid.siege ? `🔥 오크 대공세 ${w + 1}/${waves.length}` : "🌙 밤 습격", bg: "village_wall" });
+      await playBattle(B, { title: raid.siege ? `오크 대공세 ${w + 1}/${waves.length}` : "밤 습격", bg: "village_wall" });
       const rw = battleRewards(B);
       LOVE_Q.push(...romanceAfterBattle(B));
       G.res.gold += rw.gold;
@@ -277,6 +278,7 @@ const ACT = {
     const n = G.roster[(i + +d + G.roster.length) % G.roster.length];
     showDetail(n);
   },
+  lovedate(arg) { loveDate(arg); },
   fullview(id) { showFullView(unitById(id) || PEEK); },
   fullpick(arg) { const [id, i] = arg.split(":"); showFullView(unitById(id) || PEEK, +i); },
   dispspot(i) { DISP_SPOT = +i; showHub(); },
@@ -291,7 +293,7 @@ const ACT = {
   rebirth(id) {
     const u = unitById(id), c = rebirthCost(u);
     if (G.res.gold < c) return toast("금화가 부족해요");
-    if (!confirm(`${u.name}을(를) 환생시킬까요? Lv1로 돌아가지만 능력 일부가 남고 잠재력 하나가 오릅니다. (💰${c})`)) return;
+    if (!confirm(`${u.name}을(를) 환생시킬까요? Lv1로 돌아가지만 능력 일부가 남고 잠재력 하나가 오릅니다. (금화 ${c})`)) return;
     G.res.gold -= c;
     const k = rebirth(u);
     log(`${u.name} ${u.reb}번째 환생`);

@@ -19,11 +19,17 @@ const HERO_TOKEN = "세진";
 function heroName() { return (typeof G !== "undefined" && G && G.heroName) || HERO_TOKEN; }
 function hasBatchim(ch) { const c = ch.charCodeAt(0) - 0xac00; return c >= 0 && c <= 11171 && c % 28 !== 0; }
 const JOSA = { "이에요": ["이에요", "예요"], "이야": ["이야", "야"], "이라": ["이라", "라"], "으로": ["으로", "로"], "이": ["이", "가"], "은": ["은", "는"], "을": ["을", "를"], "과": ["과", "와"], "아": ["아", "야"] };
+// "과(와)" 같은 두 갈래 조사는 앞 글자 받침에 맞춰 하나로
+const JOSA2 = { "과(와)": ["과", "와"], "와(과)": ["과", "와"], "을(를)": ["을", "를"], "를(을)": ["을", "를"], "은(는)": ["은", "는"], "는(은)": ["은", "는"], "이(가)": ["이", "가"], "가(이)": ["이", "가"] };
 function hn(s) {
+  if (typeof s !== "string") return s;
   const n = heroName();
-  if (n === HERO_TOKEN || typeof s !== "string" || !s.includes(HERO_TOKEN)) return s;
-  const b = hasBatchim(n[n.length - 1]);
-  return s.replace(/세진(이에요|이야|이라|으로|이|은|을|과|아)?/g, (m, j) => n + (j ? JOSA[j][b ? 0 : 1] : ""));
+  if (n !== HERO_TOKEN && s.includes(HERO_TOKEN)) {
+    const b = hasBatchim(n[n.length - 1]);
+    s = s.replace(/세진(이에요|이야|이라|으로|이|은|을|과|아)?/g, (m, j) => n + (j ? JOSA[j][b ? 0 : 1] : ""));
+  }
+  if (s.includes("(")) s = s.replace(/([가-힣])(과\(와\)|와\(과\)|을\(를\)|를\(을\)|은\(는\)|는\(은\)|이\(가\)|가\(이\))/g, (m, c, j) => c + JOSA2[j][hasBatchim(c) ? 0 : 1]);
+  return s;
 }
 // 화면에 글을 넣는 두 통로(innerHTML, textContent)에서 한 번에 바꾼다
 for (const [proto, prop] of [[Element.prototype, "innerHTML"], [Node.prototype, "textContent"]]) {
@@ -246,10 +252,13 @@ function playScene(sc, done) {
     who2.classList.toggle("has-face", !!who2.querySelector(".sc-face"));
   };
   show();
+  let ended = false;
+  const end = () => { if (!ended) { ended = true; done(); } };
   app.querySelector(".scene").onclick = (e) => {
-    if (e.target.id === "scskip") { done(); return; }
+    if (ended) return;
+    if (e.target.id === "scskip") { end(); return; }
     i++;
-    if (i >= sc.lines.length) done(); else show();
+    if (i >= sc.lines.length) end(); else show();
   };
 }
 
@@ -354,7 +363,7 @@ function recruitCard(u, from, i) {
   return `<div class="rc" role="group" data-act="peek" data-arg="${from}:${i}"><div class="por" style="--lc:${LINES[u.line].color}">${unitBust(u)}</div>
     <div class="rc-tx"><b>${esc(u.name)}</b><small>${u.race} · ${JOBS[u.job].name} Lv${u.lv} · ${aptText(u)}</small>
     <div class="tags"><span class="tag">${traitOf(u, "personality").name}</span><span class="tag">${traitOf(u, "hobby").name}</span>${u.traits.quirk ? `<span class="tag gold">${traitOf(u, "quirk").name}</span>` : ""}</div>
-    <small>${u.price ? `맞이하기 💰${u.price} · ` : ""}마을 사람 1명</small></div>
+    <small>${u.price ? `맞이하기 금화 ${u.price} · ` : ""}마을 사람 1명</small></div>
     <button class="btn sm gold" data-act="hire" data-arg="${from}:${i}">합류</button></div>`;
 }
 
@@ -464,7 +473,7 @@ function renderExpe() {
     return `<section class="dun ${done ? "cleared" : ""}"><div class="dun-art">${scenery(d.bg)}<h3>${d.name}${done ? " ✓" : ""}${d.endless ? ` · 최고 ${cleared}층` : ""}</h3></div>
       <div class="nodes">${nodes}</div>
       <p class="hint">원정은 하루가 걸려요. 일반 층은 3연전(체력 유지), 보스 층은 1전. 전투 사이에 돌아올 수 있어요.</p></section>`;
-  }).join("") + renderDispatch() + panel("출전 파티", `<div class="mini-party">${formUnits().map((f) => `<div class="mp"><div class="mp-art" style="--lc:${LINES[f.unit.line].color}">${unitFace(f.unit)}</div><small><b>${esc(f.unit.name)}</b> Lv${f.unit.lv}${f.unit.fatigue >= 3 ? " 💤" : ""}</small></div>`).join("") || '<p class="dim">편성된 동료가 없어요.</p>'}</div>`, `전투력 ${fmt(tp)}`);
+  }).join("") + renderDispatch() + panel("출전 파티", `<div class="mini-party">${formUnits().map((f) => `<div class="mp"><div class="mp-art" style="--lc:${LINES[f.unit.line].color}">${unitFace(f.unit)}</div><small><b>${esc(f.unit.name)}</b> Lv${f.unit.lv}${f.unit.fatigue >= 3 ? " · 지침" : ""}</small></div>`).join("") || '<p class="dim">편성된 동료가 없어요.</p>'}</div>`, `전투력 ${fmt(tp)}`);
 }
 
 // ---------- 동료 상세 ----------
@@ -511,7 +520,7 @@ function statBar(label, v, max, icon) { return `<div class="sbar"><span>${ic(ico
 function detailStats(u, d) {
   const top = Math.max(...STATS.map((k) => u.st[k]), 20);
   const reb = typeof canRebirth === "function" && G.bld.spring && G.roster.includes(u)
-    ? (canRebirth(u) ? `<button class="btn gold wide" data-act="rebirth" data-arg="${u.id}">💧 환생 · 💰${rebirthCost(u)}${u.reb ? ` · 현재 ${u.reb}회` : ""}</button>` : `<p class="dim">Lv20부터 윤회의 샘에서 환생할 수 있어요.${u.reb ? ` (환생 ${u.reb}회)` : ""}</p>`) : "";
+    ? (canRebirth(u) ? `<button class="btn gold wide" data-act="rebirth" data-arg="${u.id}">환생 · 금화 ${rebirthCost(u)}${u.reb ? ` · 현재 ${u.reb}회` : ""}</button>` : `<p class="dim">Lv20부터 윤회의 샘에서 환생할 수 있어요.${u.reb ? ` (환생 ${u.reb}회)` : ""}</p>`) : "";
   // 기본 능력 6칸(값·잠재력·막대), 전투 능력 10칸
   const tiles = STATS.map((k) => `<div class="st"><span>${STAT_NAME[k]}</span><em class="pot g${revealLevel(u, k) >= 2 ? u.pot[k] : "x"}">${potText(u, k).replace(/[()]/g, "")}</em><b>${u.st[k]}</b><div class="mbar"><i style="width:${(u.st[k] / top) * 100}%"></i></div></div>`).join("");
   const cb = [["HP", d.hp], ["공격", d.atk], ["마공", d.mag], ["회복", d.heal], ["방어", d.def], ["저항", d.res], ["속도", d.spd], ["회피", d.eva + "%"], ["치명", d.crit + "%"], ["명중", d.acc]].map(([n, v]) => `<div class="cbt"><span>${n}</span><b>${v}</b></div>`).join("");
