@@ -90,7 +90,22 @@ def keyed(cell):
     return rgb, a
 
 
-def foot_anchor(cell, size):
+def head_x(a, S, fx, top, bot):
+    """머리 가운데 x. 발 근처 열에서 처음으로 굵어지는 줄들(가는 무기 끝 제외)의 가운데. 못 찾으면 발 가운데."""
+    cx, head = [], None
+    for y in range(top, bot):
+        x0 = int(max(0, fx - S * 0.2)); x1 = int(min(a.shape[1], fx + S * 0.2))
+        r0, r1 = longest_run(a[y, x0:x1] > 0)
+        if r1 - r0 >= S * 0.09:
+            if head is None:
+                head = y
+            cx.append(x0 + (r0 + r1) / 2)
+            if y - head > S * 0.12:
+                break
+    return int(np.median(cx)) if cx else int(fx)
+
+
+def foot_anchor(cell, size, by_head=False):
     """발을 아래 가운데에 맞춘 정사각형(필요하면 가로로 넓게) RGBA."""
     rgb, a = keyed(cell)
     ys, xs = np.nonzero(a)
@@ -98,8 +113,9 @@ def foot_anchor(cell, size):
         return None
     top, bot = ys.min(), ys.max()
     low = ys >= bot - max(4, (bot - top) * 0.12)
-    fx = int(np.median(xs[low]))
     S = cell.height
+    # 가로 기준은 머리 가운데(벌린 다리·내디딘 발 때문에 발 기준이면 몸이 한쪽으로 쏠려 보인다)
+    fx = head_x(a, S, np.median(xs[low]), top, bot) if by_head else int(np.median(xs[low]))
     half = max(S // 2, fx - xs.min() + 2, xs.max() - fx + 2)
     body = Image.fromarray(np.dstack([rgb, a]), "RGBA").crop((xs.min(), top, xs.max() + 1, bot + 1))
     im = Image.new("RGBA", (half * 2, S))
@@ -216,7 +232,7 @@ def sheet(cat, name, mode, cols, rows, size, keyfn, faces=False):
         k = CELL_SCALE.get(f"{cat}/{name}#{n}", 1) * sheet_k
         if k > 1.001:
             cell = scale_cell(cell, k)
-        out = foot_anchor(cell, size) if mode == "foot" else centered(cell, size)
+        out = foot_anchor(cell, size, cat in ("jobs", "npc")) if mode == "foot" else centered(cell, size)
         if out is not None:
             save(out, f"{cat}/{key}.webp", key)
         if faces:
