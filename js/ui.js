@@ -321,7 +321,7 @@ function renderParty() {
     const st = u.injured ? `<span class="tag red">${ic("injury", "sm")}부상 ${u.injured}일</span>` : u.fatigue >= 3 ? `<span class="tag">${ic("tired", "sm")}지침</span>` : "";
     const promo = canPromote(u) ? `<span class="tag gold">${ic("lvup", "sm")}전직</span>` : "";
     return `<div class="cc" role="button" tabindex="0" data-act="detail" data-arg="${u.id}">
-      <div class="cc-art" style="--lc:${LINES[u.line].color}">${unitSprite(u)}<span class="lv">Lv${u.lv}</span></div>
+      <div class="cc-art" style="--lc:${LINES[u.line].color}">${unitBust(u)}<span class="lv">Lv${u.lv}</span></div>
       <div class="cc-tx"><b>${esc(u.name)}</b><small>${JOBS[u.job].name}</small>
       <div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div>
       <div class="tags">${st}${promo}${loveTag(u)}</div><small class="pw">전투력 ${fmt(power(u))}</small></div></div>`;

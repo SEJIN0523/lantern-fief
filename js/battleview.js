@@ -25,6 +25,11 @@ function unitSprite(u, cls = "") {
   const hair = u.hero ? "#222" : ["#6b4426", "#222", "#c8502a", "#e8c050", "#ddd", "#888"][u.slot % 6];
   return `<div class="ph ${cls}" style="--c:${color};--s:${skin};--h:${hair}"><i class="ph-b"></i><i class="ph-h"></i><b class="ph-w">${WEAPON_ICON[JOBS[u.job].weapon] || ""}</b></div>`;
 }
+// 동료 카드·상세: 가슴께 초상, 없으면 전신
+function unitBust(u) {
+  const k = "bust_" + artKey(u);
+  return typeof ART !== "undefined" && ART[k] ? `<img class="spr bust" src="${ART[k]}" alt="">` : unitSprite(u);
+}
 function monSprite(id, cls = "") {
   const k = MON_ART[id];
   if (typeof ART !== "undefined" && ART[k]) return `<img class="spr ${cls}${MONSTERS[id].flip ? " flipx" : ""}" src="${ART[k]}" alt="">`;
