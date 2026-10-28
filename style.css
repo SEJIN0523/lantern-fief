@@ -1037,3 +1037,18 @@ small, .dim, .hint { color:var(--dim); }
 /* 긴 장 제목은 작게, 넘치면 말줄임 */
 .village-heading h1 { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .village-heading h1.long { font-size:15px; }
+
+/* 전신 보기 */
+.sheet.dt .dt-art { padding:0; cursor:pointer; position:relative; }
+.dt-zoom { position:absolute; right:3px; bottom:3px; padding:0 5px; font-size:10px; line-height:16px; border-radius:3px; background:#0a1d27dd; color:#f0d49b; border:1px solid #c9ad715c; }
+.fullview { max-width:440px; }
+.fullview h2 { margin:0 48px 8px 0; font-size:18px; line-height:44px; }
+.fullview h2 small { font-size:12px; color:var(--dim); font-weight:normal; }
+.fv-stage { height:min(52vh,420px); display:flex; align-items:flex-end; justify-content:center; border-radius:6px; border:1px solid #ffffff1a; background:radial-gradient(ellipse at 50% 92%, color-mix(in srgb, var(--lc) 35%, transparent), transparent 60%), linear-gradient(#22394a, #0d1d26); overflow:hidden; }
+.fv-stage .spr { height:100%; width:auto; max-width:100%; object-fit:contain; object-position:50% 100%; image-rendering:pixelated; }
+.fv-thumbs { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; }
+.fv-t { flex:none; width:66px; display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px; background:#0c1d26aa; border:1px solid #2c4650; border-radius:5px; color:var(--tx); }
+.fv-t.on { border-color:var(--gold); box-shadow:inset 0 0 0 1px var(--gold); }
+.fv-t .spr { width:56px; height:56px; object-fit:contain; object-position:50% 100%; }
+.fv-t small { font-size:10px; line-height:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.fullview { padding-bottom:16px; } .fv-thumbs { padding-bottom:2px; }

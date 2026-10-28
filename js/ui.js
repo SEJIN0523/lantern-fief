@@ -445,7 +445,7 @@ function showDetail(u, hireFrom) {
   m.innerHTML = `<div class="sheet dt">
     <div class="dt-hero" style="--lc:${LINES[u.line].color}">
       <button class="x" data-act="close">✕</button>
-      <div class="dt-art">${unitBust(u)}</div>
+      <button class="dt-art" data-act="fullview" data-arg="${u.id}" aria-label="전신 보기">${unitBust(u)}<span class="dt-zoom">전신</span></button>
       <div class="dt-id"><div class="dt-name"><h2>${esc(u.name)}</h2><span class="job">${J.name}</span></div>
         <p>${u.race} · ${u.gender === "m" ? "남" : "여"} · ${J.role}${u.job === "villager" ? " · " + aptText(u) : ""}</p>
         <div class="dt-lv"><b>Lv${u.lv}</b><div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div><small>${u.exp}/${expNeed(u.lv)}</small></div>
@@ -498,6 +498,22 @@ function detailSkills(u, hireFrom) {
     return `<button class="btn ${why ? "" : "gold"}" ${why ? "disabled" : ""} data-act="promote" data-arg="${u.id}:${j}"><b>${JOBS[j].name}</b><small>${why ? why + " · " : ""}${JOBS[j].role} · ${JOBS[j].skills.map((s) => SKILLS[s].name).join(", ")}</small></button>`;
   }).join("")}</div>`;
   return mana + sk + promo;
+}
+// 전신 보기: 큰 그림 + 지나온 모습 썸네일
+function showFullView(u, idx) {
+  closeModal(true);
+  const looks = lookHistory(u);
+  if (idx == null) idx = Math.max(0, looks.findIndex((l) => l.now));
+  const L = looks[idx];
+  const m = document.createElement("div");
+  m.className = "modal center"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true"); m.setAttribute("aria-label", "전신 보기");
+  m.innerHTML = `<div class="sheet small fullview" style="--lc:${LINES[u.line].color}">
+    <button class="x" data-act="${G.roster.includes(u) ? "detail" : "close"}" data-arg="${u.id}" aria-label="닫기">✕</button>
+    <h2>${esc(u.name)} <small>${L ? L.label : ""}${L && L.now ? " · 지금" : ""}</small></h2>
+    <div class="fv-stage">${L ? `<img class="spr" src="${ART[L.key]}" alt="">` : unitSprite(u)}</div>
+    ${looks.length > 1 ? `<h4 class="sub">지나온 모습 <small>${idx + 1}/${looks.length}</small></h4><div class="fv-thumbs">${looks.map((l, i) => `<button class="fv-t ${i === idx ? "on" : ""}" data-act="fullpick" data-arg="${u.id}:${i}"><img class="spr" src="${ART[l.key]}" alt=""><small>${l.label}</small></button>`).join("")}</div>` : ""}
+  </div>`;
+  document.body.appendChild(m);
 }
 function closeModal(silent) { document.querySelectorAll(".modal").forEach((m) => m.remove()); }
 

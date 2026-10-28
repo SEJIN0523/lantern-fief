@@ -26,6 +26,28 @@ function unitSprite(u, cls = "") {
   const hair = u.hero ? "#222" : ["#6b4426", "#222", "#c8502a", "#e8c050", "#ddd", "#888"][u.slot % 6];
   return `<div class="ph ${cls}" style="--c:${color};--s:${skin};--h:${hair}"><i class="ph-b"></i><i class="ph-h"></i><b class="ph-w">${WEAPON_ICON[JOBS[u.job].weapon] || ""}</b></div>`;
 }
+// 지나온 모습: 평민 복장 → 거친 직업 순서, 세진은 사고 직후 · 회복 중부터
+function lookHistory(u) {
+  const out = [], seen = new Set();
+  const add = (key, label) => { if (typeof ART !== "undefined" && ART[key] && !seen.has(key)) { seen.add(key); out.push({ key, label }); } };
+  if (u.art) { add(u.art, JOBS[u.job].name); return out; }
+  if (u.hero) {
+    add("sejin_1", "사고 직후");
+    add("sejin_2", "마을에서 회복 중");
+    for (const j of u.jobs || [u.job]) add("sejin_" + (j === "stranger" ? 3 : HERO_ART[j] || 2), JOBS[j].name);
+  } else {
+    const jobs = u.jobs && u.jobs.length ? u.jobs : [u.job];
+    for (const j of jobs) {
+      if (j === "villager") add(`civ_${u.line}_${u.slot + 1}`, "마을 주민");
+      else add(`${j}_${u.slot + 1}`, JOBS[j].name);
+    }
+  }
+  const cur = artKey(u);
+  if (!seen.has(cur)) add(cur, JOBS[u.job].name);
+  out.forEach((o) => (o.now = o.key === cur));
+  return out;
+}
+
 // 편성 칸·대기 명단: 얼굴, 없으면 전신
 function unitFace(u) {
   const k = "face_" + artKey(u);
