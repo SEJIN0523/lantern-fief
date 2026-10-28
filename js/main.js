@@ -122,6 +122,31 @@ async function night() {
 const ACT = {
   newgame() { if (hasSave() && !confirm("저장된 게임을 지우고 새로 시작할까요?")) return; startNewGame(); },
   continue() { if (load()) showHub(); },
+  savemenu(from) { showSaveMenu(from); },
+  saveslot(n) {
+    if (slotInfo(+n) && !confirm(`${n}번 칸에 덮어쓸까요?`)) return;
+    if (saveSlot(+n)) { toast(`${n}번 칸에 저장했어요`); showSaveMenu(); } else toast("저장할 수 없어요 (저장 공간 부족)");
+  },
+  loadslot(n) {
+    const inGame = !!document.querySelector(".hub");
+    if (inGame && !confirm("지금 진행 중인 게임은 저장 칸에 저장하지 않았다면 사라져요. 불러올까요?")) return;
+    if (loadSlot(n === "auto" ? "auto" : +n)) { closeModal(); toast("불러왔어요"); showHub(); } else toast("불러올 수 없어요");
+  },
+  delslot(n) { if (confirm(`${n}번 칸을 지울까요?`)) { deleteSlot(+n); showSaveMenu(document.querySelector(".hub") ? "" : "title"); } },
+  exportsave() {
+    const code = exportCode();
+    (navigator.clipboard ? navigator.clipboard.writeText(code) : Promise.reject()).then(() => toast("백업 코드를 복사했어요"), () => prompt("아래 코드를 길게 눌러 복사하세요", code));
+  },
+  downloadsave() {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([exportCode()], { type: "text/plain" }));
+    a.download = `등불영지_${G.day}일째.txt`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  },
+  importsave() {
+    const code = prompt("백업 코드를 붙여 넣으세요");
+    if (!code) return;
+    try { importCode(code); closeModal(); toast("불러왔어요"); showHub(); } catch (e) { toast("코드를 읽을 수 없어요"); }
+  },
   endday() {
     if (raidTonight() && !G.form.length) { if (!confirm("편성된 동료가 없어요. 이대로 습격을 맞을까요?")) return; }
     night();

@@ -114,6 +114,12 @@ function body(id) { return document.getElementById("bu-" + id)?.querySelector(".
 const hasArt = (k) => typeof ART !== "undefined" && ART[k];
 // 스크립트로 건 움직임만 지운다 (CSS 숨쉬기 애니메이션은 유지)
 function clearAnims(el) { el?.getAnimations().forEach((x) => { if (!(window.CSSAnimation && x instanceof CSSAnimation)) x.cancel(); }); }
+// 행동마다 시작 전에: 끝났거나 멈춘 채 남은 움직임을 지워 모두 제자리로 (쓰러짐 자세는 .dead 클래스가 맡음)
+function resetPoses() {
+  document.querySelectorAll("#field .bu-body").forEach((el) => el.getAnimations().forEach((x) => {
+    if (!(window.CSSAnimation && x instanceof CSSAnimation) && x.playState !== "running") x.cancel();
+  }));
+}
 
 function anim(el, frames, ms, opts = {}) {
   if (!el || BV.skip) return Promise.resolve();
@@ -270,10 +276,11 @@ function banner(text, cls) {
 // 히트스톱: 전장의 모든 움직임을 잠깐 멈춘다
 async function hitStop(ms) {
   if (BV.skip) return;
-  const list = document.getElementById("field").getAnimations({ subtree: true });
+  // 돌고 있는 것만 멈춘다. 이미 끝난 움직임을 다시 play() 하면 처음부터 재생돼 위치가 어긋난다
+  const list = document.getElementById("field").getAnimations({ subtree: true }).filter((a) => a.playState === "running");
   list.forEach((a) => a.pause());
   await new Promise((r) => setTimeout(r, ms));
-  list.forEach((a) => { try { a.play(); } catch (e) {} });
+  list.forEach((a) => { try { if (a.playState === "paused") a.play(); } catch (e) {} });
 }
 function flashField(color) {
   const f = document.getElementById("field");
@@ -323,8 +330,8 @@ function deathAnim(id, B) {
   const c = B.units.find((x) => x.id === id);
   const el = body(id);
   fxAt(id, "death", { rise: true, size: 0.9, ms: 700 });
-  if (c.side === "A") anim(el, [{ transform: "rotate(0)", opacity: 1 }, { transform: "rotate(-75deg) translateY(20%)", opacity: 0.45 }], 500, { fill: "forwards" });
-  else anim(el, [{ transform: "translateY(0)", opacity: 1, filter: "brightness(1)" }, { transform: "translateY(0)", filter: "brightness(0) invert(1)", opacity: 0.9, offset: 0.2 }, { transform: "translateY(10%) scale(.92)", opacity: 0, filter: "brightness(0) invert(1)" }], 560, { fill: "forwards" });
+  if (c.side === "A") anim(el, [{ transform: "rotate(0)", opacity: 1 }, { transform: "rotate(-75deg) translateY(20%)", opacity: 0.45 }], 500);
+  else anim(el, [{ transform: "translateY(0)", opacity: 1, filter: "brightness(1)" }, { transform: "translateY(0)", filter: "brightness(0) invert(1)", opacity: 0.9, offset: 0.2 }, { transform: "translateY(10%) scale(.92)", opacity: 0, filter: "brightness(0) invert(1)" }], 560);
 }
 
 // 무기별 베기 모양: 검 = 호, 창 = 찌르기, 도끼·둔기 = 내려찍기
@@ -339,6 +346,7 @@ function shotKind(c) {
 
 async function playEvent(B, ev) {
   if (!ev) return;
+  resetPoses();
   const c = B.units.find((x) => x.id === ev.actor);
   const el = body(ev.actor);
   // 행동하는 유닛을 맨 앞으로, 끝나면 줄 순서로 복귀
@@ -370,9 +378,10 @@ async function playEvent(B, ev) {
     await anim(el, [{ transform: `translate(${-9 * dir}px,0) rotate(${-4 * dir}deg)` }, { transform: `translate(${dx}px,${dy}px) rotate(${7 * dir}deg)` }], 220, { ease: "ease-in", fill: "forwards" });
     fxAt(ev.target, slashKind(c, sk), { size: 1.15, ms: 320, flip: dir < 0 });
     anim(el, [{ transform: `translate(${dx}px,${dy}px) rotate(${7 * dir}deg)` }, { transform: `translate(${dx + 6 * dir}px,${dy}px) rotate(${-3 * dir}deg)` }], 120, { fill: "forwards" });
-    await showHits(B, ev.hits, ev.side);
-    await anim(el, [{ transform: `translate(${dx + 6 * dir}px,${dy}px) rotate(${-3 * dir}deg)` }, { transform: "translate(0,0) rotate(0)" }], 330, { ease: "ease-in-out", fill: "forwards" });
-    clearAnims(el);
+    try {
+      await showHits(B, ev.hits, ev.side);
+      await anim(el, [{ transform: `translate(${dx + 6 * dir}px,${dy}px) rotate(${-3 * dir}deg)` }, { transform: "translate(0,0) rotate(0)" }], 330, { ease: "ease-in-out", fill: "forwards" });
+    } finally { clearAnims(el); }
   } else if (ev.kind === "shoot" || (ev.kind === "atk" && !(sk && sk.mag) && c.range !== "magic")) {
     // 활을 6° 젖힘 → 직선으로 날아가는 화살 + 빛 꼬리
     await anim(el, [{ transform: "translateX(0) rotate(0)" }, { transform: `translateX(${-6 * dir}px) rotate(${-6 * dir}deg)` }], 160, { fill: "forwards" });
@@ -401,7 +410,7 @@ async function playEvent(B, ev) {
       fxAt(h.id, h.revive ? "revive" : "heal", { rise: true, size: 0.9, ms: 700 });
       cross(h.id);
       popText(h.id, (h.revive ? "부활 " : "+") + h.amt, "heal");
-      if (h.revive) anim(body(h.id), [{ transform: "rotate(-75deg)", opacity: 0.4 }, { transform: "rotate(0)", opacity: 1 }], 400, { fill: "forwards" });
+      if (h.revive) anim(body(h.id), [{ transform: "rotate(-75deg)", opacity: 0.4 }, { transform: "rotate(0)", opacity: 1 }], 400);
     }
     updateBars(B); await wait(320);
   } else if (ev.kind === "shield") {

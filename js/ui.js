@@ -126,8 +126,42 @@ function showTitle() {
     <div class="title-btns">
       ${hasSave() ? `<button class="btn gold big" data-act="continue"><span>이야기 이어가기</span><span aria-hidden="true">→</span></button>` : ""}
       <button class="btn ${hasSave() ? "" : "gold"} big" data-act="newgame"><span>새로운 이야기</span><span aria-hidden="true">→</span></button>
+      <button class="btn big" data-act="savemenu" data-arg="title"><span>불러오기 · 백업</span><span aria-hidden="true">→</span></button>
     </div>
     <p class="title-save">진행 상황은 이 기기에 자동 저장됩니다</p><p class="ver">CHAPTER 01 <span>◆</span> v0.2 · 체험판</p></div>`;
+}
+
+// ---------- 저장 · 불러오기 ----------
+function showSaveMenu(from) {
+  closeModal(true);
+  const inGame = from !== "title" && G;
+  const when = (t) => { if (!t) return ""; const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+  const desc = (i) => i ? `<b>${i.ch} · ${i.day}일째</b><small>동료 ${i.n}명 · 최고 Lv${i.lv}${i.t ? " · " + when(i.t) : ""}</small>` : `<b class="dim">비어 있음</b>`;
+  const auto = slotInfo("auto");
+  const rows = [1, 2, 3].map((n) => {
+    const i = slotInfo(n);
+    return `<div class="sv"><span class="sv-n">${n}</span><div class="sv-tx">${desc(i)}</div><div class="sv-bt">
+      ${inGame ? `<button class="btn sm gold" data-act="saveslot" data-arg="${n}">저장</button>` : ""}
+      ${i ? `<button class="btn sm" data-act="loadslot" data-arg="${n}">불러오기</button><button class="btn sm ghost" data-act="delslot" data-arg="${n}" aria-label="${n}번 칸 지우기">✕</button>` : ""}</div></div>`;
+  }).join("");
+  const m = document.createElement("div");
+  m.className = "modal"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true"); m.setAttribute("aria-label", "저장과 불러오기");
+  m.innerHTML = `<div class="sheet small save-sheet"><button class="x" data-act="close">✕</button>
+    <h2>저장 · 불러오기</h2>
+    <h4 class="sub">자동 저장 <small>진행하면 저절로 저장</small></h4>
+    <div class="sv auto"><span class="sv-n">A</span><div class="sv-tx">${desc(auto)}</div><div class="sv-bt">${auto && !inGame ? `<button class="btn sm gold" data-act="loadslot" data-arg="auto">이어하기</button>` : ""}</div></div>
+    <h4 class="sub">저장 칸</h4>${rows}
+    <h4 class="sub">백업 <small>다른 기기로 옮기거나 보관</small></h4>
+    <div class="sv-backup">
+      ${inGame ? `<button class="btn" data-act="exportsave">코드 복사</button><button class="btn" data-act="downloadsave">파일로 받기</button>` : ""}
+      <button class="btn" data-act="importsave">코드 붙여넣기</button>
+      <label class="btn">파일 열기<input type="file" accept=".json,.txt,application/json,text/plain" id="save-file" hidden></label>
+    </div></div>`;
+  document.body.appendChild(m);
+  m.querySelector("#save-file").onchange = (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    f.text().then((t) => { try { importCode(t); closeModal(); toast("불러왔어요"); showHub(); } catch (err) { toast("세이브 파일을 읽을 수 없어요"); } });
+  };
 }
 
 // ---------- 대화 ----------
@@ -201,7 +235,7 @@ function showHub() {
   HUB_VIEW = view;
   app.innerHTML = `<div class="hub">
     <header class="banner-v">${scenery("village")}
-      <div class="village-heading"><small>등불 영지</small><h1>${G.chapter ? (G.chapter >= 7 ? "엔딩 후 · " : "제" + G.chapter + "장 · ") + CHAPTERS[G.chapter].name : "프롤로그"}</h1></div><div class="plaque"><b>${G.day}</b><span>일째</span></div>
+      <div class="village-heading"><small>등불 영지</small><h1>${G.chapter ? (G.chapter >= 7 ? "엔딩 후 · " : "제" + G.chapter + "장 · ") + CHAPTERS[G.chapter].name : "프롤로그"}</h1></div><div class="plaque"><b>${G.day}</b><span>일째</span></div><button class="save-btn" data-act="savemenu" aria-label="저장 · 불러오기">💾</button>
       <div class="vstat"><span>${ic("pop")} 주민 <b>${G.pop}</b></span><span>${ic("morale")} 사기 <b>${G.morale}</b></span></div>
     </header>
     <div class="resbar">${res("gold")}${res("food")}${res("wood")}${res("stone")}</div>

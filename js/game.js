@@ -28,7 +28,7 @@ function newGame() {
 }
 
 function save() {
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify(G)); } catch (e) { /* 저장 불가 환경 */ }
+  try { G.savedAt = Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(G)); } catch (e) { /* 저장 불가 환경 */ }
 }
 function load() {
   try {
@@ -55,6 +55,43 @@ function migrate() {
   }
 }
 function hasSave() { try { return !!localStorage.getItem(SAVE_KEY); } catch (e) { return false; } }
+
+// ---------- 수동 저장 칸 3개 + 백업 코드 ----------
+const SLOT_KEY = (n) => SAVE_KEY + "_slot" + n;
+function saveSummary(g) {
+  const ch = g.chapter ? (g.chapter >= 7 ? "엔딩 후" : "제" + g.chapter + "장") : "프롤로그";
+  const lv = g.roster.length ? Math.max(...g.roster.map((u) => u.lv)) : 1;
+  return { ch, day: g.day, n: g.roster.length, lv };
+}
+function slotInfo(n) {
+  try {
+    const s = localStorage.getItem(n === "auto" ? SAVE_KEY : SLOT_KEY(n));
+    if (!s) return null;
+    const g = JSON.parse(s);
+    return { ...saveSummary(g), t: g.savedAt || 0 };
+  } catch (e) { return null; }
+}
+function saveSlot(n) {
+  try { G.savedAt = Date.now(); localStorage.setItem(SLOT_KEY(n), JSON.stringify(G)); save(); return true; } catch (e) { return false; }
+}
+// 불러온 판은 자동 저장에도 바로 덮어써서 이어하기가 그 판을 가리키게
+function loadText(s) {
+  const g = JSON.parse(s);
+  if (!g || !Array.isArray(g.roster) || typeof g.day !== "number") throw new Error("세이브 형식이 아니에요");
+  G = g; migrate(); save();
+}
+function loadSlot(n) {
+  try { const s = localStorage.getItem(n === "auto" ? SAVE_KEY : SLOT_KEY(n)); if (!s) return false; loadText(s); return true; } catch (e) { return false; }
+}
+function deleteSlot(n) { try { localStorage.removeItem(SLOT_KEY(n)); } catch (e) {} }
+function anySave() { return hasSave() || [1, 2, 3].some((n) => slotInfo(n)); }
+// 다른 기기로 옮길 때 쓰는 글자 코드 (UTF-8 → base64)
+function exportCode() { return "FIEF1:" + btoa(unescape(encodeURIComponent(JSON.stringify(G)))); }
+function importCode(code) {
+  code = code.trim();
+  const json = code.startsWith("{") ? code : decodeURIComponent(escape(atob(code.replace(/^FIEF1:/, "").replace(/\s+/g, ""))));
+  loadText(json);
+}
 
 function log(msg) { G.log.unshift({ d: G.day, m: msg }); if (G.log.length > 60) G.log.pop(); }
 
