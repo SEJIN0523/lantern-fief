@@ -328,4 +328,12 @@ window.addEventListener("popstate", () => {
   if (Date.now() - backArmed < 2000 || !backDepth) { history.back(); return; }
   backArmed = Date.now(); toast("한 번 더 누르면 종료돼요");
 });
+// 화면 꺼짐 방지: 게임을 켜 둔 동안 절전으로 꺼지지 않게(지원하는 브라우저만). 다른 앱에 다녀오면 다시 건다
+let wakeLock = null;
+async function keepAwake() {
+  try { if ("wakeLock" in navigator && document.visibilityState === "visible" && !wakeLock) { wakeLock = await navigator.wakeLock.request("screen"); wakeLock.addEventListener("release", () => (wakeLock = null)); } } catch (e) { wakeLock = null; }
+}
+document.addEventListener("visibilitychange", keepAwake);
+document.addEventListener("pointerdown", keepAwake, true);
+keepAwake();
 showTitle();
