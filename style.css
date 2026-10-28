@@ -861,3 +861,36 @@ div.mc-holy, div.mc-heal { border-color: #ffe680; box-shadow: 0 0 14px #ffe680, 
 .pf-row b { text-align:left; }
 .pf-row:nth-child(n+5) { grid-column:1/-1; flex-direction:row; justify-content:space-between; }
 .pf-note { grid-column:1/-1; }
+
+/* 가독성 v2: 흐린 글자 대비 올림, 건물 카드 정리, 모집 초상 */
+:root { --dim:#b3c2c6; }
+small, .dim, .hint { color:var(--dim); }
+.hint { font-size:12px; }
+.bld-done { display:flex; align-items:center; gap:6px; margin:0 0 8px; padding:8px 10px; border-radius:5px; background:#2a2418cc; border:1px solid #a98b5655; color:#f0d49b; font-size:12px; line-height:16px; }
+.tiles { gap:8px; }
+.tile { grid-template-columns:56px minmax(0,1fr) 84px; column-gap:10px; padding:10px; min-height:0; }
+.tile .tile-art { width:56px; height:56px; }
+.tile-art img { image-rendering:pixelated; }
+.tile-heading>b { font-size:14px; }
+.tile .tile-level { font-size:11px; color:#c9d6d9; }
+.tile .pips { margin:3px 0 4px; }
+.tile .pips i { width:6px; height:6px; }
+.tile p { font-size:12px; line-height:17px; color:#c4d0d3; }
+.tile-action { gap:4px; }
+.tile-action .cost { flex-wrap:wrap; justify-content:flex-end; font-size:11px; }
+.tile-action .cost .ic { width:13px; height:13px; }
+.tile .btn { min-height:40px; font-size:13px; }
+.tile .btn:disabled { opacity:.55; }
+.tile .why { grid-column:2 / 4; font-size:11px; }
+.rc .por { width:64px; height:64px; flex:none; border-radius:5px; }
+.rc .por:before { display:none; }
+.rc .por>.spr.bust { width:100%; height:100%; object-fit:cover; object-position:50% 0; }
+.rc-tx small { font-size:11px; }
+@media(max-width:360px) { .tile { grid-template-columns:44px minmax(0,1fr) 72px; } .tile .tile-art { width:44px; height:44px; } }
+.mini-party { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
+.mp { display:flex; flex-direction:column; align-items:center; gap:3px; min-width:0; }
+.mp .mp-art { width:100%; max-width:64px; height:auto; aspect-ratio:1; border-radius:5px; }
+.mp .mp-art:before { display:none; }
+.mp .mp-art>.spr.face { width:100%; height:100%; object-fit:cover; }
+.mp small { font-size:11px; line-height:14px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.mp small b { display:block; color:var(--tx); font-weight:600; }

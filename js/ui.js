@@ -260,10 +260,12 @@ function renderBuild() {
       <div class="tile-art">${art}</div>
       <div class="tile-info"><div class="tile-heading"><b>${b.name}</b><span class="tile-level">${lv ? "Lv." + lv : "미건설"}</span></div><div class="pips" aria-hidden="true">${pips}</div><p>${b.desc}</p></div>
       <div class="tile-action">${max ? `<div class="tile-max">최대 레벨</div>` : `<div class="cost">${uiCost(buildCost(id))}</div><button class="btn sm ${why ? "" : "gold"}" data-act="build" data-arg="${id}" ${why ? "disabled" : ""} aria-label="${b.name} ${lv ? "증축" : "건설"}">${lv ? "증축" : "건설"}</button>`}</div>
-      ${why && why !== "자원 부족" && !max ? `<small class="why">${why}</small>` : ""}
+      ${why && why !== "자원 부족" && why !== "오늘은 이미 공사했어요" && !max ? `<small class="why">${why}</small>` : ""}
     </div>`;
   }).join("");
-  return panel("건물", `<div class="tiles">${tiles}</div>`, "하루에 한 번 공사");
+  // 오늘 공사를 마쳤으면 카드마다 쓰지 않고 위에 한 번만
+  const done = G.built[G.day] ? `<div class="bld-done">${ic("build", "sm")}오늘 공사를 마쳤어요. 내일 다시 지을 수 있어요.</div>` : "";
+  return panel("건물", done + `<div class="tiles">${tiles}</div>`, "하루에 한 번 공사");
 }
 
 function renderWork() {
@@ -288,7 +290,7 @@ function aptText(u) {
   return aptKnown(u) ? `${LINES[u.line].name} 적성` : "적성 ???";
 }
 function recruitCard(u, from, i) {
-  return `<div class="rc" role="group" data-act="peek" data-arg="${from}:${i}"><div class="por" style="--lc:${LINES[u.line].color}">${unitSprite(u, "mini")}</div>
+  return `<div class="rc" role="group" data-act="peek" data-arg="${from}:${i}"><div class="por" style="--lc:${LINES[u.line].color}">${unitBust(u)}</div>
     <div class="rc-tx"><b>${esc(u.name)}</b><small>${u.race} · ${JOBS[u.job].name} Lv${u.lv} · ${aptText(u)}</small>
     <div class="tags"><span class="tag">${traitOf(u, "personality").name}</span><span class="tag">${traitOf(u, "hobby").name}</span>${u.traits.quirk ? `<span class="tag gold">${traitOf(u, "quirk").name}</span>` : ""}</div>
     <small>${u.price ? `맞이하기 💰${u.price} · ` : ""}마을 사람 1명</small></div>
@@ -365,7 +367,7 @@ function renderExpe() {
     return `<section class="dun ${done ? "cleared" : ""}"><div class="dun-art">${scenery(d.bg)}<h3>${d.name}${done ? " ✓" : ""}${d.endless ? ` · 최고 ${cleared}층` : ""}</h3></div>
       <div class="nodes">${nodes}</div>
       <p class="hint">원정은 하루가 걸려요. 일반 층은 3연전(체력 유지), 보스 층은 1전. 전투 사이에 돌아올 수 있어요.</p></section>`;
-  }).join("") + panel("출전 파티", `<div class="mini-party">${formUnits().map((f) => `<div class="mp"><div class="mp-art" style="--lc:${LINES[f.unit.line].color}">${unitSprite(f.unit)}</div><small>${esc(f.unit.name)} ${f.unit.lv}${f.unit.fatigue >= 3 ? " 💤" : ""}</small></div>`).join("") || '<p class="dim">편성된 동료가 없어요.</p>'}</div>`, `전투력 ${fmt(tp)}`);
+  }).join("") + panel("출전 파티", `<div class="mini-party">${formUnits().map((f) => `<div class="mp"><div class="mp-art" style="--lc:${LINES[f.unit.line].color}">${unitFace(f.unit)}</div><small><b>${esc(f.unit.name)}</b> Lv${f.unit.lv}${f.unit.fatigue >= 3 ? " 💤" : ""}</small></div>`).join("") || '<p class="dim">편성된 동료가 없어요.</p>'}</div>`, `전투력 ${fmt(tp)}`);
 }
 
 // ---------- 동료 상세 ----------
