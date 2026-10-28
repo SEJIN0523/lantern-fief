@@ -1059,3 +1059,7 @@ small, .dim, .hint { color:var(--dim); }
 .sheet.dt .dt-id { padding-right:0; }
 .sheet.dt .dt-name, .sheet.dt .dt-id>p { padding-right:50px; }
 .sheet.dt .dt-lv { padding-right:112px; }
+/* 전신 보기 v2: 창을 줄이고 그림은 가운데 */
+.fullview { max-width:340px; }
+.fv-stage { height:min(36vh,300px); align-items:center; padding:10px; }
+.fv-stage .spr { height:100%; width:100%; object-fit:contain; object-position:50% 50%; }
