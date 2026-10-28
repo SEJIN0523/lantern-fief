@@ -60,7 +60,7 @@ const UI_PIXELS = {
   stone: ".....llll/....llllbb/...llllbbbb/..llllbbbbbbs/.lllbbbbbbbss/.llbbbbbbbsss/..bbbbbbbssss/...sssssssss",
   pop: "..ll....ll/..lb....lb/..bs....bs/........../.llbb..llbb/llbbbsllbbbs/lbbbbbssbbbs/lbbbbbssbbbs/.ssss..ssss",
   morale: "wlllllllll/vlbbbbbbbs/vlbbbbbbs/vlbbbbbss/vsssssss/v/v/v/v/v/u",
-  village: "...lll/..llbbs.....l/.llbbbss...lbs/llbbbbsss.llbbs/..wwvvu..llbbss/..wvvvu...wvuu/..wvuvu...wuuu/..wvuvu...wuuu/..uuuuu...uuuu",
+  village: "...lll/..llbbs....l/.llbbbss..lbs/llbbbbss.llbbs/..wwvvu.llbbss/..wvvvu..wvuu/..wvuvu..wuuu/..wvuvu..wuuu/..uuuuu..uuuu",
   party: "..llllllll/llbbbbbbbbss/lbbbbbbbbsss/lbbbbbbbbsss/lbbbllbbbsss/.bbbllbbsss/.bbllllbsss/..bbllbsss/...bllsss/....bsss/.....ss",
   form: "l..........l/lb........lb/.lb......lb/..lb....lb/...lb..lb/....lbbb/....bbss/...vssssv/..wv....wv/.vu......vu/uu........uu",
   expe: "llll....llll/l*bbllllbbbs/lbbbllbbbbbs/lbbbllbblbbs/lbblslblbbbs/lblbslbbbsbs/lbbbslbbbsss/lbbbslbbbsss/lbbbssbbbbss/llll..ssssss",
