@@ -460,7 +460,8 @@ function detailGear(u, hireFrom) {
 }
 function detailSkills(u, hireFrom) {
   const J = JOBS[u.job];
-  const sk = unitSkills(u).map((id) => { const s = SKILLS[id]; return `<div class="skc"><b>${s.name}</b><span class="tag ${s.kind === "passive" ? "" : "gold"}">${s.kind === "passive" ? "패시브" : "쿨 " + s.cd}</span>${s.desc ? `<small>${s.desc}</small>` : ""}</div>`; }).join("") || '<p class="dim">아직 익힌 기술이 없어요.</p>';
+  const sk = unitSkills(u).map((id) => { const s = SKILLS[id]; return `<div class="skc"><b>${s.name}</b><span class="tag ${s.kind === "passive" ? "" : "gold"}">${s.kind === "passive" ? "패시브" : `MP ${mpCost(s)} · 쿨 ${s.cd}`}</span>${s.desc ? `<small>${s.desc}</small>` : ""}</div>`; }).join("") || '<p class="dim">아직 익힌 기술이 없어요.</p>';
+  const mana = `<div class="mp-info"><span>마나</span><b>최대 100 · 시작 50 · 매 턴 +${mpRegen(u)}</b><small>성향: ${MP_STYLE_NAME[mpStyle(u)]} — ${traitOf(u, "personality").name}</small></div>`;
   const nx = nextJobs(u);
   const shown = (j) => u.job !== "villager" || aptKnown(u);
   const promo = !nx.length || hireFrom ? "" : `<h4 class="sub">전직</h4><div class="promo">${nx.map((j) => {
@@ -468,7 +469,7 @@ function detailSkills(u, hireFrom) {
     const why = promoteBlock(u, j);
     return `<button class="btn ${why ? "" : "gold"}" ${why ? "disabled" : ""} data-act="promote" data-arg="${u.id}:${j}"><b>${JOBS[j].name}</b><small>${why ? why + " · " : ""}${JOBS[j].role} · ${JOBS[j].skills.map((s) => SKILLS[s].name).join(", ")}</small></button>`;
   }).join("")}</div>`;
-  return sk + promo;
+  return mana + sk + promo;
 }
 function closeModal(silent) { document.querySelectorAll(".modal").forEach((m) => m.remove()); }
 

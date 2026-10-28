@@ -3,6 +3,18 @@
 
 const HERO_AURA = [0.05, 0.08, 0.11, 0.15, 0.27];
 
+// ---------- 마나: 동료만 쓴다(몬스터는 대기 시간만) ----------
+// 기술 비용: 쿨이 긴 큰 기술일수록, 전체 대상이면 더 든다
+function mpCost(sk) {
+  if (sk.mp != null) return sk.mp;
+  return Math.min(45, 6 + (sk.cd || 2) * 5 + (sk.tgt === "all" ? 6 : 0));
+}
+// 성격에 따른 마나 쓰는 버릇: big = 모아서 큰 기술, small = 작은 기술을 자주
+const MP_STYLE = { hot: "big", brave: "big", bluff: "big", greedy: "big", optimist: "big", calm: "small", coward: "small", diligent: "small", kind: "small", loyal: "small" };
+const MP_STYLE_NAME = { big: "큰 기술 위주 (마나를 모았다가 크게)", small: "작은 기술 위주 (마나를 아껴 자주)", mid: "균형 (쓸 수 있는 가장 큰 기술)" };
+function mpStyle(u) { return MP_STYLE[u.traits && u.traits.personality] || "mid"; }
+function mpRegen(u) { return 10 + Math.min(10, Math.floor((u.st.spi || 0) / 6)); }
+
 function mkFromUnit(u, col, lane, opts) {
   const d = derived(u);
   const J = JOBS[u.job];
@@ -12,6 +24,7 @@ function mkFromUnit(u, col, lane, opts) {
     spd: d.spd, acc: d.acc, eva: d.eva, crit: d.crit,
     range: J.range, skills: unitSkills(u).map((id) => ({ id, cd: 0 })),
     buffs: [], taunt: 0, shield: 0, dots: [], silence: 0, alive: true, ct: 0, endured: false,
+    maxMp: 100, mp: 50, mpRegen: mpRegen(u), mpStyle: mpStyle(u),
   };
   // 피로 3 이상이면 지침
   if (u.fatigue >= 3) { c.atk = Math.round(c.atk * 0.85); c.mag = Math.round(c.mag * 0.85); c.def = Math.round(c.def * 0.85); }
@@ -181,7 +194,7 @@ function healAmt(B, c, pow) {
 
 function readySkills(c) {
   if (c.silence > 0) return [];
-  return c.skills.filter((s) => s.cd <= 0 && SKILLS[s.id].kind !== "passive").map((s) => s.id);
+  return c.skills.filter((s) => s.cd <= 0 && SKILLS[s.id].kind !== "passive" && (c.mp == null || c.mp >= mpCost(SKILLS[s.id]))).map((s) => s.id);
 }
 
 // 행동 결정
@@ -215,10 +228,18 @@ function decide(B, c) {
     }
   }
   if (B.tactic !== "save" || c.side === "E") {
-    for (const id of ready) {
+    let atks = ready.filter((id) => SKILLS[id].kind === "atk" && !(SKILLS[id].rng === "melee" && meleeBlocked));
+    if (c.mp != null && atks.length) {
+      const cost = (id) => mpCost(SKILLS[id]);
+      atks.sort((a, b) => (c.mpStyle === "small" ? cost(a) - cost(b) : cost(b) - cost(a)));
+      // 큰 기술 성향: 대기 중인 가장 큰 공격 기술을 쓸 마나가 모일 때까지 작은 기술을 참는다
+      if (c.mpStyle === "big") {
+        const top = Math.max(...c.skills.filter((s) => s.cd <= 0 && SKILLS[s.id].kind === "atk").map((s) => cost(s.id)));
+        if (top > c.mp) atks = [];
+      }
+    }
+    for (const id of atks) {
       const sk = SKILLS[id];
-      if (sk.kind !== "atk") continue;
-      if (sk.rng === "melee" && meleeBlocked) continue;
       const list = sk.rng === "melee" ? frontTargets(B, c) : alive(B, foe(c));
       if (!list.length) break;
       return { sk: id, t: pickTarget(B, c, list, sk) };
@@ -253,6 +274,7 @@ function step(B) {
   for (const d of c.dots) { tick += d.v; d.t--; }
   c.dots = c.dots.filter((d) => d.t > 0);
   if (tick) { c.hp = Math.max(0, c.hp - tick); out.dot = tick; if (c.hp <= 0) { c.alive = false; out.dotDead = true; return finish(B, out); } }
+  if (c.mp != null) c.mp = Math.min(c.maxMp, c.mp + c.mpRegen);
   if (has(c, "innerpeace")) { const r = Math.round(c.maxHp * 0.03); c.hp = Math.min(c.maxHp, c.hp + r); }
 
   const act = decide(B, c);
@@ -276,6 +298,7 @@ function step(B) {
     const sk = SKILLS[act.sk];
     const slot = c.skills.find((s) => s.id === act.sk);
     slot.cd = sk.cd + 1;
+    if (c.mp != null) c.mp -= mpCost(sk);
     out.skill = act.sk;
     out.kind = sk.kind;
     out.target = act.t.id;

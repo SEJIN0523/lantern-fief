@@ -77,7 +77,7 @@ function renderField(B, opts) {
     const spr = c.side === "A" ? unitSprite(c.unit) : monSprite(c.mon);
     return `<div class="bu ${c.side === "E" ? "foe" : ""}${c.boss ? " big" : ""}" id="bu-${c.id}" data-z="${10 + c.lane}" style="left:${p.x}%;top:${p.y}%;z-index:${10 + c.lane}">
       <div class="bu-body">${spr}</div>
-      <div class="bu-hp"><i style="width:${(c.hp / c.maxHp) * 100}%"></i><s style="width:0"></s></div>
+      <div class="bu-hp"><i style="width:${(c.hp / c.maxHp) * 100}%"></i><s style="width:0"></s></div>${c.mp != null ? `<div class="bu-mp"><i style="width:${c.mp}%"></i></div>` : ""}
       <div class="bu-nm">${c.side === "E" ? c.name + " Lv" + c.lv : c.name}</div>
     </div>`;
   }).join("");
@@ -98,6 +98,7 @@ function updateBars(B) {
     if (!el) continue;
     el.querySelector(".bu-hp i").style.width = (c.hp / c.maxHp) * 100 + "%";
     el.querySelector(".bu-hp s").style.width = Math.min(100, (c.shield / c.maxHp) * 100) + "%";
+    const mp = el.querySelector(".bu-mp i"); if (mp) mp.style.width = (c.mp / c.maxMp) * 100 + "%";
     el.classList.toggle("dead", !c.alive);
     el.classList.toggle("taunt", c.taunt > 0);
   }
