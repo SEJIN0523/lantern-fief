@@ -336,10 +336,10 @@ function renderForm() {
     for (const col of [1, 0]) {
       const f = at(col, lane);
       const u = f && unitById(f.id);
-      grid += `<div role="button" tabindex="0" aria-label="${col === 0 ? '전열' : '후열'} ${lane + 1}줄 ${u ? esc(u.name) : '빈 칸'}" class="cell ${col === 0 ? "front" : "back"} ${u && SEL === u.id ? "sel" : ""} ${u ? "full" : ""}" data-act="cell" data-arg="${col}:${lane}">${u ? `<div class="cell-u">${unitSprite(u)}</div><small>${esc(u.name)}</small>${u.injured ? `<em>${ic("injury", "sm")}</em>` : ""}` : `<span class="plus">＋</span>`}</div>`;
+      grid += `<div role="button" tabindex="0" aria-label="${col === 0 ? '전열' : '후열'} ${lane + 1}줄 ${u ? esc(u.name) : '빈 칸'}" class="cell ${col === 0 ? "front" : "back"} ${u && SEL === u.id ? "sel" : ""} ${u ? "full" : ""}" data-act="cell" data-arg="${col}:${lane}">${u ? `<div class="cell-u" style="--lc:${LINES[u.line].color}">${unitFace(u)}</div><div class="cell-t"><b>${esc(u.name)}</b><small>Lv${u.lv} · ${JOBS[u.job].name}</small></div>${u.injured ? `<em>${ic("injury", "sm")}</em>` : ""}` : `<span class="plus">＋</span>`}</div>`;
     }
   }
-  const bench = G.roster.filter((u) => !G.form.some((f) => f.id === u.id)).map((u) => `<button class="bc ${SEL === u.id ? "on" : ""}" data-act="pickunit" data-arg="${u.id}"><div class="bc-art" style="--lc:${LINES[u.line].color}">${unitSprite(u)}</div><b>${esc(u.name)}</b><small>${JOBS[u.job].name} ${u.lv}</small></button>`).join("");
+  const bench = G.roster.filter((u) => !G.form.some((f) => f.id === u.id)).map((u) => `<button class="bc ${SEL === u.id ? "on" : ""}" data-act="pickunit" data-arg="${u.id}"><div class="bc-art" style="--lc:${LINES[u.line].color}">${unitFace(u)}</div><span class="bc-t"><b>${esc(u.name)}</b><small>Lv${u.lv} · ${JOBS[u.job].name}</small></span></button>`).join("");
   const tp = formUnits().reduce((a, f) => a + power(f.unit), 0);
   return panel("편성", `
     <div class="fwrap"><div class="fgrid"><div class="fh">후열</div><div class="fh">전열 ▶ 적</div>${grid}</div></div>

@@ -798,3 +798,27 @@ div.mc-holy, div.mc-heal { border-color: #ffe680; box-shadow: 0 0 14px #ffe680, 
 .cc-tx .mbar { flex:none; }
 .cc .pw { margin-top:auto; }
 @media(max-width:360px) { .cc { grid-template-columns:68px minmax(0,1fr); } .cc-art { width:68px; } }
+
+/* 편성 v2: 칸마다 얼굴 + 이름·직업, 대기 명단은 2열 카드 */
+.fwrap { padding:8px; }
+.fgrid { gap:6px; }
+.fh { padding:2px 0 4px; font-size:12px; }
+.cell { height:58px; flex-direction:row; align-items:center; justify-content:flex-start; gap:8px; padding:4px; }
+.cell:not(.full) { justify-content:center; }
+.cell .plus { font-size:18px; opacity:.35; }
+.cell-u { position:relative; inset:auto; flex:none; width:48px; height:48px; border-radius:4px; overflow:hidden; display:block; background:radial-gradient(ellipse at 50% 90%,color-mix(in srgb,var(--lc) 40%,transparent),transparent 75%),#0d1e25; border:1px solid #ffffff1a; }
+.cell-u>.spr.face { width:100%; height:100%; max-width:none; object-fit:cover; }
+.cell-u>.spr:not(.face), .cell-u>.ph { width:100%; height:100%; }
+.cell-t { min-width:0; display:flex; flex-direction:column; gap:1px; text-align:left; }
+.cell-t b { font-size:13px; line-height:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cell-t small { font-size:10px; line-height:14px; color:var(--dim, #9fb3b3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cell.front.full { box-shadow:inset 3px 0 0 #c9a46a88; }
+.cell em { top:3px; right:4px; }
+.bench { display:grid; grid-template-columns:1fr 1fr; gap:6px; overflow:visible; }
+.bc { width:auto; flex-direction:row; align-items:center; gap:8px; padding:4px; text-align:left; min-height:58px; }
+.bc-art { flex:none; width:48px; height:48px; border-radius:4px; }
+.bc-art>.spr.face { width:100%; height:100%; object-fit:cover; }
+.bc-t { min-width:0; display:flex; flex-direction:column; }
+.bc-t b { margin:0; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bc-t small { font-size:10px; }
+@media(max-height:700px) { .cell { height:52px; } .cell-u { width:42px; height:42px; } }
