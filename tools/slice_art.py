@@ -121,6 +121,35 @@ def longest_run(row):
     return best
 
 
+def body_height(cell):
+    """머리 꼭대기(가는 무기 끝 제외)부터 발까지의 높이 / 칸 높이."""
+    rgb, a = keyed(cell)
+    ys, xs = np.nonzero(a)
+    if not len(ys):
+        return None
+    S = cell.height
+    top, bot = ys.min(), ys.max()
+    low = ys >= bot - max(4, (bot - top) * 0.12)
+    fx = np.median(xs[low])
+    for y in range(top, bot):
+        x0 = int(max(0, fx - S * 0.2)); x1 = int(min(a.shape[1], fx + S * 0.2))
+        r0, r1 = longest_run(a[y, x0:x1] > 0)
+        if r1 - r0 >= S * 0.09:
+            return (bot - y) / S
+    return None
+
+
+# 시트마다 그린 크기가 달라서(궁수·세진·평민 시트가 작게 그려짐) 가장 큰 인물의 키를 이 비율로 맞춘다
+BODY_TARGET = 0.91
+
+
+def scale_cell(cell, k):
+    """발 기준으로 키운 뒤 같은 크기로 다시 자른다."""
+    w, h = cell.size
+    big = cell.resize((round(w * k), round(h * k)), Image.NEAREST)
+    return big.crop(((big.width - w) // 2, big.height - h, (big.width - w) // 2 + w, big.height))
+
+
 def face_crop(cell, size):
     """얼굴(전투 행동 순서)과 상반신(대화창): 발 위쪽에서 머리를 찾아 정사각형으로 자른다. 지팡이·활 끝은 가늘어서 건너뛴다."""
     rgb, a = keyed(cell)
@@ -172,18 +201,21 @@ def sheet(cat, name, mode, cols, rows, size, keyfn, faces=False):
     if not src.exists() or f"{cat}/{name}" in SKIP:
         return
     im = Image.open(src).convert("RGB")
+    sheet_k = 1.0
+    if mode == "foot" and cat in ("jobs", "npc"):
+        hs = [body_height(c) * CELL_SCALE.get(f"{cat}/{name}#{n}", 1) for n, c in cells(im, cols, rows)]
+        hs = [h for h in hs if h]
+        if hs:
+            sheet_k = min(1.25, max(1.0, BODY_TARGET / max(hs)))
     for n, cell in cells(im, cols, rows):
         if f"{cat}/{name}#{n}" in SKIP:
             continue
         key = keyfn(n)
         if key is None:
             continue
-        k = CELL_SCALE.get(f"{cat}/{name}#{n}")
-        if k:
-            # 발 기준으로 키운 뒤 같은 크기로 다시 자른다
-            w, h = cell.size
-            big = cell.resize((round(w * k), round(h * k)), Image.NEAREST)
-            cell = big.crop(((big.width - w) // 2, big.height - h, (big.width - w) // 2 + w, big.height))
+        k = CELL_SCALE.get(f"{cat}/{name}#{n}", 1) * sheet_k
+        if k > 1.001:
+            cell = scale_cell(cell, k)
         out = foot_anchor(cell, size) if mode == "foot" else centered(cell, size)
         if out is not None:
             save(out, f"{cat}/{key}.webp", key)

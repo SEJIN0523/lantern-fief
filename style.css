@@ -965,3 +965,6 @@ small, .dim, .hint { color:var(--dim); }
 .mp-info b { font-size:12px; }
 .mp-info small { grid-column:1/-1; font-size:11px; }
 .bu:not(.foe) .bu-nm { bottom:calc(-17% - 5px); }
+/* 태그는 줄바꿈하지 않는다 */
+.tag { display:inline-flex; align-items:center; gap:3px; white-space:nowrap; flex:none; }
+.cc-tx .tags { min-width:0; }
