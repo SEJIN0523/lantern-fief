@@ -36,7 +36,7 @@ const JOBS = {
   // 마을 주민: 모두 여기서 시작해 숨은 적성(계열)의 1차 직업으로 전직한다
   villager: { name: "마을 주민", line: "villager", tier: 0, role: "만능", range: "melee", weapon: "tool", mods: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0], skills: [], next: [], lv: 5 },
 
-  warrior: { bld: "smithy", name: "전사", line: "warrior", tier: 1, role: "근딜/방탱", range: "melee", weapon: "sword", mods: [1.2, 1.15, 0.9, 0.6, 0.7, 0.9], skills: ["bash"], next: ["knight", "swordsman", "berserker"] },
+  warrior: { bld: "training", name: "전사", line: "warrior", tier: 1, role: "근딜/방탱", range: "melee", weapon: "sword", mods: [1.2, 1.15, 0.9, 0.6, 0.7, 0.9], skills: ["bash"], next: ["knight", "swordsman", "berserker"] },
   knight: { name: "기사", line: "warrior", tier: 2, role: "방탱", range: "melee", weapon: "sword", mods: [1.1, 1.4, 0.8, 0.6, 0.9, 0.9], skills: ["guard", "shieldup"], next: ["fortressknight", "paladin"] },
   swordsman: { name: "검사", line: "warrior", tier: 2, role: "근딜", range: "melee", weapon: "sword", mods: [1.4, 1.0, 1.15, 0.6, 0.7, 1.0], skills: ["twincut", "counter"], next: ["swordsaint"] },
   berserker: { name: "광전사", line: "warrior", tier: 2, role: "근딜", range: "melee", weapon: "axe", mods: [1.55, 1.25, 0.9, 0.4, 0.5, 0.9], skills: ["frenzy", "whirl"], next: ["warlord"] },
@@ -45,7 +45,7 @@ const JOBS = {
   swordsaint: { name: "검성", line: "warrior", tier: 3, role: "근딜", range: "melee", weapon: "sword", mods: [1.7, 1.0, 1.35, 0.6, 0.8, 1.1], skills: ["issen"], next: [] },
   warlord: { name: "전쟁군주", line: "warrior", tier: 3, role: "근딜/버프", range: "melee", weapon: "axe", mods: [1.7, 1.35, 0.9, 0.5, 0.8, 0.9], skills: ["warcry"], next: [] },
 
-  spearman: { bld: "barracks", name: "창병", line: "soldier", tier: 1, role: "관통", range: "reach", weapon: "spear", mods: [1.1, 1.1, 1.0, 0.6, 0.8, 0.9], skills: ["thrust"], next: ["phalanx", "halberdier", "sapper"] },
+  spearman: { bld: "training", name: "창병", line: "soldier", tier: 1, role: "관통", range: "reach", weapon: "spear", mods: [1.1, 1.1, 1.0, 0.6, 0.8, 0.9], skills: ["thrust"], next: ["phalanx", "halberdier", "sapper"] },
   phalanx: { name: "방진병", line: "soldier", tier: 2, role: "방탱", range: "reach", weapon: "spear", mods: [1.0, 1.5, 0.8, 0.6, 1.0, 0.8], skills: ["guard", "spearwall"], next: ["guardcaptain"] },
   halberdier: { name: "미늘창병", line: "soldier", tier: 2, role: "근딜", range: "reach", weapon: "spear", mods: [1.45, 1.15, 0.95, 0.5, 0.7, 0.9], skills: ["sweep"], next: ["dragoon"] },
   sapper: { name: "공병", line: "soldier", tier: 2, role: "특수", range: "reach", weapon: "tool", mods: [1.1, 1.15, 1.0, 1.1, 0.8, 1.0], skills: ["barricade", "snare"], next: ["siegeengineer"] },
@@ -53,7 +53,7 @@ const JOBS = {
   dragoon: { name: "용기병", line: "soldier", tier: 3, role: "근딜", range: "reach", weapon: "spear", mods: [1.65, 1.2, 1.2, 0.5, 0.8, 0.9], skills: ["jump"], next: [] },
   siegeengineer: { name: "공성기술자", line: "soldier", tier: 3, role: "특수", range: "reach", weapon: "tool", mods: [1.2, 1.2, 0.9, 1.4, 0.9, 1.0], skills: ["turret"], next: [] },
 
-  thief: { bld: "tavern", name: "도적", line: "rogue", tier: 1, role: "근딜/회피", range: "melee", weapon: "dagger", mods: [1.0, 0.85, 1.35, 0.7, 0.7, 1.3], skills: ["steal"], next: ["duelist", "assassin", "scout"] },
+  thief: { bld: "training", name: "도적", line: "rogue", tier: 1, role: "근딜/회피", range: "melee", weapon: "dagger", mods: [1.0, 0.85, 1.35, 0.7, 0.7, 1.3], skills: ["steal"], next: ["duelist", "assassin", "scout"] },
   duelist: { name: "결투가", line: "rogue", tier: 2, role: "회탱", range: "melee", weapon: "dagger", mods: [1.1, 1.0, 1.55, 0.6, 0.8, 1.2], skills: ["taunt", "riposte"], next: ["bladedancer"] },
   assassin: { name: "암살자", line: "rogue", tier: 2, role: "근딜", range: "ranged", weapon: "dagger", mods: [1.35, 0.8, 1.45, 0.6, 0.6, 1.2], skills: ["vital"], next: ["nightblade"] },
   scout: { name: "척후병", line: "rogue", tier: 2, role: "특수", range: "ranged", weapon: "dagger", mods: [1.0, 0.9, 1.5, 0.9, 0.8, 1.4], skills: ["expose"], next: ["pathfinder"] },
@@ -61,7 +61,7 @@ const JOBS = {
   nightblade: { name: "그림자칼날", line: "rogue", tier: 3, role: "근딜", range: "ranged", weapon: "dagger", mods: [1.6, 0.9, 1.7, 0.6, 0.6, 1.3], skills: ["shadowstrike"], next: [] },
   pathfinder: { name: "길잡이", line: "rogue", tier: 3, role: "특수", range: "ranged", weapon: "dagger", mods: [1.2, 1.0, 1.7, 1.0, 1.0, 1.5], skills: ["gale"], next: [] },
 
-  archer: { bld: "guild", name: "궁수", line: "archer", tier: 1, role: "원딜", range: "ranged", weapon: "bow", mods: [1.1, 0.85, 1.25, 0.7, 0.8, 1.1], skills: ["aimshot"], next: ["ranger", "hunter", "crossbowman"] },
+  archer: { bld: "training", name: "궁수", line: "archer", tier: 1, role: "원딜", range: "ranged", weapon: "bow", mods: [1.1, 0.85, 1.25, 0.7, 0.8, 1.1], skills: ["aimshot"], next: ["ranger", "hunter", "crossbowman"] },
   ranger: { name: "레인저", line: "archer", tier: 2, role: "원딜", range: "ranged", weapon: "bow", mods: [1.3, 0.9, 1.45, 0.7, 0.8, 1.1], skills: ["volley"], next: ["hawkeye"] },
   hunter: { name: "사냥꾼", line: "archer", tier: 2, role: "디버프", range: "ranged", weapon: "bow", mods: [1.25, 1.0, 1.3, 0.8, 0.8, 1.2], skills: ["bleedshot"], next: ["monsterhunter"] },
   crossbowman: { name: "석궁병", line: "archer", tier: 2, role: "원딜", range: "ranged", weapon: "crossbow", mods: [1.45, 1.0, 1.0, 0.7, 0.8, 1.0], skills: ["pierce"], next: ["siegearcher"] },
@@ -69,7 +69,7 @@ const JOBS = {
   monsterhunter: { name: "마물 사냥꾼", line: "archer", tier: 3, role: "원딜/디버프", range: "ranged", weapon: "bow", mods: [1.5, 1.1, 1.4, 0.8, 0.9, 1.3], skills: ["weakspot"], next: [] },
   siegearcher: { name: "공성사수", line: "archer", tier: 3, role: "원딜", range: "ranged", weapon: "crossbow", mods: [1.75, 1.1, 1.0, 0.7, 0.8, 1.0], skills: ["barrage"], next: [] },
 
-  mage: { bld: "magetower", name: "견습 마법사", line: "mage", tier: 1, role: "마딜", range: "magic", weapon: "staff", mods: [0.5, 0.75, 0.9, 1.4, 1.1, 1.0], skills: ["fireball"], next: ["elementalist", "warlock", "barriermage"] },
+  mage: { bld: "training", name: "견습 마법사", line: "mage", tier: 1, role: "마딜", range: "magic", weapon: "staff", mods: [0.5, 0.75, 0.9, 1.4, 1.1, 1.0], skills: ["fireball"], next: ["elementalist", "warlock", "barriermage"] },
   elementalist: { name: "원소술사", line: "mage", tier: 2, role: "마딜", range: "magic", weapon: "staff", mods: [0.5, 0.8, 0.95, 1.7, 1.2, 1.0], skills: ["burst"], next: ["archmage"] },
   warlock: { name: "흑마법사", line: "mage", tier: 2, role: "디버프", range: "magic", weapon: "staff", mods: [0.5, 0.85, 0.9, 1.55, 1.3, 1.0], skills: ["curse"], next: ["darkmage"] },
   barriermage: { name: "결계술사", line: "mage", tier: 2, role: "마탱", range: "magic", weapon: "staff", mods: [0.5, 1.0, 0.85, 1.45, 1.45, 1.0], skills: ["barrier"], next: ["grandbarrier"] },
@@ -77,7 +77,7 @@ const JOBS = {
   darkmage: { name: "암흑마도사", line: "mage", tier: 3, role: "마딜/디버프", range: "magic", weapon: "staff", mods: [0.5, 0.95, 0.95, 1.85, 1.45, 1.0], skills: ["drain"], next: [] },
   grandbarrier: { name: "대결계사", line: "mage", tier: 3, role: "마탱", range: "magic", weapon: "staff", mods: [0.5, 1.2, 0.85, 1.6, 1.75, 1.0], skills: ["grandward"], next: [] },
 
-  acolyte: { bld: "church", name: "견습 사제", line: "cleric", tier: 1, role: "힐", range: "heal", weapon: "mace", mods: [0.7, 0.9, 0.85, 1.0, 1.4, 1.0], skills: ["heal"], next: ["priest", "monk", "inquisitor"] },
+  acolyte: { bld: "training", name: "견습 사제", line: "cleric", tier: 1, role: "힐", range: "heal", weapon: "mace", mods: [0.7, 0.9, 0.85, 1.0, 1.4, 1.0], skills: ["heal"], next: ["priest", "monk", "inquisitor"] },
   priest: { name: "사제", line: "cleric", tier: 2, role: "힐", range: "heal", weapon: "staff", mods: [0.6, 0.95, 0.9, 1.1, 1.7, 1.1], skills: ["massheal"], next: ["highpriest"] },
   monk: { name: "수도승", line: "cleric", tier: 2, role: "회탱/근딜", range: "melee", weapon: "fist", mods: [1.3, 1.1, 1.4, 0.6, 1.1, 1.0], skills: ["flurry", "innerpeace"], next: ["grandmaster"] },
   inquisitor: { name: "심판관", line: "cleric", tier: 2, role: "방탱/근딜", range: "melee", weapon: "mace", mods: [1.3, 1.3, 0.85, 0.8, 1.2, 0.9], skills: ["judgement", "guard"], next: ["grandinquisitor"] },
@@ -184,16 +184,16 @@ const TRAITS = {
   ],
   hobby: [
     { id: "cook", name: "요리", desc: "원정 중 식사로 시작 체력 +5%", mod: { startHp: 0.05 } },
-    { id: "fish", name: "낚시", desc: "마을 식량 +1/일", mod: { food: 1 } },
+    { id: "fish", name: "낚시", desc: "잡은 물고기를 팔아 하루 수입 +1", mod: { gold1: 1 } },
     { id: "sing", name: "노래", desc: "주점 수입 +, 아군 사기 +", mod: { gold1: 2 } },
     { id: "read", name: "독서", desc: "지력 성장 +10%", mod: { growInt: 0.1 } },
     { id: "gamble", name: "도박", desc: "행운 +, 치명 +3%", mod: { crit: 0.03 } },
     { id: "smith", name: "대장일", desc: "무기 강화 비용 -15%", mod: { forge: 0.15 } },
-    { id: "garden", name: "원예", desc: "농장 식량 +1/일", mod: { food: 1 } },
+    { id: "garden", name: "원예", desc: "텃밭 채소를 팔아 하루 수입 +1", mod: { gold1: 1 } },
     { id: "drink", name: "술", desc: "피로 회복 +", mod: { rest: 1 } },
     { id: "animal", name: "동물 돌보기", desc: "짐승에게 받는 피해 -10%", mod: { beastDef: 0.1 } },
     { id: "train", name: "훈련광", desc: "쉬는 날에도 경험치 획득", mod: { idleExp: 1 } },
-    { id: "craft", name: "손재주", desc: "함정 피해 무시, 목재 +1/일", mod: { wood: 1 } },
+    { id: "craft", name: "손재주", desc: "함정 피해 무시, 공예품으로 하루 수입 +1", mod: { gold1: 1 } },
   ],
   origin: [
     { id: "farm", name: "농가 출신", desc: "체력 +3", stat: { vit: 3 } },
@@ -246,21 +246,14 @@ const DUNGEONS = {
   },
 };
 
-// 건물. cost(lv): 다음 레벨 비용
+// 건물: 금화로만 짓는다. cost(lv): 다음 레벨 비용
 const BUILDINGS = {
-  hall: { name: "촌장의 집", icon: "🏠", max: 5, desc: "마을의 중심. 레벨이 다른 건물의 상한.", cost: (l) => ({ wood: 20 * l, stone: 10 * (l - 1), gold: 40 * l }) },
-  palisade: { name: "목책과 망루", icon: "🪵", max: 5, desc: "밤 습격 때 아군 방어 +8%/레벨, 패배 피해 감소.", cost: (l) => ({ wood: 15 + 15 * l, stone: 8 * (l - 1), gold: 10 * l }) },
-  lodging: { name: "숙소", icon: "🛏️", max: 5, desc: "동료 수용 인원 +2/레벨, 피로 회복.", cost: (l) => ({ wood: 20 + 10 * l, gold: 20 * l }) },
-  farm: { name: "농장", icon: "🌾", max: 5, desc: "일꾼 1명당 식량 +레벨.", cost: (l) => ({ wood: 10 + 10 * l, gold: 10 * l }) },
-  lumber: { name: "벌목장", icon: "🪓", max: 5, desc: "일꾼 1명당 목재 +레벨.", cost: (l) => ({ wood: 5 + 8 * l, gold: 10 * l }) },
-  quarry: { name: "채석장", icon: "⛏️", max: 5, desc: "일꾼 1명당 석재 +레벨.", cost: (l) => ({ wood: 20 + 10 * l, gold: 20 * l }) },
-  guild: { name: "사냥꾼 오두막", icon: "🏹", max: 5, desc: "궁수 전직. 이주민이 더 자주 찾아온다.", cost: (l) => ({ wood: 25 * l, stone: 5 * l, gold: 30 * l }) },
-  barracks: { name: "병영", icon: "🛡️", max: 5, desc: "창병 전직과 훈련(대기 동료 경험치).", cost: (l) => ({ wood: 25 * l, stone: 5 * l, gold: 30 * l }) },
-  smithy: { name: "대장간", icon: "⚒️", max: 5, desc: "전사 전직. 고유 무기 강화, 레벨마다 강화 상한 +10.", cost: (l) => ({ wood: 15 * l, stone: 15 * l, gold: 40 * l }) },
-  church: { name: "교회", icon: "⛪", max: 5, desc: "견습 사제 전직. 부상 회복 속도 +.", cost: (l) => ({ wood: 25 * l, stone: 15 * l, gold: 40 * l }) },
-  tavern: { name: "주점", icon: "🍺", max: 5, desc: "도적 전직. 금화 수입 +, 사기 +.", cost: (l) => ({ wood: 20 * l, gold: 30 * l }) },
-  magetower: { name: "마탑", icon: "🔮", max: 5, desc: "견습 마법사 전직. 레벨마다 마법 계열 경험치 +10%.", cost: (l) => ({ wood: 20 * l, stone: 20 * l, gold: 50 * l }) },
-  spring: { name: "윤회의 샘", icon: "💧", max: 5, unlock: "spring", desc: "환생. 레벨이 높을수록 환생 때 남는 힘이 커진다.", cost: (l) => ({ stone: 60 * l, gold: 150 * l }) },
+  hall: { name: "촌장의 집", icon: "🏠", max: 5, desc: "마을의 중심. 레벨마다 하루 수입 +4, 다른 건물의 상한, 상점 품목 증가.", cost: (l) => ({ gold: 40 * l * l + 40 * l }) },
+  lodging: { name: "숙소", icon: "🛏️", max: 5, desc: "동료 수용 인원 +2/레벨. 피로와 부상이 빨리 낫는다.", cost: (l) => ({ gold: 30 * l * l + 20 }) },
+  training: { name: "수련장", icon: "🛡️", max: 5, desc: "마을 주민의 첫 전직. 레벨마다 쉬는 동료 경험치 +, 이주민이 더 자주 온다.", cost: (l) => ({ gold: 30 * l * l + 30 * l }) },
+  smithy: { name: "대장간", icon: "⚒️", max: 5, desc: "무기 강화. 레벨마다 강화 상한 +10, 상점에 좋은 무기가 들어온다.", cost: (l) => ({ gold: 30 * l * l + 30 * l }) },
+  palisade: { name: "목책과 망루", icon: "🪵", max: 5, desc: "밤 습격 때 아군 방어 +8%/레벨, 패배 피해 감소.", cost: (l) => ({ gold: 20 * l * l + 20 * l }) },
+  spring: { name: "윤회의 샘", icon: "💧", max: 5, unlock: "spring", desc: "환생. 레벨이 높을수록 환생 때 남는 힘이 커진다.", cost: (l) => ({ gold: 300 * l }) },
 };
 
 const NAMES = {

@@ -58,7 +58,7 @@ function newUnit(opts = {}) {
       origin: pick(TRAITS.origin).id,
       quirk: chance(opts.quirkChance ?? 0.18) ? pick(TRAITS.quirk).id : null,
     },
-    weapon: { plus: 0, name: null },
+    weapon: newWeapon(J.weapon, 0),
     armor: null, acc: [null, null],
     injured: 0, fatigue: 0, bond: 0, days: 0, kills: 0, battles: 0,
     hero: !!opts.hero,
@@ -126,19 +126,33 @@ function gainExp(u, amount) {
   return ups;
 }
 
-// 고유 무기
-function weaponTier(u) { return Math.max(1, JOBS[u.job].tier); }
-function weaponAtk(u) { return (5 + weaponTier(u) * 5) * (1 + u.weapon.plus * 0.07) + u.weapon.plus; }
-function weaponName(u) {
-  const base = { sword: "검", axe: "도끼", spear: "창", dagger: "단검", bow: "활", crossbow: "석궁", staff: "지팡이", mace: "철퇴", fist: "건틀릿", tool: "연장", book: "마도서" }[JOBS[u.job].weapon];
-  return (u.weapon.name ? `「${u.weapon.name}」 ` : `${u.name}의 `) + base + (u.weapon.plus ? ` +${u.weapon.plus}` : "");
-}
+// ---------- 무기: 상점에서 사거나 전투에서 얻어 장착하고, 대장간에서 강화한다 ----------
+// 종류가 지금 직업의 무기와 맞아야 제 힘을 낸다(맞지 않으면 60%)
+const WEAPON_KIND = { sword: "검", axe: "도끼", spear: "창", dagger: "단검", bow: "활", crossbow: "석궁", staff: "지팡이", mace: "철퇴", fist: "건틀릿", tool: "연장", book: "마도서" };
+const WEAPON_GRADE = [
+  { name: "낡은", pow: 8, price: 20 }, { name: "쇠", pow: 12, price: 70 }, { name: "강철", pow: 17, price: 180 },
+  { name: "미스릴", pow: 24, price: 420 }, { name: "용린", pow: 33, price: 900 }, { name: "이계의", pow: 44, price: 1800 },
+];
+const GRADE_NAME = ["일반", "고급", "희귀", "영웅", "전설", "이계"];
+let WID = 1;
+function newWeapon(kind, grade) { return { id: "w" + Date.now().toString(36) + WID++, kind, grade, plus: 0, name: null }; }
+function weaponFits(u, w) { return !!w && w.kind === JOBS[u.job].weapon; }
+function weaponPow(w) { return WEAPON_GRADE[w.grade].pow * (1 + w.plus * 0.07) + w.plus; }
+function weaponAtk(u) { const w = u.weapon; if (!w) return 3; return weaponPow(w) * (weaponFits(u, w) ? 1 : 0.6); }
+function weaponLabel(w) { return (w.name ? `「${w.name}」 ` : "") + `${WEAPON_GRADE[w.grade].name} ${WEAPON_KIND[w.kind]}` + (w.plus ? ` +${w.plus}` : ""); }
+function weaponName(u) { return u.weapon ? weaponLabel(u.weapon) : "맨손"; }
+function weaponPrice(w) { return Math.round(WEAPON_GRADE[w.grade].price * (1 + w.plus * 0.15)); }
 function forgeCost(u) {
   const p = u.weapon.plus + 1;
   const disc = 1 - traitMod(u, "forge");
-  return { gold: Math.round(18 * Math.pow(p, 1.35) * disc), stone: Math.round(4 * p * disc) };
+  return { gold: Math.round(22 * Math.pow(p, 1.35) * (1 + u.weapon.grade * 0.35) * disc) };
 }
 function forgeChance(u) { return Math.max(0.3, 1 - u.weapon.plus * 0.03); }
+// 적 레벨로 떨어지는 무기 등급
+function dropGrade(lv, boss) {
+  const g = lv < 8 ? pick([0, 0, 1]) : lv < 20 ? pick([1, 1, 2]) : lv < 35 ? pick([2, 2, 3]) : lv < 55 ? pick([3, 3, 4]) : lv < 75 ? pick([3, 4, 4]) : pick([4, 4, 5]);
+  return Math.min(lv >= 60 ? 5 : 4, g + (boss ? 1 : 0));
+}
 
 // 파생 능력치(전투 외 표시용 + 전투 초기값)
 function maxHp(u) {
@@ -212,6 +226,12 @@ function promote(u, to) {
     const opts = LINES[line].slots.map((s, i) => [s, i]).filter(([s]) => s[0] === u.gender);
     const [s, i] = pick(opts);
     u.line = line; u.slot = i; u.race = s[1];
+  }
+  // 무기 종류가 바뀌는 전직: 새 직업의 기본 무기를 받고, 쓰던 무기는 무기고로
+  const kind = JOBS[to].weapon;
+  if (!u.weapon || u.weapon.kind !== kind) {
+    if (u.weapon && typeof G !== "undefined" && G && G.arms) G.arms.push(u.weapon);
+    u.weapon = newWeapon(kind, clamp(JOBS[to].tier - 1, 0, 3));
   }
   // 전직 보너스: 마을 주민에서 1차로 갈 때 크게
   const bonus = JOBS[to].tier === 1 ? 4 : 2;

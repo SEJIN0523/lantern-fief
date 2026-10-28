@@ -34,7 +34,7 @@ function mkFromUnit(u, col, lane, opts) {
   return c;
 }
 
-var MON_POWER = 1.2;
+var MON_POWER = 1.3;
 function mkMonster(id, lv, col, lane, idx) {
   const M = MONSTERS[id];
   const [hp, atk, def, spd, mag] = M.base;
@@ -400,6 +400,15 @@ function battleRewards(B) {
   if (!B.win) { exp = Math.round(exp * 0.5); gold = Math.round(gold * 0.3); }
   const share = Math.round((exp / Math.max(1, as.length)) * 2.1);
   const res = { exp: share, gold, ups: {}, injured: [] };
+  // 전리품 무기: 이기면 30%(보스는 반드시). 종류는 출전한 동료들의 무기 중 하나
+  if (B.win && typeof G !== "undefined" && G && G.arms) {
+    const boss = es.some((e) => e.boss), lv = Math.max(...es.map((e) => e.lv));
+    if (boss || chance(0.3)) {
+      const kinds = [...new Set(as.map((c) => JOBS[c.unit.job].weapon))];
+      res.drop = newWeapon(pick(kinds), dropGrade(lv, boss));
+      G.arms.push(res.drop);
+    }
+  }
   if (B.hero) { const h = B.hero.unit; h.battles++; const ups = gainExp(h, share); if (ups.length) res.ups[h.id] = ups.length; }
   for (const c of as) {
     const u = c.unit;

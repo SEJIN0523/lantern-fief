@@ -10,10 +10,11 @@ function unitById(id) { return G.roster.find((u) => u.id === id); }
 function newGame(name) {
   G = {
     v: 1, day: 1, chapter: 0, story: "prologue",
-    res: { gold: 60, food: 40, wood: 30, stone: 0 },
+    res: { gold: 120 },
     pop: 22, morale: 50, fame: 0,
     workers: { farm: 4, lumber: 3, quarry: 0 },
-    bld: { hall: 1, palisade: 0, lodging: 1, farm: 1, lumber: 1, quarry: 0, guild: 0, barracks: 0, smithy: 0, church: 0, tavern: 0, magetower: 0, spring: 0 },
+    bld: { hall: 1, lodging: 1, training: 0, smithy: 0, palisade: 0, spring: 0 },
+    arms: [],
     chStart: 0, migrants: [], migDay: 0,
     built: {},
     roster: [], form: [], tactic: "all",
@@ -42,6 +43,11 @@ function load() {
 }
 // 예전 세이브 보정
 function migrate() {
+  if (G.bld.training == null) G.bld.training = Math.max(G.bld.barracks || 0, G.bld.guild || 0, G.bld.church || 0, G.bld.magetower || 0, G.bld.tavern || 0);
+  for (const k of Object.keys(G.bld)) if (!BUILDINGS[k]) delete G.bld[k];
+  if (G.res.wood != null || G.res.food != null || G.res.stone != null) { G.res.gold += Math.round((G.res.wood || 0) + (G.res.stone || 0) * 1.5 + (G.res.food || 0) * 0.5); G.res = { gold: G.res.gold }; }
+  G.arms = G.arms || [];
+  for (const u of G.roster) if (!u.weapon || u.weapon.kind == null) { const old = u.weapon || {}; u.weapon = { ...newWeapon(JOBS[u.job].weapon, clamp(JOBS[u.job].tier, 0, 4)), plus: old.plus || 0, name: old.name || null }; }
   for (const k in BUILDINGS) G.bld[k] = G.bld[k] || 0;
   G.chStart = G.chStart || 0; G.migrants = G.migrants || []; G.migDay = G.migDay || 0; G.dispatch = G.dispatch || null;
   G.heroName = G.heroName || "세진";
@@ -120,13 +126,12 @@ function log(msg) { G.log.unshift({ d: G.day, m: msg }); if (G.log.length > 60) 
 // 수용 인원과 일꾼
 function rosterCap() { return 3 + G.bld.lodging * 2; }
 function workerCap(b) { return G.bld[b] ? 3 + G.bld[b] * 2 : 0; }
-function freeVillagers() { return G.pop - G.workers.farm - G.workers.lumber - G.workers.quarry; }
+function freeVillagers() { return G.pop; }
 
 function canAfford(cost) { return Object.entries(cost).every(([k, v]) => (G.res[k] || 0) >= v); }
 function pay(cost) { for (const [k, v] of Object.entries(cost)) G.res[k] -= v; }
 function costText(cost) {
-  const ic = { gold: "💰", food: "🍞", wood: "🪵", stone: "🪨" };
-  return Object.entries(cost).filter(([, v]) => v > 0).map(([k, v]) => `${ic[k]}${v}`).join(" ");
+  return cost.gold ? `금화 ${cost.gold}` : "";
 }
 
 function buildCost(id) { return BUILDINGS[id].cost(G.bld[id] + 1); }
@@ -136,7 +141,7 @@ function canBuild(id) {
   if (lv >= b.max) return "최대 레벨";
   if (id !== "hall" && lv >= G.bld.hall) return "촌장의 집 레벨 부족";
   if (G.built[G.day]) return "오늘은 이미 공사했어요";
-  if (!canAfford(buildCost(id))) return "자원 부족";
+  if (!canAfford(buildCost(id))) return "금화 부족";
   return null;
 }
 function build(id) {
@@ -150,14 +155,9 @@ function build(id) {
 
 // 하루 생산과 유지비
 function dailyIncome() {
-  const w = G.workers;
-  const r = {
-    food: w.farm * (1 + G.bld.farm) - Math.ceil(G.pop * 0.3) - G.roster.length,
-    wood: w.lumber * (1 + G.bld.lumber),
-    stone: w.quarry * (G.bld.quarry ? 1 + G.bld.quarry : 0),
-    gold: 4 + Math.floor(G.pop / 4) + G.bld.tavern * 6 - G.roster.reduce((a, u) => a + (u.wage || 0), 0),
-  };
-  for (const u of G.roster) { r.food += traitMod(u, "food"); r.wood += traitMod(u, "wood"); r.gold += traitMod(u, "gold1"); }
+  // 마을 세금(주민 수)과 촌장의 집, 동료 급여
+  const r = { gold: 4 + Math.floor(G.pop / 4) + G.bld.hall * 4 - G.roster.reduce((a, u) => a + (u.wage || 0), 0) };
+  for (const u of G.roster) r.gold += traitMod(u, "gold1");
   return r;
 }
 
@@ -167,7 +167,7 @@ function refreshVolunteers() {
   G.volDay = G.day;
 }
 // 이주민: 명성이 오르면 다른 종족 가족이 찾아온다. 마을 인구도 늘어난다
-function migrantInterval() { return Math.max(3, 7 - G.bld.guild); }
+function migrantInterval() { return Math.max(3, 7 - G.bld.training); }
 function refreshMigrants() {
   if (G.fame < 5) return;
   const n = G.fame >= 60 ? 3 : G.fame >= 25 ? 2 : 1;
@@ -196,7 +196,7 @@ function hire(u, from) {
   return null;
 }
 function barracksRecruit() {
-  const u = newUnit({ job: "spearman", line: "soldier", lv: Math.max(1, G.bld.barracks), traits: { personality: pick(["brave", "loyal", "diligent", "calm", "optimist"]) } });
+  const u = newUnit({ job: "spearman", line: "soldier", lv: Math.max(1, G.bld.training), traits: { personality: pick(["brave", "loyal", "diligent", "calm", "optimist"]) } });
   u.wage = 1; u.price = 20;
   return u;
 }
@@ -318,14 +318,14 @@ function endDay() {
   resolveDispatch();
   const inc = dailyIncome();
   for (const k in inc) G.res[k] = Math.max(0, G.res[k] + inc[k]);
-  if (G.res.food <= 0) { G.morale = Math.max(0, G.morale - 8); log("식량이 바닥났어요. 사기가 떨어집니다."); }
+  if (G.res.gold <= 0) { G.morale = Math.max(0, G.morale - 5); log("금고가 바닥나 급여가 밀렸어요. 사기가 떨어집니다."); }
   const restBonus = 1 + Math.floor(G.bld.lodging / 2);
   for (const u of G.roster) {
     u.days++;
-    if (u.injured > 0) u.injured = Math.max(0, u.injured - (G.bld.church ? 2 : 1) * (traitMod(u, "injury") ? 2 : 1));
+    if (u.injured > 0) u.injured = Math.max(0, u.injured - (G.bld.lodging >= 2 ? 2 : 1) * (traitMod(u, "injury") ? 2 : 1));
     if (!u.busyToday) u.fatigue = Math.max(0, u.fatigue - restBonus - traitMod(u, "rest"));
     if (!u.busyToday && traitMod(u, "idleExp")) gainExp(u, 4 + u.lv);
-    if (!u.busyToday && G.bld.barracks) gainExp(u, G.bld.barracks * 2 + Math.floor(u.lv / 4));
+    if (!u.busyToday && G.bld.training) gainExp(u, G.bld.training * 2 + Math.floor(u.lv / 4));
     u.busyToday = false;
   }
   G.day++;

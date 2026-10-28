@@ -132,7 +132,7 @@ function dayEvents() {
     if (G.day >= 20 && G.seen.tax && !G.seen.taxdone) {
       G.seen.taxdone = true;
       if (G.res.gold >= 150) { G.res.gold -= 150; out.push("taxpaid"); G.morale = Math.min(100, G.morale + 10); }
-      else { G.res.food = Math.round(G.res.food * 0.5); G.res.wood = Math.round(G.res.wood * 0.5); G.res.gold = 0; G.morale = Math.max(0, G.morale - 20); out.push("taxfail"); }
+      else { G.res.gold = 0; G.morale = Math.max(0, G.morale - 20); out.push("taxfail"); }
     }
     once("ch1late", G.day > 30 && !G.flags.ch1clear);
   }

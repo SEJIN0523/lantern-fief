@@ -465,7 +465,7 @@ sceneEffect = function (id) {
   }
   if (id === "lina_promise") G.morale = Math.min(100, G.morale + 20);
   if (id === "lina_take") G.morale = Math.max(0, G.morale - 15);
-  if (id === "valtor_ally") { G.res.gold += 600; G.res.stone += 200; G.flags.valtor = true; }
+  if (id === "valtor_ally") { G.res.gold += 900; G.flags.valtor = true; }
   if (id === "valtor_refuse") { G.morale = Math.min(100, G.morale + 15); G.fame += 10; }
   if (id === "ch5clear") { G.inv.phone = (G.inv.phone || 0) + 1; if (h) promote(h, "pioneer"); }
   if (id === "late") G.morale = Math.max(0, G.morale - 10);

@@ -220,8 +220,7 @@ function loveOath(u) {
 
 // ---------- 화면 ----------
 function giftIc(id) {
-  const k = GIFT_ART[id];
-  return typeof ART !== "undefined" && ART[k] ? `<img class="ic item-ic" src="${ART[k]}" alt="">` : "🎁";
+  return `<span class="itx ${id === "ring" ? "g4" : "g1"}">선물</span>`;
 }
 function loveTag(u) {
   if (!u.loveStage || u.gender !== "f") return "";

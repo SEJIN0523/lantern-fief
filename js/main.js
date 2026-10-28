@@ -107,7 +107,7 @@ async function night() {
     if (win) { G.morale = Math.min(100, G.morale + 6); G.fame += 5; log("밤 습격을 막아냈다"); }
     else {
       const keep = 0.75 + G.bld.palisade * 0.04;
-      for (const k of ["gold", "food", "wood"]) G.res[k] = Math.round(G.res[k] * keep);
+      G.res.gold = Math.round(G.res.gold * keep);
       G.morale = Math.max(0, G.morale - 15); if (G.pop > 10) G.pop--;
       log("밤 습격에 마을이 약탈당했다");
     }
@@ -154,12 +154,6 @@ const ACT = {
     night();
   },
   build(id) { if (build(id)) { save(); showHub(); } },
-  wk(arg) {
-    const [k, d] = arg.split(":"); const v = +d;
-    if (v > 0 && (freeVillagers() < 1 || G.workers[k] >= workerCap(k))) return toast("더 배치할 수 없어요");
-    if (v < 0 && G.workers[k] <= 0) return;
-    G.workers[k] += v; save(); showHub();
-  },
   hire(arg) {
     const [from, i] = arg.split(":");
     const u = (from === "mig" ? G.migrants : G.volunteers)[+i];
@@ -189,6 +183,8 @@ const ACT = {
   forge(id) {
     const u = unitById(id), c = forgeCost(u);
     if (!canAfford(c)) return toast("재료가 부족해요");
+    if (!u.weapon) return toast("장착한 무기가 없어요");
+    if (u.weapon.plus >= G.bld.smithy * 10) return toast("대장간 레벨을 올리면 더 강화할 수 있어요");
     pay(c);
     if (chance(forgeChance(u))) {
       u.weapon.plus++;
@@ -206,6 +202,30 @@ const ACT = {
     if (promoteBlock(u, to)) return toast(promoteBlock(u, to));
     if (!confirm(`${u.name}을(를) ${JOBS[to].name}(으)로 전직할까요?`)) return;
     promote(u, to); log(`${u.name} → ${JOBS[to].name} 전직`); save(); closeModal(); showDetail(u);
+  },
+  // 무기: 무기고에서 바꿔 끼기, 사기, 팔기
+  equipw(arg) {
+    const [id, wid] = arg.split(":");
+    const u = unitById(id), i = G.arms.findIndex((w) => w.id === wid);
+    if (!u || i < 0) return;
+    const w = G.arms.splice(i, 1)[0];
+    if (u.weapon) G.arms.push(u.weapon);
+    u.weapon = w; save(); showDetail(u);
+  },
+  unequipw(id) { const u = unitById(id); if (u.weapon) { G.arms.push(u.weapon); u.weapon = null; } save(); showDetail(u); },
+  buyw(arg) {
+    const [kind, g] = arg.split(":");
+    const price = WEAPON_GRADE[+g].price;
+    if (G.res.gold < price) return toast("금화가 부족해요");
+    G.res.gold -= price; G.arms.push(newWeapon(kind, +g));
+    toast(`${WEAPON_GRADE[+g].name} ${WEAPON_KIND[kind]} 구입 · 무기고에 넣었어요`); save(); showHub();
+  },
+  sellw(wid) {
+    const i = G.arms.findIndex((w) => w.id === wid);
+    if (i < 0) return;
+    const w = G.arms[i], v = Math.round(weaponPrice(w) * 0.4);
+    if (w.name && !confirm(`이름 붙은 무기 「${w.name}」을(를) 팔까요?`)) return;
+    G.arms.splice(i, 1); G.res.gold += v; toast(`${weaponLabel(w)} 판매 · 금화 +${v}`); save(); showHub();
   },
   equip(arg) { const [id, slot, i] = arg.split(":"); showEquipPicker(unitById(id), slot, +i); },
   equipset(arg) {

@@ -143,8 +143,11 @@ function orderArt(c) {
   return typeof ART !== "undefined" && ART[k] ? `<img class="spr oface" src="${ART[k]}" alt="">` : unitSprite(c.unit);
 }
 function center(id) {
-  const f = document.getElementById("field").getBoundingClientRect();
-  const r = document.getElementById("bu-" + id).querySelector(".bu-body").getBoundingClientRect();
+  // 전투 화면이 사라졌거나 전장에 없는 유닛(지휘관)이면 가운데로
+  const fe = document.getElementById("field"), ue = document.getElementById("bu-" + id);
+  if (!fe || !ue) return { x: 0, y: 0, w: 0 };
+  const f = fe.getBoundingClientRect();
+  const r = ue.querySelector(".bu-body").getBoundingClientRect();
   return { x: r.left - f.left + r.width / 2, y: r.top - f.top + r.height / 2, w: r.width };
 }
 function foot(id) {
@@ -202,7 +205,7 @@ function popText(id, text, cls) {
   d.textContent = text;
   d.style.left = p.x + rnd(-10, 10) + "px";
   d.style.top = p.y - p.w * 0.3 + "px";
-  document.getElementById("fxl").appendChild(d);
+  (document.getElementById("fxl") || document.body).appendChild(d);
   const big = cls === "crit";
   d.animate([
     { transform: `translate(-50%,0) scale(${big ? 1.9 : 0.6})`, opacity: 0 },
@@ -232,7 +235,7 @@ function fxAt(id, kind, o = {}) {
   else d.className = "fx fx-" + kind;
   d.style.left = p.x + "px"; d.style.top = p.y + "px";
   const flip = o.flip ? " scaleX(-1)" : "";
-  document.getElementById("fxl").appendChild(d);
+  (document.getElementById("fxl") || document.body).appendChild(d);
   const frames = o.rise
     ? [{ transform: `translate(-50%,-50%) scale(.6)${flip}`, opacity: 0 }, { transform: `translate(-50%,-70%) scale(1)${flip}`, opacity: 1, offset: 0.3 }, { transform: `translate(-50%,-110%) scale(1.05)${flip}`, opacity: 0 }]
     : [{ transform: `translate(-50%,-50%) scale(.35)${flip}`, opacity: 1 }, { transform: `translate(-50%,-50%) scale(1)${flip}`, opacity: 1, offset: 0.45 }, { transform: `translate(-50%,-50%) scale(1.2)${flip}`, opacity: 0 }];
@@ -247,7 +250,7 @@ function magicCircle(id, kind) {
   if (hasArt(k)) d.src = ART[k];
   d.className = "mcircle mc-" + kind;
   d.style.left = p.x + "px"; d.style.top = p.y + "px"; d.style.width = p.w * 1.15 + "px";
-  document.getElementById("fxl").appendChild(d);
+  (document.getElementById("fxl") || document.body).appendChild(d);
   return d.animate([
     { transform: "translate(-50%,-50%) scaleY(.38) scale(.2) rotate(0deg)", opacity: 0 },
     { transform: "translate(-50%,-50%) scaleY(.38) scale(1.05) rotate(90deg)", opacity: 1, offset: 0.35 },
@@ -262,7 +265,7 @@ function ring(id, color) {
   const p = center(id);
   const d = document.createElement("div");
   d.className = "ring"; d.style.left = p.x + "px"; d.style.top = p.y + "px"; d.style.borderColor = color;
-  document.getElementById("fxl").appendChild(d);
+  (document.getElementById("fxl") || document.body).appendChild(d);
   d.animate([{ transform: "translate(-50%,-50%) scale(.2)", opacity: 1 }, { transform: "translate(-50%,-50%) scale(1.6)", opacity: 0 }], { duration: 420 / BV.speed, easing: "ease-out" }).finished.then(() => d.remove());
 }
 
@@ -274,7 +277,7 @@ function cross(id) {
     const d = document.createElement("i");
     d.className = "hcross"; d.textContent = "✚";
     d.style.left = p.x + (i - 1) * p.w * 0.25 + "px"; d.style.top = p.y + "px";
-    document.getElementById("fxl").appendChild(d);
+    (document.getElementById("fxl") || document.body).appendChild(d);
     d.animate([{ transform: "translate(-50%,0)", opacity: 0 }, { opacity: 1, offset: 0.25 }, { transform: "translate(-50%,-40px)", opacity: 0 }], { duration: 800 / BV.speed, delay: (i * 110) / BV.speed, fill: "backwards" }).finished.then(() => d.remove());
   }
 }
@@ -310,6 +313,7 @@ function projectile(fromId, toId, kind) {
 function banner(text, cls) {
   if (BV.skip) return;
   const b = document.getElementById("banner");
+  if (!b) return;
   b.textContent = text; b.className = "banner show " + (cls || "");
   clearTimeout(banner.t);
   banner.t = setTimeout(() => (b.className = "banner"), 900 / BV.speed);
@@ -536,6 +540,7 @@ function playBattle(B, opts) {
       await wait(500);
       while (!B.over) {
         while (BV.paused && !BV.skip) await new Promise((r) => setTimeout(r, 80));
+        if (!document.getElementById("field")) BV.skip = true; // 화면이 바뀌었으면 결과만 계산
         if (BV.pendingCmd) { const ev = useCommand(B, BV.pendingCmd); BV.pendingCmd = null; await playEvent(B, ev); }
         const ev = step(B);
         if (BV.skip) { updateBars(B); continue; }
