@@ -220,8 +220,7 @@ function loveOath(u) {
 
 // ---------- 화면 ----------
 function giftIc(id) {
-  const k = GIFT_ART[id];
-  return typeof ART !== "undefined" && ART[k] ? `<img class="ic item-ic" src="${ART[k]}" alt="">` : "🎁";
+  return itemIcon("gift", giftGrade(id));
 }
 function loveTag(u) {
   if (!u.loveStage || u.gender !== "f") return "";
@@ -255,10 +254,10 @@ function detailProfile(u, hireFrom) {
       ${u.loveStage === 3 && u.love >= 84 ? `<button class="btn gold" data-act="loveconfess" data-arg="${u.id}">💌 고백하기</button>` : ""}
       ${u.loveStage === 4 && u.love >= 100 ? `<button class="btn gold" data-act="loveoath" data-arg="${u.id}">💍 서약하기 ${G.inv.ring ? "" : "(반지 필요)"}</button>` : ""}
     </div>
-    <div class="gift-row">${gifted ? '<p class="dim">오늘은 선물을 줬어요.</p>' : gifts.length ? gifts.map((g) => `<button class="btn sm" data-act="lovegift" data-arg="${u.id}:${g}">${giftIc(g)} ${GIFTS[g].name} ×${G.inv[g]}</button>`).join("") : '<p class="dim">가진 선물이 없어요. 마을 → 상점에서 살 수 있어요.</p>'}</div>`;
+    <div class="gift-row">${gifted ? '<p class="dim">오늘은 선물을 줬어요.</p>' : gifts.length ? gifts.map((g) => `<button class="btn sm" data-act="lovegift" data-arg="${u.id}:${g}">${giftIc(g)}<span class="item-name grade-${giftGrade(g)}">${GIFTS[g].name} ×${G.inv[g]}</span>${gradeText(giftGrade(g))}</button>`).join("") : '<p class="dim">가진 선물이 없어요. 마을 → 상점에서 살 수 있어요.</p>'}</div>`;
   return html;
 }
 function renderGiftShop() {
   return Object.entries(GIFTS).filter(([, g]) => !g.oath || G.bld.hall >= 2).map(([id, g]) => `
-    <div class="shop-it"><span class="shop-ic">${giftIc(id)}</span><div><b>${g.name}</b><small>${g.oath ? "연인에게 서약을 청할 때 필요해요" : "선물"}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buygift" data-arg="${id}">💰${g.price}</button></div>`).join("");
+    <div class="shop-it"><span class="shop-ic">${giftIc(id)}</span><div><b class="item-name grade-${giftGrade(id)}">${g.name}</b>${gradeText(giftGrade(id))}<small>${g.oath ? "연인에게 서약을 청할 때 필요해요" : "선물"}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buygift" data-arg="${id}">${ic("gold", "sm")}${g.price}</button></div>`).join("");
 }

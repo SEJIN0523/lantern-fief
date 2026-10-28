@@ -12,7 +12,7 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 const fmt = (n) => (n >= 1e9 ? (n / 1e9).toFixed(2) + "B" : n >= 1e6 ? (n / 1e6).toFixed(2) + "M" : n >= 1e4 ? (n / 1e3).toFixed(1) + "K" : String(Math.round(n)));
 const sign = (v) => (v >= 0 ? "+" + v : String(v));
 
-// UI 아이콘: Codex 아이콘 시트가 있으면 그림, 없으면 이모지
+// 픽셀 SVG 우선, 누락된 이름은 기존 그림과 대체 표시를 유지한다.
 const ICON = {
   gold: ["ui_icons_a_1", "💰"], food: ["ui_icons_a_2", "🍞"], wood: ["ui_icons_a_3", "🪵"], stone: ["ui_icons_a_4", "🪨"],
   pop: ["ui_icons_a_5", "👥"], morale: ["ui_icons_a_6", "🚩"], village: ["ui_icons_a_7", "🏘️"], party: ["ui_icons_a_8", "🛡️"],
@@ -27,6 +27,8 @@ const ICON = {
 };
 const UI_GLYPHS = {"gold": "M12 3 3 8v8l9 5 9-5V8ZM3 8l9 5 9-5M12 13v8", "food": "M6 11c-5-6 3-10 6-6 4-4 11 0 6 6v9H6ZM9 13v4m6-4v4", "wood": "m5 19 14-14m-9 0 9 9M4 15l5 5M4 15l-1 6 6-1M14 4l6 6", "stone": "m3 17 4-10 9-3 5 10-6 7H6ZM7 7l5 8 9-1M12 15l3 6", "pop": "M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-6 8v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6m0 3a5 5 0 0 1 5 5v1", "morale": "M5 22V3m0 1h14l-3 4 3 4H5", "village": "m2 11 10-8 10 8M5 9v12h14V9M10 21v-7h4v7", "party": "M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6ZM12 7v9m-4-5h8", "form": "m4 3 12 12m4-12L8 15M2 18l4 4m12 0 4-4M4 20l5-5m6 0 5 5M4 3v5h5m11-5v5h-5", "expe": "m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2ZM9 3v16m6-14v16", "moon": "M20 16A9 9 0 0 1 8 4a9 9 0 1 0 12 12Z", "build": "m14 3 7 7-4 4-4-4-9 11-3-3 11-9-3-3Z", "worker": "M3 11h18M5 11V9a7 7 0 0 1 14 0v2M8 4v4m8-4v4M6 14a6 6 0 0 0 12 0", "recruit": "M9 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM2 21v-2a7 7 0 0 1 14 0v2m3-13v8m-4-4h8", "shop": "M4 9h16l-1 12H5ZM8 9V7a4 4 0 0 1 8 0v2", "log": "M5 3h14v18H5ZM8 7h8m-8 5h8m-8 5h5", "quest": "M5 3h14v18H5ZM9 7h6m-6 4h6m-6 4h3", "bell": "M4 17h16l-2-4V9a6 6 0 0 0-12 0v4Zm6 3h4", "lock": "M5 10h14v11H5ZM8 10V7a4 4 0 0 1 8 0v3m-4 5v2", "boss": "m3 6 4 4 5-7 5 7 4-4-2 14H5Z", "lantern": "M9 4a3 3 0 0 1 6 0M7 6h10l3 5-2 10H6L4 11ZM4 11h16M10 11l-1 10m5-10 1 10"};
 function ic(name, cls = "") {
+  const svg = pixelIcon(name, cls);
+  if (svg) return svg;
   const [k, e] = ICON[name] || ["", name];
   if (typeof ART !== "undefined" && ART[k]) return `<img class="ic ${cls}" src="${ART[k]}" alt="">`;
   if (UI_GLYPHS[name]) return `<svg class="ic glyph ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${UI_GLYPHS[name]}"/></svg>`;
@@ -297,15 +299,15 @@ function recruitCard(u, from, i) {
 
 function renderShop() {
   const items = Object.entries(ITEMS).filter(([, it]) => it.price && it.price <= 80 + G.bld.hall * 60).map(([id, it]) => `
-    <div class="shop-it"><span class="shop-ic">${itemIc(id, it.slot)}</span><div><b>${it.name}</b><small>${itemStatText(it)}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buy" data-arg="${id}">💰${it.price}</button></div>`).join("");
+    <div class="shop-it"><span class="shop-ic">${itemIc(id, it.slot)}</span><div><b class="item-name grade-${itemGrade(it)}">${it.name}</b>${gradeText(itemGrade(it))}<small>${itemStatText(it)}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buy" data-arg="${id}">${ic("gold", "sm")}${it.price}</button></div>`).join("");
   return locationBanner("tavern", "주점에 들른 떠돌이 상인") + panel("떠돌이 상인", items, "촌장의 집 레벨이 오르면 품목이 늘어요") + panel("선물", renderGiftShop(), "동료에게 건네면 호감이 올라요");
 }
-// 장비 아이콘: items 시트 칸이 있으면 그림, 없으면 UI 아이콘
+// 예전 그림 키는 되돌리기용으로 보관한다.
 const ITEM_ART = { leather: "items_armor_2", chain: "items_armor_3", robe: "items_armor_6", plate: "items_armor_5", ring_str: "items_accessory_1", amulet: "items_accessory_4", charm: "items_accessory_7", coin: "items_accessory_8", belt: "items_armor_23", pen: "items_otherworld_1" };
 function itemIc(id, slot) {
-  const k = ITEM_ART[id];
-  if (k && typeof ART !== "undefined" && ART[k]) return `<img class="ic item-ic" src="${ART[k]}" alt="">`;
-  return ic(slot === "armor" ? "armor" : "ring");
+  const it = ITEMS[id];
+  if (!it) return itemIcon("empty");
+  return itemIcon(it.otherworld ? "otherworld" : (it.slot || slot) === "armor" ? "armor" : "acc", itemGrade(it));
 }
 function itemStatText(it) {
   const n = { atk: "공격", mag: "마공", def: "방어", res: "저항", hp: "HP", eva: "회피", crit: "치명", spd: "속도" };
@@ -415,9 +417,9 @@ function detailGear(u, hireFrom) {
   const cap = G.bld.smithy * 10;
   const slot = (s, i) => {
     const cur = s === "armor" ? u.armor : u.acc[i];
-    return `<button class="eq" ${hireFrom ? "disabled" : ""} data-act="equip" data-arg="${u.id}:${s}:${i}"><span>${cur ? itemIc(cur, s) : ic(s === "armor" ? "armor" : "ring")}</span><div><b>${cur ? ITEMS[cur].name : "비어 있음"}</b><small>${cur ? itemStatText(ITEMS[cur]) : s === "armor" ? "방어구" : "장신구"}</small></div></button>`;
+    return `<button class="eq" ${hireFrom ? "disabled" : ""} data-act="equip" data-arg="${u.id}:${s}:${i}"><span>${itemIc(cur, s)}</span><div><b class="item-name grade-${itemGrade(ITEMS[cur])}">${cur ? ITEMS[cur].name : "비어 있음"}</b>${cur ? gradeText(itemGrade(ITEMS[cur])) : ""}<small>${cur ? itemStatText(ITEMS[cur]) : s === "armor" ? "방어구" : "장신구"}</small></div></button>`;
   };
-  return locationBanner("smithy", "무기와 장비") + `<div class="wpn"><div class="wpn-ic">${ic("weapon")}</div><div><b>${esc(weaponName(u))}</b><small>무기 공격 ${Math.round(weaponAtk(u))} · 이 동료만의 무기예요. 전직하면 같은 문양으로 다시 벼려져요.</small></div></div>
+  return locationBanner("smithy", "무기와 장비") + `<div class="wpn"><div class="wpn-ic">${itemIcon(JOBS[u.job].weapon, weaponGrade(u))}</div><div><b class="item-name grade-${weaponGrade(u)}">${esc(weaponName(u))}</b>${gradeText(weaponGrade(u))}<small>무기 공격 ${Math.round(weaponAtk(u))} · 이 동료만의 무기예요. 전직하면 같은 문양으로 다시 벼려져요.</small></div></div>
     ${hireFrom ? "" : G.bld.smithy ? (u.weapon.plus >= cap ? `<p class="dim">대장간 레벨을 올리면 더 강화할 수 있어요 (상한 +${cap}).</p>` : `<button class="btn gold wide" data-act="forge" data-arg="${u.id}">${ic("forge", "sm")} 강화 +${u.weapon.plus + 1} · ${costText(fc)} · 성공 ${Math.round(forgeChance(u) * 100)}%</button>`) : '<p class="dim">대장간을 지으면 강화할 수 있어요. +20, +40, +60에서 각성해 이름을 지을 수 있어요.</p>'}
     <h4 class="sub">장비</h4><div class="eqs">${slot("armor", 0)}${slot("acc", 0)}${slot("acc", 1)}</div>`;
 }
@@ -440,8 +442,8 @@ function showEquipPicker(u, slot, i) {
   const m = document.createElement("div");
   m.className = "modal"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true"); m.setAttribute("aria-label", "동료 상세");
   m.innerHTML = `<div class="sheet small"><button class="x" data-act="close">✕</button><h3 class="ptitle">${slot === "armor" ? "방어구" : "장신구"} 고르기</h3>
-    <button class="btn wide" data-act="equipset" data-arg="${u.id}:${slot}:${i}:">빼기</button>
-    ${own.map(([id, n]) => `<button class="btn wide" data-act="equipset" data-arg="${u.id}:${slot}:${i}:${id}">${ITEMS[id].name} ×${n} <small>${itemStatText(ITEMS[id])}</small></button>`).join("") || '<p class="dim">가진 장비가 없어요. 마을 → 상점에서 살 수 있어요.</p>'}</div>`;
+    <button class="btn wide equip-choice" data-act="equipset" data-arg="${u.id}:${slot}:${i}:">${itemIcon("empty")} 빼기</button>
+    ${own.map(([id, n]) => `<button class="btn wide equip-choice" data-act="equipset" data-arg="${u.id}:${slot}:${i}:${id}">${itemIc(id, slot)}<span class="equip-choice-text"><b class="item-name grade-${itemGrade(ITEMS[id])}">${ITEMS[id].name} ×${n}</b>${gradeText(itemGrade(ITEMS[id]))}<small>${itemStatText(ITEMS[id])}</small></span></button>`).join("") || '<p class="dim">가진 장비가 없어요. 마을 → 상점에서 살 수 있어요.</p>'}</div>`;
   document.body.appendChild(m);
 }
 
