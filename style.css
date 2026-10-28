@@ -901,7 +901,7 @@ small, .dim, .hint { color:var(--dim); }
 
 /* 저장 · 불러오기 */
 .save-btn { position:absolute; z-index:2; top:12px; right:66px; width:40px; height:40px; padding:0; font-size:18px; border-radius:5px; background:#0a1d27d9; border:1px solid #c9ad715c; color:var(--tx); }
-.save-sheet h2 { margin:0 0 4px; font-size:18px; }
+.save-sheet h2 { margin:0 0 6px; font-size:18px; line-height:44px; }
 .sv { display:grid; grid-template-columns:28px minmax(0,1fr) auto; align-items:center; gap:8px; padding:8px; margin-bottom:6px; background:#0c1d26aa; border:1px solid #2c4650; border-radius:5px; }
 .sv.auto { border-color:#a98b5655; }
 .sv-n { width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:4px; background:#07131a; color:var(--gold); font-weight:700; }
