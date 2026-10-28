@@ -249,6 +249,12 @@ const ACT = {
     toast(g.name + " 구입"); save(); showHub();
   },
   disppick(id) { DISP_SEL = DISP_SEL.includes(id) ? DISP_SEL.filter((x) => x !== id) : [...DISP_SEL, id]; showHub(); },
+  dtnav(arg) {
+    const [id, d] = arg.split(":");
+    const i = G.roster.findIndex((x) => x.id === id);
+    const n = G.roster[(i + +d + G.roster.length) % G.roster.length];
+    showDetail(n);
+  },
   fullview(id) { showFullView(unitById(id) || PEEK); },
   fullpick(arg) { const [id, i] = arg.split(":"); showFullView(unitById(id) || PEEK, +i); },
   dispspot(i) { DISP_SPOT = +i; showHub(); },

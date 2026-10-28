@@ -445,6 +445,7 @@ function showDetail(u, hireFrom) {
   m.innerHTML = `<div class="sheet dt">
     <div class="dt-hero" style="--lc:${LINES[u.line].color}">
       <button class="x" data-act="close">✕</button>
+      ${!hireFrom && G.roster.length > 1 && G.roster.includes(u) ? `<div class="dt-nav"><button data-act="dtnav" data-arg="${u.id}:-1" aria-label="이전 동료">‹</button><span>${G.roster.indexOf(u) + 1}/${G.roster.length}</span><button data-act="dtnav" data-arg="${u.id}:1" aria-label="다음 동료">›</button></div>` : ""}
       <button class="dt-art" data-act="fullview" data-arg="${u.id}" aria-label="전신 보기">${unitBust(u)}<span class="dt-zoom">전신</span></button>
       <div class="dt-id"><div class="dt-name"><h2>${esc(u.name)}</h2><span class="job">${J.name}</span></div>
         <p>${u.race} · ${u.gender === "m" ? "남" : "여"} · ${J.role}${u.job === "villager" ? " · " + aptText(u) : ""}</p>
@@ -457,6 +458,18 @@ function showDetail(u, hireFrom) {
     ${hireFrom ? "" : !u.hero ? `<button class="btn ghost danger dt-dismiss" data-act="dismiss" data-arg="${u.id}">내보내기</button>` : ""}</div>
   </div>`;
   document.body.appendChild(m);
+  // 좌우로 밀어서 이전·다음 동료
+  if (!hireFrom && G.roster.includes(u)) {
+    let sx = null, sy = 0;
+    const sh = m.querySelector(".sheet");
+    sh.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+    sh.addEventListener("touchend", (e) => {
+      if (sx == null) return;
+      const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+      sx = null;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) ACT.dtnav(`${u.id}:${dx < 0 ? 1 : -1}`);
+    });
+  }
 }
 function statBar(label, v, max, icon) { return `<div class="sbar"><span>${ic(icon, "sm")}${label}</span><div class="mbar"><i style="width:${Math.min(100, (v / max) * 100)}%"></i></div><b>${v}</b></div>`; }
 function detailStats(u, d) {

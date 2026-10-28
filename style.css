@@ -1052,3 +1052,10 @@ small, .dim, .hint { color:var(--dim); }
 .fv-t .spr { width:56px; height:56px; object-fit:contain; object-position:50% 100%; }
 .fv-t small { font-size:10px; line-height:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
 .fullview { padding-bottom:16px; } .fv-thumbs { padding-bottom:2px; }
+/* 상세창 이전·다음 */
+.dt-nav { position:absolute; right:10px; top:62px; z-index:3; display:flex; align-items:center; gap:2px; }
+.dt-nav button { width:34px; height:34px; padding:0; font-size:20px; line-height:1; border-radius:5px; background:#102430e6; border:1px solid #62737b80; color:var(--tx); }
+.dt-nav span { min-width:30px; text-align:center; font-size:11px; color:var(--dim); }
+.sheet.dt .dt-id { padding-right:0; }
+.sheet.dt .dt-name, .sheet.dt .dt-id>p { padding-right:50px; }
+.sheet.dt .dt-lv { padding-right:112px; }
