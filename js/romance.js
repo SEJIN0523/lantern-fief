@@ -174,7 +174,7 @@ function loveScene(u, stage) {
       : { all: [["세진", "좋아해. 이 세계에 와서 처음으로, 여기 남고 싶다는 생각이 들었어."], [n, toneOf(u) === "bold" ? "…바보. 내가 먼저 말하려고 했는데." : "…네. 저도요. 처음부터 쭉."], ["*", `${n}과(와) 연인이 되었다.`]] },
     5: { all: [["", "등불골의 작은 예배당. 마을 사람 몇이 조용히 지켜보고 있었다."], [n, m ? "이번에는 제가 고른 사람이에요. 끝까지 함께할게요." : "어느 세계에 있든, 당신 곁이 제 자리예요."], ["*", `${n}과(와) 평생을 함께하기로 서약했다. 전투에서 서로를 지키는 힘이 강해진다.`]] },
   }[stage];
-  return { bg: stage >= 5 ? "festival" : stage >= 3 ? "dusk" : "village", lines: S.all || S[t] };
+  return { bg: stage >= 5 ? "festival" : stage >= 3 ? "dusk" : "village", lines: S.all || S[t], uid: u.id };
 }
 function playLoveScenes(ups, done) {
   if (!ups.length) return done && done();
@@ -190,7 +190,7 @@ function loveTalk(u) {
   const line = talkLine(u);
   const ups = addLove(u, rint(3, 5)).map((s) => [u, s]);
   save();
-  playScene({ bg: "village", lines: [[u.name, line]] }, () => playLoveScenes(ups, () => { save(); showHub(); showDetail(u); }));
+  playScene({ bg: "village", lines: [[u.name, line]], uid: u.id }, () => playLoveScenes(ups, () => { save(); showHub(); showDetail(u); }));
 }
 function loveGift(u, gid) {
   if (u.giftDay === G.day) return toast("선물은 하루에 한 번이에요");
@@ -204,7 +204,7 @@ function loveGift(u, gid) {
     : bad ? { shy: "아… 고, 고마워요. (조금 곤란해 보인다)", bright: "음… 마음만 받을게요! 헤헤.", bold: "이건 별로야. 다음엔 제대로 골라 와." }[toneOf(u)]
     : { shy: "고마워요. 소중히 할게요.", bright: "선물이에요? 고마워요!", bold: "주는 거면 받지 뭐." }[toneOf(u)];
   save();
-  playScene({ bg: "village", lines: [[u.name, line]] }, () => playLoveScenes(ups, () => { save(); showHub(); showDetail(u); }));
+  playScene({ bg: "village", lines: [[u.name, line]], uid: u.id }, () => playLoveScenes(ups, () => { save(); showHub(); showDetail(u); }));
 }
 function loveConfess(u) {
   if (u.loveStage !== 3 || u.love < 84) return toast("아직 마음이 충분히 깊지 않아요");

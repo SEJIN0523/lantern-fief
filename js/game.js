@@ -53,6 +53,14 @@ function migrate() {
     }
     ensureProfile(u);
   }
+  const names = new Set();
+  for (const u of G.roster) {
+    if (names.has(u.name) && !u.hero && !u.art) {
+      const free = NAMES[u.gender].filter((n) => !names.has(n) && !G.roster.some((x) => x.name === n));
+      if (free.length) u.name = pick(free);
+    }
+    names.add(u.name);
+  }
   const seen = new Set();
   for (const u of G.roster) {
     if (u.hero || u.art) continue;

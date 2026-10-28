@@ -185,7 +185,8 @@ function speakerArt(who, sc) {
   const nk = NPC_ART[who];
   if (nk) return has("bust_" + nk) ? face(nk) : has(nk) ? `<img class="spr talk" src="${ART[nk]}" alt="">` : "";
   if (!G) return "";
-  const u = who === "세진" ? heroU() : G.roster.find((x) => x.name === who);
+  const byId = sc && sc.uid ? unitById(sc.uid) : null;
+  const u = who === "세진" ? heroU() : byId && byId.name === who ? byId : G.roster.find((x) => x.name === who);
   if (!u) return "";
   // 사고 직후(프롤로그 1~4)의 세진은 정장 차림
   if (u.hero && sc && /^story_0[1-4]/.test(sc.art || "") && has("bust_sejin_1")) return face("sejin_1");
