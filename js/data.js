@@ -28,7 +28,7 @@ const WEAPON_ICON = { sword: "🗡️", axe: "🪓", spear: "🔱", dagger: "�
 
 // mods: 성장 가중치(근 체 민 지 정 행). range: melee 근접 / reach 관통 / ranged 원거리 / magic 마법 / heal 회복
 const JOBS = {
-  stranger: { name: "이방인", line: "hero", tier: 0, role: "지휘", range: "melee", weapon: "sword", mods: [0.7, 0.8, 0.8, 1.1, 1.0, 1.0], skills: ["command"], next: ["tactician"], lv: 5 },
+  stranger: { name: "자경단장", line: "hero", tier: 0, role: "지휘", range: "melee", weapon: "sword", mods: [0.7, 0.8, 0.8, 1.1, 1.0, 1.0], skills: ["command"], next: ["tactician"], lv: 5 },
   tactician: { name: "통솔자", line: "hero", tier: 1, role: "지휘", range: "melee", weapon: "sword", mods: [0.8, 0.9, 0.9, 1.2, 1.1, 1.0], skills: ["analyze"], next: ["strategist"], lv: 30 },
   strategist: { name: "군사", line: "hero", tier: 2, role: "지휘", range: "melee", weapon: "sword", mods: [0.9, 1.0, 1.0, 1.3, 1.2, 1.0], skills: ["rally"], next: ["lord"], lv: 60 },
   lord: { name: "영주", line: "hero", tier: 3, role: "지휘", range: "melee", weapon: "sword", mods: [1.0, 1.1, 1.0, 1.4, 1.3, 1.1], skills: ["kingsorder"], next: [] },

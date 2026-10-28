@@ -9,8 +9,8 @@ const HERO_ART = { stranger: 2, tactician: 3, strategist: 4, lord: 5 };
 
 function artKey(u) {
   if (u.art) return u.art;
-  // 세진: 사고 직후 붕대 모습은 처음 사흘만, 몸이 나으면 조끼 차림
-  if (u.hero) return "sejin_" + (u.job === "stranger" && typeof G !== "undefined" && G.day > 3 ? 3 : HERO_ART[u.job] || 2);
+  // 주인공: 리나를 구하다 다친 붕대 모습은 첫 닷새, 상처가 아물면 조끼 차림
+  if (u.hero) return "sejin_" + (u.job === "stranger" && typeof G !== "undefined" && G.day > 5 ? 3 : HERO_ART[u.job] || 2);
   // 마을 주민: 평민 복장 시트(civ_계열)가 있으면 그것, 없으면 적성 계열의 1차 직업 그림
   if (u.job === "villager" && FIRST_JOB[u.line]) {
     const civ = `civ_${u.line}_${u.slot + 1}`;
@@ -33,7 +33,7 @@ function lookHistory(u) {
   if (u.art) { add(u.art, JOBS[u.job].name); return out; }
   if (u.hero) {
     add("sejin_1", "사고 직후");
-    add("sejin_2", "마을에서 회복 중");
+    add("sejin_2", "리나를 구하다 다친 몸");
     for (const j of u.jobs || [u.job]) add("sejin_" + (j === "stranger" ? 3 : HERO_ART[j] || 2), JOBS[j].name);
   } else {
     const jobs = u.jobs && u.jobs.length ? u.jobs : [u.job];
