@@ -274,8 +274,8 @@ const ACT = {
   disppick(id) { DISP_SEL = DISP_SEL.includes(id) ? DISP_SEL.filter((x) => x !== id) : [...DISP_SEL, id]; showHub(); },
   dtnav(arg) {
     const [id, d] = arg.split(":");
-    const i = G.roster.findIndex((x) => x.id === id);
-    const n = G.roster[(i + +d + G.roster.length) % G.roster.length];
+    const c = crew(), i = c.findIndex((x) => x.id === id);
+    const n = c[(i + +d + c.length) % c.length];
     showDetail(n);
   },
   lovedate(arg) { loveDate(arg); },

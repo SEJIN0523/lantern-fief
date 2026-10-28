@@ -406,7 +406,10 @@ function hpBar(u) {
   return `<div class="mbar hp"><i style="width:${pct}%"></i></div>`;
 }
 function renderParty() {
-  const cards = G.roster.map((u) => {
+  // 주인공은 동료 목록이 아니라 위쪽 지휘관 칸에
+  const h = heroU();
+  const cmdr = h ? `<button class="cmdr" data-act="detail" data-arg="${h.id}"><span class="cmdr-face">${unitFace(h)}</span><span class="cmdr-tx"><small>지휘관</small><b>${esc(h.name)}</b><small>${JOBS[h.job].name} · Lv${h.lv} · 아군 능력 +${Math.round(HERO_AURA[JOBS[h.job].tier] * 100)}%</small></span><span class="cmdr-go">보기</span></button>` : "";
+  const cards = crew().map((u) => {
     const st = u.injured ? `<span class="tag red">${ic("injury", "sm")}부상 ${u.injured}일</span>` : u.fatigue >= 3 ? `<span class="tag">${ic("tired", "sm")}지침</span>` : "";
     const promo = canPromote(u) ? `<span class="tag gold">${ic("lvup", "sm")}전직</span>` : "";
     return `<div class="cc" role="button" tabindex="0" data-act="detail" data-arg="${u.id}">
@@ -415,7 +418,7 @@ function renderParty() {
       <div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div>
       <div class="tags">${st}${promo}${loveTag(u)}</div><small class="pw">전투력 ${fmt(power(u))}</small></div></div>`;
   }).join("");
-  return panel("동료", `<div class="cards">${cards}</div>`, `${crew().length}/${rosterCap()}명 + 지휘관`);
+  return cmdr + panel("동료", `<div class="cards">${cards || '<p class="dim">아직 동료가 없어요. 마을 → 모집에서 데려올 수 있어요.</p>'}</div>`, `${crew().length}/${rosterCap()}명`);
 }
 
 function renderForm() {
@@ -490,7 +493,7 @@ function showDetail(u, hireFrom) {
   m.innerHTML = `<div class="sheet dt">
     <div class="dt-hero" style="--lc:${LINES[u.line].color}">
       <button class="x" data-act="close">✕</button>
-      ${!hireFrom && G.roster.length > 1 && G.roster.includes(u) ? `<div class="dt-nav"><button data-act="dtnav" data-arg="${u.id}:-1" aria-label="이전 동료">‹</button><span>${G.roster.indexOf(u) + 1}/${G.roster.length}</span><button data-act="dtnav" data-arg="${u.id}:1" aria-label="다음 동료">›</button></div>` : ""}
+      ${!hireFrom && !u.hero && crew().length > 1 && G.roster.includes(u) ? `<div class="dt-nav"><button data-act="dtnav" data-arg="${u.id}:-1" aria-label="이전 동료">‹</button><span>${crew().indexOf(u) + 1}/${crew().length}</span><button data-act="dtnav" data-arg="${u.id}:1" aria-label="다음 동료">›</button></div>` : ""}
       <button class="dt-art" data-act="fullview" data-arg="${u.id}" aria-label="전신 보기">${unitBust(u)}<span class="dt-zoom">전신</span></button>
       <div class="dt-id"><div class="dt-name"><h2>${esc(u.name)}</h2><span class="job">${J.name}</span></div>
         <p>${u.race} · ${u.gender === "m" ? "남" : "여"} · ${J.role}${u.job === "villager" ? " · " + aptText(u) : ""}</p>
@@ -504,7 +507,7 @@ function showDetail(u, hireFrom) {
   </div>`;
   document.body.appendChild(m);
   // 좌우로 밀어서 이전·다음 동료
-  if (!hireFrom && G.roster.includes(u)) {
+  if (!hireFrom && !u.hero && G.roster.includes(u)) {
     let sx = null, sy = 0;
     const sh = m.querySelector(".sheet");
     sh.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
