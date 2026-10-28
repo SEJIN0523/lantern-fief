@@ -181,7 +181,7 @@ const ACT = {
     G.res.gold -= it.price; G.inv[id] = (G.inv[id] || 0) + 1;
     toast(it.name + " 구입"); save(); showHub();
   },
-  detail(id) { DTAB = "stat"; showDetail(unitById(id)); },
+  detail(id) { const u = unitById(id); DTAB = canPromote(u) ? "skill" : "stat"; showDetail(u); },
   close() { closeModal(); showHub(); },
   forge(id) {
     const u = unitById(id), c = forgeCost(u);
@@ -271,4 +271,15 @@ document.addEventListener("click", (e) => {
 });
 
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+// 안드로이드 뒤로 버튼: 앱을 끄지 않고 창 닫기 → 마을 탭으로 → 두 번 누르면 종료
+let backArmed = 0;
+function trapBack() { try { history.pushState({ fief: 1 }, ""); } catch (e) {} }
+window.addEventListener("popstate", () => {
+  if (document.querySelector(".modal")) { closeModal(); if (document.querySelector(".hub")) showHub(); trapBack(); return; }
+  if (document.querySelector(".scene, .battle")) { trapBack(); return; }
+  if (document.querySelector(".hub") && (TAB !== "village" || SUB !== "build")) { TAB = "village"; SUB = "build"; showHub(); trapBack(); return; }
+  if (Date.now() - backArmed < 2000) { history.back(); return; }
+  backArmed = Date.now(); toast("한 번 더 누르면 종료돼요"); trapBack();
+});
+trapBack();
 showTitle();

@@ -412,7 +412,7 @@ function showDetail(u, hireFrom) {
   const m = document.createElement("div");
   m.className = "modal"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true"); m.setAttribute("aria-label", "동료 상세");
   m.dataset.uid = u.id;
-  const tabs = [["stat", "능력"], ["trait", "특성"], ["prof", u.gender === "f" && !u.hero && !hireFrom ? "관계" : "프로필"], ["gear", "장비"], ["skill", "기술"]];
+  const tabs = [["stat", "능력"], ["trait", "특성"], ["prof", u.gender === "f" && !u.hero && !hireFrom ? "관계" : "프로필"], ["gear", "장비"], ["skill", canPromote(u) && !hireFrom ? "전직 ★" : "기술·전직"]];
   const body = DTAB === "stat" ? detailStats(u, d) : DTAB === "trait" ? detailTraits(u) : DTAB === "prof" ? detailProfile(u, hireFrom) : DTAB === "gear" ? detailGear(u, hireFrom) : detailSkills(u, hireFrom);
   m.innerHTML = `<div class="sheet dt">
     <div class="dt-hero" style="--lc:${LINES[u.line].color}">
@@ -421,7 +421,8 @@ function showDetail(u, hireFrom) {
       <div class="dt-id"><div class="dt-name"><h2>${esc(u.name)}</h2><span class="job">${J.name}</span></div>
         <p>${u.race} · ${u.gender === "m" ? "남" : "여"} · ${J.role}${u.job === "villager" ? " · " + aptText(u) : ""}</p>
         <div class="dt-lv"><b>Lv${u.lv}</b><div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div><small>${u.exp}/${expNeed(u.lv)}</small></div>
-        <small class="dt-pw">전투력 <b>${fmt(power(u))}</b> · 전투 ${u.battles} · 처치 ${u.kills}</small></div>
+        <small class="dt-pw">전투력 <b>${fmt(power(u))}</b> · 전투 ${u.battles} · 처치 ${u.kills}</small>
+        ${!hireFrom && canPromote(u) && DTAB !== "skill" ? `<button class="btn sm gold dt-promo" data-act="dtab" data-arg="skill:${u.id}">${ic("lvup", "sm")}전직할 수 있어요 →</button>` : ""}</div>
     </div>
     <div class="seg dseg">${tabs.map(([k, n]) => `<button data-act="dtab" data-arg="${k}:${u.id}${hireFrom ? ":" + hireFrom : ""}" class="${DTAB === k ? "on" : ""}">${n}</button>`).join("")}</div>
     <div class="dt-body">${body}

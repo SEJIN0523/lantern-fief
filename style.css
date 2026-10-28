@@ -938,3 +938,4 @@ small, .dim, .hint { color:var(--dim); }
   .res { grid-template-columns:24px minmax(0,1fr); padding:0 4px; } .res-ic, .res-ic .ic { width:24px; height:24px; }
   .seg button .ic, .village-seg button .ic { width:17px; height:17px; }
 }
+.dt-promo { align-self:flex-start; margin-top:4px; min-height:32px; padding:4px 10px; font-size:12px; }
