@@ -230,33 +230,36 @@ function loveTag(u) {
 function detailProfile(u, hireFrom) {
   ensureProfile(u);
   const p = u.prof, f = u.gender === "f";
-  const row = (k, v) => `<div class="pf-row"><span>${k}</span><b>${v}</b></div>`;
+  const row = (k, v, wide) => `<div class="pf-row${wide ? " wide" : ""}"><span>${k}</span><b>${v}</b></div>`;
   const age = p.realAge ? `겉보기 ${p.age}세 <small>(실제 ${p.realAge}세)</small>` : `${p.age}세`;
   const known = p.known || [];
   const likeTxt = f ? (u.loveStage >= 2 ? p.likes.map((g) => GIFTS[g].name).join(", ") : p.likes.map((g) => (known.includes(g) ? GIFTS[g].name : "???")).join(", ")) : "";
-  let html = `<h4 class="sub">프로필</h4><div class="pf">
-    ${row("나이", age)}${row("키", p.height + "cm")}
-    ${f ? row("신체", `B${p.bwh[0]}(${p.cup}) · W${p.bwh[1]} · H${p.bwh[2]}`) : ""}
-    ${row("생일", p.birthday)}${row("좋아하는 음식", p.food)}${row("꿈", p.dream)}
+  const prof = `<h4 class="sub">프로필</h4><div class="pf pf2">
+    ${row("나이", age)}${row("키", p.height + "cm")}${row("생일", p.birthday)}
     ${row("관계", (u.hero ? "독신" : f ? REL[p.rel].name : p.rel === "married" ? "기혼" : "독신"))}
+    ${f ? row("신체", `B${p.bwh[0]}(${p.cup}) · W${p.bwh[1]} · H${p.bwh[2]}`, true) : ""}
+    ${row("좋아하는 음식", p.food, true)}${row("꿈", p.dream, true)}
     ${f && p.note ? `<p class="pf-note">${esc(p.note)}</p>` : ""}
   </div>`;
-  if (!canRomance(u) || hireFrom) return html;
+  if (!canRomance(u) || hireFrom) return prof;
+  // 연애는 맨 위: 버튼을 스크롤 없이 바로 누를 수 있게
   const st = LOVE_STAGES[u.loveStage];
   const next = LOVE_STAGES[u.loveStage + 1];
   const talked = u.talkDay === G.day, gifted = u.giftDay === G.day;
   const gifts = Object.keys(GIFTS).filter((g) => G.inv[g] > 0 && !GIFTS[g].oath);
-  html += `<h4 class="sub">세진과의 관계 <small>${st.name}</small></h4>
-    <div class="love"><div class="love-bar"><i style="width:${u.love}%"></i></div><b>♥ ${Math.floor(u.love)}</b></div>
-    <p class="dim">${next ? `다음 단계 「${next.name}」 ${next.at}` : "서약을 맺었어요"} · 세진과 같은 파티면 능력 +${Math.round(st.bonus * 100)}%${REL[p.rel].gain ? ` · ${REL[p.rel].name}라 마음이 쉽게 열리지 않아요` : ""}</p>
-    <p class="dim">좋아하는 선물: ${likeTxt}</p>
+  const love = `<div class="love-box">
+    <div class="love-head"><b>세진과의 관계 · ${st.name}</b><span>♥ ${Math.floor(u.love)}</span></div>
+    <div class="love-bar"><i style="width:${u.love}%"></i></div>
+    <small>${next ? `다음 「${next.name}」 ${next.at}` : "서약을 맺었어요"} · 같은 파티면 능력 +${Math.round(st.bonus * 100)}%${REL[p.rel].gain ? ` · ${REL[p.rel].name}라 마음이 쉽게 열리지 않아요` : ""}</small>
     <div class="love-acts">
-      <button class="btn ${talked ? "" : "gold"}" ${talked ? "disabled" : ""} data-act="lovetalk" data-arg="${u.id}">💬 ${talked ? "오늘은 대화함" : "대화하기"}</button>
+      <button class="btn ${talked ? "" : "gold"}" ${talked ? "disabled" : ""} data-act="lovetalk" data-arg="${u.id}">💬 ${talked ? "오늘 대화함" : "대화하기"}</button>
       ${u.loveStage === 3 && u.love >= 84 ? `<button class="btn gold" data-act="loveconfess" data-arg="${u.id}">💌 고백하기</button>` : ""}
       ${u.loveStage === 4 && u.love >= 100 ? `<button class="btn gold" data-act="loveoath" data-arg="${u.id}">💍 서약하기 ${G.inv.ring ? "" : "(반지 필요)"}</button>` : ""}
     </div>
-    <div class="gift-row">${gifted ? '<p class="dim">오늘은 선물을 줬어요.</p>' : gifts.length ? gifts.map((g) => `<button class="btn sm" data-act="lovegift" data-arg="${u.id}:${g}">${giftIc(g)} ${GIFTS[g].name} ×${G.inv[g]}</button>`).join("") : '<p class="dim">가진 선물이 없어요. 마을 → 상점에서 살 수 있어요.</p>'}</div>`;
-  return html;
+    <div class="gift-row">${gifted ? '<small>오늘은 선물을 줬어요.</small>' : gifts.length ? gifts.map((g) => `<button class="btn sm" data-act="lovegift" data-arg="${u.id}:${g}">${giftIc(g)} ${GIFTS[g].name} ×${G.inv[g]}</button>`).join("") : '<small>가진 선물이 없어요 (마을 → 상점)</small>'}</div>
+    <small>좋아하는 선물: ${likeTxt}</small>
+  </div>`;
+  return love + prof;
 }
 function renderGiftShop() {
   return Object.entries(GIFTS).filter(([, g]) => !g.oath || G.bld.hall >= 2).map(([id, g]) => `

@@ -42,7 +42,7 @@ function load() {
 // 예전 세이브 보정
 function migrate() {
   for (const k in BUILDINGS) G.bld[k] = G.bld[k] || 0;
-  G.chStart = G.chStart || 0; G.migrants = G.migrants || []; G.migDay = G.migDay || 0;
+  G.chStart = G.chStart || 0; G.migrants = G.migrants || []; G.migDay = G.migDay || 0; G.dispatch = G.dispatch || null;
   G.offers = [];
   for (const u of G.roster) {
     // 예전 평민 계열 → 적성 계열로
@@ -263,7 +263,46 @@ function floorEnemies(did, fi, phase = 0) {
 }
 
 // 하루 마감
+// ---------- 파견: 편성에 없는 동료를 이미 깬 층으로 하루 보낸다 ----------
+function dispatchSpots() {
+  const out = [];
+  for (const [id, D] of Object.entries(DUNGEONS)) {
+    if (D.endless || id === "duel") continue;
+    for (let i = 0; i < (G.dungeon[id] || 0) && i < D.floors.length; i++) {
+      const F = floorOf(id, i);
+      if (!F.boss) out.push({ did: id, fi: i, lv: F.lv, name: `${D.name} ${i + 1}층` });
+    }
+  }
+  return out.sort((a, b) => b.lv - a.lv).slice(0, 3);
+}
+function dispatchCands() { return G.roster.filter((u) => !u.injured && !G.form.some((f) => f.id === u.id)); }
+function resolveDispatch() {
+  const D = G.dispatch;
+  G.dispatch = null;
+  if (!D) return;
+  const us = D.ids.map(unitById).filter((u) => u && !G.form.some((f) => f.id === u.id));
+  if (!us.length) return;
+  const F = floorOf(D.did, D.fi);
+  const avg = us.reduce((a, u) => a + u.lv, 0) / us.length;
+  const gap = Math.max(0, F.lv - avg);
+  // 층보다 약하면 얻는 것이 줄고 다칠 수 있다. 인원이 적을수록 1인당 몫이 크다
+  const k = Math.max(0.3, 1 - gap * 0.12) * (us.length <= 2 ? 1.2 : 1);
+  const exp = Math.round((F.lv * 6 + 4) * 2.4 * k);
+  const gold = Math.round((F.lv * 3 + 6) * us.length * k);
+  const hurt = [];
+  for (const u of us) {
+    gainExp(u, exp);
+    u.busyToday = true; u.fatigue += 1;
+    if (gap > 0 && chance(Math.min(0.6, gap * 0.08))) { u.injured = Math.max(u.injured, 2); hurt.push(u.name); }
+  }
+  G.res.gold += gold;
+  const msg = `파견대 귀환 (${us.map((u) => u.name).join(", ")}): 경험치 +${exp}, 💰${gold}${hurt.length ? ` · 부상 ${hurt.join(", ")}` : ""}`;
+  log(msg);
+  if (typeof toast === "function") toast(msg);
+}
+
 function endDay() {
+  resolveDispatch();
   const inc = dailyIncome();
   for (const k in inc) G.res[k] = Math.max(0, G.res[k] + inc[k]);
   if (G.res.food <= 0) { G.morale = Math.max(0, G.morale - 8); log("식량이 바닥났어요. 사기가 떨어집니다."); }

@@ -406,5 +406,12 @@ function battleRewards(B) {
   }
   for (const c of as) if (c.unit.traits.personality === "greedy") gold = Math.round(gold * 1.05);
   res.gold = gold;
+  // 싸우지 않은 동료(파견 중 제외)도 마을에서 소식을 듣고 조금 배운다
+  if (typeof G !== "undefined" && G && G.roster) {
+    const ids = new Set(as.map((c) => c.unit.id));
+    const away = (G.dispatch && G.dispatch.ids) || [];
+    res.bench = Math.max(1, Math.round(share * 0.15));
+    for (const u of G.roster) if (!ids.has(u.id) && !away.includes(u.id)) { const ups = gainExp(u, res.bench); if (ups.length) res.ups[u.id] = ups.length; }
+  }
   return res;
 }

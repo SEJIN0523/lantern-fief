@@ -5,6 +5,7 @@ const app = document.getElementById("app");
 let TAB = "village";
 let SUB = "build"; // 마을 탭 안의 하위 메뉴
 let DTAB = "stat"; // 동료 상세 탭
+let SHOPTAB = "gear"; // 상점: 장비 / 선물
 let SEL = null; // 편성에서 고른 동료
 let HUB_VIEW = ""; // Preserve scroll only while refreshing the same menu.
 
@@ -235,7 +236,7 @@ function showHub() {
   HUB_VIEW = view;
   app.innerHTML = `<div class="hub">
     <header class="banner-v">${scenery("village")}
-      <div class="village-heading"><small>등불 영지</small><h1>${G.chapter ? (G.chapter >= 7 ? "엔딩 후 · " : "제" + G.chapter + "장 · ") + CHAPTERS[G.chapter].name : "프롤로그"}</h1></div><div class="plaque"><b>${G.day}</b><span>일째</span></div><button class="save-btn" data-act="savemenu" aria-label="저장 · 불러오기">💾</button>
+      <div class="village-heading"><small>등불 영지</small><h1 class="${(CHAPTERS[G.chapter] || {}).name && CHAPTERS[G.chapter].name.length > 8 ? "long" : ""}">${G.chapter ? (G.chapter >= 7 ? "엔딩 후 · " : "제" + G.chapter + "장 · ") + CHAPTERS[G.chapter].name : "프롤로그"}</h1></div><div class="plaque"><b>${G.day}</b><span>일째</span></div><button class="save-btn" data-act="savemenu" aria-label="저장 · 불러오기">💾</button>
       <div class="vstat"><span>${ic("pop")} 주민 <b>${G.pop}</b></span><span>${ic("morale")} 사기 <b>${G.morale}</b></span></div>
     </header>
     <div class="resbar">${res("gold")}${res("food")}${res("wood")}${res("stone")}</div>
@@ -266,14 +267,14 @@ function renderVillage() {
   const cg = chapterGoal();
   const goal = cg ? `<div class="goal">${ic("quest")}<div><span class="eyebrow">제${G.chapter}장 · ${CHAPTERS[G.chapter].name}</span><b>${cg.title}</b><small>${cg.sub}</small>${G.chapter === 1 && G.seen.tax && !G.seen.taxdone ? `<small>세금 💰150 · 20일째까지</small>` : ""}</div></div>` : "";
   const subs = [["build", "건설", "build"], ["work", "일꾼", "worker"], ["recruit", "모집", "recruit"], ["shop", "상점", "shop"], ["log", "기록", "log"]];
-  const seg = `<div class="seg village-seg">${subs.map(([k, n, i]) => `<button data-act="sub" aria-pressed="${SUB === k}" data-arg="${k}" class="${SUB === k ? "on" : ""}">${ic(i, "sm")}${n}</button>`).join("")}</div>`;
+  const seg = `<div class="seg village-seg">${subs.map(([k, n, i]) => `<button data-act="sub" aria-pressed="${SUB === k}" data-arg="${k}" class="${SUB === k ? "on" : ""}">${n}</button>`).join("")}</div>`;
   let body = "";
   if (SUB === "build") body = renderBuild();
   if (SUB === "work") body = renderWork();
   if (SUB === "recruit") body = renderRecruit();
   if (SUB === "shop") body = renderShop();
   if (SUB === "log") body = panel("마을 기록", `<div class="log">${G.log.slice(0, 20).map((l) => `<p><small>${l.d}일</small>${esc(l.m)}</p>`).join("") || `<p class="dim">아직 기록이 없어요.</p>`}</div>`);
-  return seg + goal + body;
+  return seg + (SUB === "build" ? goal : "") + body;
 }
 
 function uiCost(cost) {
@@ -284,7 +285,15 @@ function buildingGlyph(id) {
   return `<div class="bld-crest bld-${id}">${ic(symbol)}</div>`;
 }
 function renderBuild() {
-  const tiles = Object.entries(BUILDINGS).filter(([, b]) => !b.unlock || G.flags[b.unlock]).map(([id, b]) => {
+  const list = Object.entries(BUILDINGS).filter(([, b]) => !b.unlock || G.flags[b.unlock]);
+  const parked = ([id, b]) => G.bld[id] >= b.max || (id !== "hall" && G.bld[id] >= G.bld.hall);
+  const mini = list.filter(parked).map(([id, b]) => {
+    const lv = G.bld[id];
+    const k = `bld_${id}_${Math.max(1, lv)}`;
+    const art = typeof ART !== "undefined" && ART[k] ? `<img src="${ART[k]}" alt="">` : buildingGlyph(id);
+    return `<div class="bmini ${lv ? "" : "unbuilt"}" title="${b.desc}"><span class="bmini-art">${art}</span><b>${b.name}</b><small>${lv >= b.max ? "최대" : lv ? "Lv." + lv : "미건설"}</small></div>`;
+  }).join("");
+  const tiles = list.filter((e) => !parked(e)).map(([id, b]) => {
     const lv = G.bld[id];
     const why = canBuild(id);
     const max = lv >= b.max;
@@ -293,13 +302,13 @@ function renderBuild() {
     return `<div class="tile ${lv ? "" : "unbuilt"} ${!why ? "ready" : ""}">
       <div class="tile-art">${art}</div>
       <div class="tile-info"><div class="tile-heading"><b>${b.name}</b><span class="tile-level">${lv ? "Lv." + lv : "미건설"}</span></div><div class="pips" aria-hidden="true">${pips}</div><p>${b.desc}</p></div>
-      <div class="tile-action">${max ? `<div class="tile-max">최대 레벨</div>` : `<div class="cost">${uiCost(buildCost(id))}</div><button class="btn sm ${why ? "" : "gold"}" data-act="build" data-arg="${id}" ${why ? "disabled" : ""} aria-label="${b.name} ${lv ? "증축" : "건설"}">${lv ? "증축" : "건설"}</button>`}</div>
+      <div class="tile-action">${max ? `<div class="tile-max">최대 레벨</div>` : `<button class="btn sm bbtn ${why ? "" : "gold"}" data-act="build" data-arg="${id}" ${why ? "disabled" : ""} aria-label="${b.name} ${lv ? "증축" : "건설"}"><b>${lv ? "증축" : "건설"}</b><span class="cost">${uiCost(buildCost(id))}</span></button>`}</div>
       ${why && why !== "자원 부족" && why !== "오늘은 이미 공사했어요" && !max ? `<small class="why">${why}</small>` : ""}
     </div>`;
   }).join("");
   // 오늘 공사를 마쳤으면 카드마다 쓰지 않고 위에 한 번만
   const done = G.built[G.day] ? `<div class="bld-done">${ic("build", "sm")}오늘 공사를 마쳤어요. 내일 다시 지을 수 있어요.</div>` : "";
-  return panel("건물", done + `<div class="tiles">${tiles}</div>`, "하루에 한 번 공사");
+  return panel("건물", done + `<div class="tiles">${tiles}</div>` + (mini ? `<h4 class="sub">촌장의 집을 올리면 증축 <small>최대 레벨 포함</small></h4><div class="bminis">${mini}</div>` : ""), "하루에 한 번 공사");
 }
 
 function renderWork() {
@@ -315,8 +324,7 @@ function renderRecruit() {
   const vols = G.volunteers.map((u, i) => recruitCard(u, "vol", i)).join("");
   const migs = G.migrants.map((u, i) => recruitCard(u, "mig", i)).join("");
   const migNext = Math.max(0, migrantInterval() - (G.day - G.migDay));
-  return locationBanner("village", "마을 광장") +
-    panel("마을 자원자", (vols || "") + (volReady ? `<button class="btn wide" data-act="vol">${vols ? "다른 자원자 찾기" : "자원자 찾기"}</button>` : `<p class="dim">${3 - (G.day - G.volDay)}일 뒤 새 자원자가 나서요.</p>`), `${G.roster.length}/${rosterCap()}명 · 무료`) +
+  return panel("마을 자원자", (vols || "") + (volReady ? `<button class="btn wide" data-act="vol">${vols ? "다른 자원자 찾기" : "자원자 찾기"}</button>` : `<p class="dim">${3 - (G.day - G.volDay)}일 뒤 새 자원자가 나서요.</p>`), `${G.roster.length}/${rosterCap()}명 · 무료`) +
     panel("이주민", migs || `<p class="dim">${G.fame < 5 ? "마을의 명성이 오르면(습격 격퇴, 원정 승리) 다른 종족 이주민이 찾아와요." : `${migNext}일 뒤 새 이주민이 올 거예요.`}</p>`, `명성 ${G.fame}`) +
     (G.bld.barracks ? panel("병영", `<button class="btn" data-act="barracks">창병 바로 훈련 · 💰20 · 마을 사람 1명</button>`) : "");
 }
@@ -334,7 +342,8 @@ function recruitCard(u, from, i) {
 function renderShop() {
   const items = Object.entries(ITEMS).filter(([, it]) => it.price && it.price <= 80 + G.bld.hall * 60).map(([id, it]) => `
     <div class="shop-it"><span class="shop-ic">${itemIc(id, it.slot)}</span><div><b>${it.name}</b><small>${itemStatText(it)}</small></div><small class="own">보유 ${G.inv[id] || 0}</small><button class="btn sm" data-act="buy" data-arg="${id}">💰${it.price}</button></div>`).join("");
-  return locationBanner("tavern", "주점에 들른 떠돌이 상인") + panel("떠돌이 상인", items, "촌장의 집 레벨이 오르면 품목이 늘어요") + panel("선물", renderGiftShop(), "동료에게 건네면 호감이 올라요");
+  const seg = `<div class="seg shop-seg">${[["gear", "장비"], ["gift", "선물"]].map(([k, n]) => `<button data-act="shoptab" data-arg="${k}" class="${SHOPTAB === k ? "on" : ""}">${n}</button>`).join("")}</div>`;
+  return seg + (SHOPTAB === "gift" ? panel("선물", renderGiftShop(), "동료에게 건네면 호감이 올라요") : panel("떠돌이 상인", items, "촌장의 집 레벨이 오르면 품목이 늘어요"));
 }
 // 장비 아이콘: items 시트 칸이 있으면 그림, 없으면 UI 아이콘
 const ITEM_ART = { leather: "items_armor_2", chain: "items_armor_3", robe: "items_armor_6", plate: "items_armor_5", ring_str: "items_accessory_1", amulet: "items_accessory_4", charm: "items_accessory_7", coin: "items_accessory_8", belt: "items_armor_23", pen: "items_otherworld_1" };
@@ -383,6 +392,25 @@ function renderForm() {
     <h4 class="sub">대기 중</h4><div class="bench">${bench || '<p class="dim">대기 중인 동료가 없어요.</p>'}</div>`, `${G.form.length}/5명 · 전투력 ${fmt(tp)}`);
 }
 
+let DISP_SEL = [], DISP_SPOT = 0;
+function renderDispatch() {
+  const spots = dispatchSpots();
+  if (!spots.length) return "";
+  if (G.dispatch) {
+    const us = G.dispatch.ids.map(unitById).filter(Boolean);
+    const F = floorOf(G.dispatch.did, G.dispatch.fi);
+    return panel("파견", `<div class="disp-on"><div class="disp-faces">${us.map((u) => `<span class="disp-f">${unitFace(u)}</span>`).join("")}</div>
+      <div><b>${DUNGEONS[G.dispatch.did].name} ${G.dispatch.fi + 1}층</b><small>Lv${F.lv} · 오늘 밤 돌아와요</small></div>
+      <button class="btn sm ghost" data-act="dispcancel">취소</button></div>`, "남은 동료의 하루 원정");
+  }
+  const cands = dispatchCands();
+  DISP_SEL = DISP_SEL.filter((id) => cands.some((u) => u.id === id));
+  if (DISP_SPOT >= spots.length) DISP_SPOT = 0;
+  const chips = cands.map((u) => `<button class="disp-c ${DISP_SEL.includes(u.id) ? "on" : ""}" data-act="disppick" data-arg="${u.id}"><span class="disp-f">${unitFace(u)}</span><small>${esc(u.name)} ${u.lv}</small></button>`).join("");
+  return panel("파견", cands.length ? `<div class="seg disp-spots">${spots.map((s, i) => `<button data-act="dispspot" data-arg="${i}" class="${DISP_SPOT === i ? "on" : ""}">${s.name}<small>Lv${s.lv}</small></button>`).join("")}</div>
+    <div class="disp-cands">${chips}</div>
+    <button class="btn wide ${DISP_SEL.length ? "gold" : ""}" data-act="dispgo" ${DISP_SEL.length ? "" : "disabled"}>${DISP_SEL.length ? `${DISP_SEL.length}명 파견 보내기` : "보낼 동료를 고르세요"}</button>` : '<p class="dim">편성에 없는 동료가 없어요.</p>', "남은 동료의 하루 원정");
+}
 function renderExpe() {
   const tp = formUnits().reduce((a, f) => a + power(f.unit), 0);
   const open = Object.entries(DUNGEONS).filter(([id, d]) => !d.unlock || (typeof d.unlock === "function" ? d.unlock(G) : G.chapter >= d.unlock) || G.dungeon[id]).reverse();
@@ -401,7 +429,7 @@ function renderExpe() {
     return `<section class="dun ${done ? "cleared" : ""}"><div class="dun-art">${scenery(d.bg)}<h3>${d.name}${done ? " ✓" : ""}${d.endless ? ` · 최고 ${cleared}층` : ""}</h3></div>
       <div class="nodes">${nodes}</div>
       <p class="hint">원정은 하루가 걸려요. 일반 층은 3연전(체력 유지), 보스 층은 1전. 전투 사이에 돌아올 수 있어요.</p></section>`;
-  }).join("") + panel("출전 파티", `<div class="mini-party">${formUnits().map((f) => `<div class="mp"><div class="mp-art" style="--lc:${LINES[f.unit.line].color}">${unitFace(f.unit)}</div><small><b>${esc(f.unit.name)}</b> Lv${f.unit.lv}${f.unit.fatigue >= 3 ? " 💤" : ""}</small></div>`).join("") || '<p class="dim">편성된 동료가 없어요.</p>'}</div>`, `전투력 ${fmt(tp)}`);
+  }).join("") + renderDispatch() + panel("출전 파티", `<div class="mini-party">${formUnits().map((f) => `<div class="mp"><div class="mp-art" style="--lc:${LINES[f.unit.line].color}">${unitFace(f.unit)}</div><small><b>${esc(f.unit.name)}</b> Lv${f.unit.lv}${f.unit.fatigue >= 3 ? " 💤" : ""}</small></div>`).join("") || '<p class="dim">편성된 동료가 없어요.</p>'}</div>`, `전투력 ${fmt(tp)}`);
 }
 
 // ---------- 동료 상세 ----------
@@ -513,8 +541,8 @@ function showResult(title, lines, buttons) {
 }
 function rewardLines(B, rw) {
   const out = [`${ic("lvup", "sm")} 경험치 +${rw.exp} (1인당) · ${ic("gold", "sm")} +${rw.gold}`];
-  for (const c of B.units.filter((x) => x.side === "A")) {
-    const u = c.unit;
+  if (rw.bench) out.push(`<small>마을에 남은 동료 경험치 +${rw.bench}</small>`);
+  for (const u of G.roster) {
     if (rw.ups[u.id]) out.push(`<b class="up">▲ ${esc(u.name)} Lv${u.lv}</b>${canPromote(u) ? " · 전직 가능!" : ""}`);
   }
   if (rw.injured.length) out.push(`${ic("injury", "sm")} 부상: ${rw.injured.map((id) => esc(unitById(id).name)).join(", ")}`);

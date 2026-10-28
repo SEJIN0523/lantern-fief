@@ -968,3 +968,72 @@ small, .dim, .hint { color:var(--dim); }
 /* 태그는 줄바꿈하지 않는다 */
 .tag { display:inline-flex; align-items:center; gap:3px; white-space:nowrap; flex:none; }
 .cc-tx .tags { min-width:0; }
+
+/* 관계 탭 v2: 연애 상자 위, 프로필은 촘촘한 2열 */
+.sheet.dt .dt-body { scrollbar-width:none; }
+.sheet.dt .dt-body::-webkit-scrollbar { display:none; }
+.love-box { display:flex; flex-direction:column; gap:6px; margin:6px 0 4px; padding:10px; background:#2a1420aa; border:1px solid #8a3a5a88; border-radius:6px; }
+.love-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.love-head b { font-size:13px; color:#ffd2e0; }
+.love-head span { color:#ff8ab0; font-weight:700; font-size:15px; white-space:nowrap; }
+.love-box .love-bar { height:9px; }
+.love-box small { font-size:11px; line-height:15px; }
+.love-box .love-acts { margin:2px 0 0; gap:6px; }
+.love-box .love-acts .btn { min-height:42px; }
+.love-box .gift-row .btn { min-height:36px; font-size:12px; }
+.pf2 { grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; }
+.pf2 .pf-row { flex-direction:column; justify-content:flex-start; gap:0; padding:5px 7px; font-size:11px; }
+.pf2 .pf-row:nth-child(n) { grid-column:auto; flex-direction:column; }
+.pf2 .pf-row.wide { grid-column:span 2; }
+.pf2 .pf-row b { font-size:12px; line-height:16px; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pf2 .pf-note { grid-column:1/-1; margin:0; padding:6px 9px; font-size:12px; line-height:1.5; }
+
+/* 스크롤 줄이기: 건물 카드 촘촘히, 잠긴 건물은 작은 칸, 상점 나눠 보기 */
+.tile { padding:7px 9px; row-gap:2px; }
+.tile .tile-art { width:48px; height:48px; }
+.tile .pips { margin:1px 0 2px; }
+.tile p { font-size:11px; line-height:15px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.tile .btn { min-height:38px; }
+.tile-action { gap:3px; }
+.tile { grid-template-columns:48px minmax(0,1fr) 84px; }
+.bminis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:5px; }
+.bmini { display:flex; flex-direction:column; align-items:center; gap:1px; padding:5px 3px; background:#0c1d26aa; border:1px solid #2c4650; border-radius:5px; min-width:0; }
+.bmini-art { width:38px; height:38px; display:flex; align-items:center; justify-content:center; }
+.bmini-art img { width:100%; height:100%; object-fit:contain; image-rendering:pixelated; }
+.bmini-art .bld-crest { transform:scale(.7); }
+.bmini.unbuilt .bmini-art { filter:saturate(.4); opacity:.6; }
+.bmini b { font-size:11px; line-height:14px; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bmini small { font-size:10px; line-height:13px; }
+.shop-seg { margin:10px 12px 0; }
+.shop-it { padding:6px 0; }
+/* 건물: 비용을 버튼 안에 */
+.tile { grid-template-columns:48px minmax(0,1fr) 96px; align-items:center; }
+.bbtn { display:flex; flex-direction:column; align-items:center; gap:1px; padding:4px 3px !important; min-height:46px !important; width:100%; }
+.bbtn b { font-size:13px; line-height:16px; }
+.bbtn .cost { display:flex; flex-wrap:wrap; justify-content:center; gap:0 5px; font-size:10px !important; line-height:13px; }
+.bbtn .cost .ic { width:12px !important; height:12px !important; }
+.bbtn.gold .cost, .bbtn.gold .cost .neg { color:#3a2408; }
+.tile .why { grid-column:2 / 4; }
+/* 파견 */
+.disp-spots { margin:0 0 8px; }
+.disp-spots button { flex-direction:column; gap:0; line-height:15px; font-size:11px; }
+.disp-spots button small { font-size:10px; }
+.disp-cands { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; margin-bottom:8px; }
+.disp-c { display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 2px; background:#0c1d26aa; border:1px solid #2c4650; border-radius:5px; color:var(--tx); min-width:0; }
+.disp-c.on { border-color:var(--gold); box-shadow:inset 0 0 0 1px var(--gold); background:#2a2418; }
+.disp-c small { font-size:10px; line-height:13px; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.disp-f { display:block; width:44px; height:44px; border-radius:4px; overflow:hidden; background:#0d1e25; }
+.disp-f .spr { width:100%; height:100%; object-fit:cover; }
+.disp-on { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:10px; align-items:center; }
+.disp-faces { display:flex; }
+.disp-faces .disp-f { width:34px; height:34px; margin-right:-8px; border:2px solid #0b1720; }
+.disp-on b { display:block; font-size:13px; }
+.disp-on small { font-size:11px; }
+/* 마을 메뉴: 아이콘 없이 글자만 */
+.village-seg button { font-size:14px; font-weight:700; letter-spacing:1px; color:#9fb4b8; gap:0; }
+.village-seg button.on { color:#f0d49b; text-shadow:0 0 8px #f0d49b55; }
+.village-seg button.on:after { content:""; position:absolute; left:28%; right:28%; bottom:6px; height:2px; border-radius:1px; background:var(--gold); }
+.village-seg button { position:relative; }
+/* 긴 장 제목은 작게, 넘치면 말줄임 */
+.village-heading h1 { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.village-heading h1.long { font-size:15px; }

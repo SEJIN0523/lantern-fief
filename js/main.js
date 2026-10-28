@@ -167,6 +167,7 @@ const ACT = {
   },
   peek(arg) { const [from, i] = arg.split(":"); PEEK = (from === "mig" ? G.migrants : G.volunteers)[+i]; DTAB = "stat"; showDetail(PEEK, from); },
   sub(k) { SUB = k; showHub(); },
+  shoptab(k) { SHOPTAB = k; showHub(); },
   dtab(arg) { const [k, id, from] = arg.split(":"); DTAB = k; showDetail(from ? PEEK : unitById(id), from); },
   vol() { refreshVolunteers(); save(); showHub(); },
   barracks() {
@@ -247,6 +248,15 @@ const ACT = {
     G.res.gold -= g.price; G.inv[id] = (G.inv[id] || 0) + 1;
     toast(g.name + " 구입"); save(); showHub();
   },
+  disppick(id) { DISP_SEL = DISP_SEL.includes(id) ? DISP_SEL.filter((x) => x !== id) : [...DISP_SEL, id]; showHub(); },
+  dispspot(i) { DISP_SPOT = +i; showHub(); },
+  dispgo() {
+    const s = dispatchSpots()[DISP_SPOT];
+    if (!s || !DISP_SEL.length) return;
+    G.dispatch = { did: s.did, fi: s.fi, ids: [...DISP_SEL] }; DISP_SEL = [];
+    save(); toast("파견대가 떠났어요. 오늘 밤 돌아와요"); showHub();
+  },
+  dispcancel() { G.dispatch = null; save(); showHub(); },
   expe(arg) { const [did, fi] = arg.split(":"); runExpedition(did, +fi); },
   rebirth(id) {
     const u = unitById(id), c = rebirthCost(u);
@@ -272,14 +282,18 @@ document.addEventListener("click", (e) => {
 
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 // 안드로이드 뒤로 버튼: 앱을 끄지 않고 창 닫기 → 마을 탭으로 → 두 번 누르면 종료
-let backArmed = 0;
-function trapBack() { try { history.pushState({ fief: 1 }, ""); } catch (e) {} }
+// 크롬은 손가락 입력 없이 넣은 기록을 뒤로 버튼에서 건너뛰므로, 화면을 만질 때마다 기록을 채워 둔다
+let backArmed = 0, backDepth = 0;
+function trapBack() { try { while (backDepth < 3) { history.pushState({ fief: backDepth + 1 }, ""); backDepth++; } } catch (e) {} }
+document.addEventListener("pointerdown", trapBack, true);
+document.addEventListener("keydown", trapBack, true);
 window.addEventListener("popstate", () => {
-  if (document.querySelector(".modal")) { closeModal(); if (document.querySelector(".hub")) showHub(); trapBack(); return; }
-  if (document.querySelector(".scene, .battle")) { trapBack(); return; }
-  if (document.querySelector(".hub") && (TAB !== "village" || SUB !== "build")) { TAB = "village"; SUB = "build"; showHub(); trapBack(); return; }
-  if (Date.now() - backArmed < 2000) { history.back(); return; }
-  backArmed = Date.now(); toast("한 번 더 누르면 종료돼요"); trapBack();
+  backDepth = Math.max(0, backDepth - 1);
+  if (document.querySelector(".modal")) { closeModal(); if (document.querySelector(".hub")) showHub(); return; }
+  if (document.querySelector(".battle")) { if (typeof setPaused === "function") setPaused(!BV.paused); return; }
+  if (document.querySelector(".scene")) return;
+  if (document.querySelector(".hub") && (TAB !== "village" || SUB !== "build")) { TAB = "village"; SUB = "build"; showHub(); return; }
+  if (Date.now() - backArmed < 2000 || !backDepth) { history.back(); return; }
+  backArmed = Date.now(); toast("한 번 더 누르면 종료돼요");
 });
-trapBack();
 showTitle();
