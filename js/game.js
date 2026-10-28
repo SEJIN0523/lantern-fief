@@ -267,5 +267,6 @@ function endDay() {
   }
   G.day++;
   if (G.day - G.migDay >= migrantInterval()) refreshMigrants();
+  if (G.day - G.volDay >= 3) refreshVolunteers();
   save();
 }

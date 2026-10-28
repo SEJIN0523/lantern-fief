@@ -913,3 +913,28 @@ small, .dim, .hint { color:var(--dim); }
 .sv-backup { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
 .sv-backup .btn { min-height:40px; font-size:12px; display:flex; align-items:center; justify-content:center; }
 .village-heading { right:120px; }
+
+/* 아이콘 크게 v2 (화면 전체) */
+.ic { width:1.45em; height:1.45em; vertical-align:-0.3em; }
+.ic.sm { width:1.3em; height:1.3em; font-size:1em; margin-right:3px; }
+.res { grid-template-columns:30px minmax(0,1fr); gap:0 5px; padding:0 6px; }
+.res-ic { width:30px; font-size:26px; }
+.res-ic .ic { width:30px; height:30px; }
+.vstat .ic { width:20px; height:20px; }
+.vstat span { font-size:12px; gap:5px; }
+.tabs button>.ic { width:30px; height:30px; }
+.moon-ic { width:44px; height:38px; }
+.moon-ic .ic { width:26px; height:26px; }
+.seg button .ic, .village-seg button .ic { width:20px; height:20px; }
+.goal>.ic { width:30px; height:30px; }
+.tile-action .cost .ic, .cost .ic { width:17px; height:17px; }
+.tile-action .cost { font-size:12px; gap:2px 8px; }
+.bld-crest .ic { width:34px; height:34px; }
+.tag .ic { width:16px; height:16px; }
+.shop-ic .ic, .eq .ic, .wpn-ic .ic { width:36px; height:36px; }
+.sbar .ic, .minis .ic { width:18px; height:18px; }
+.alert .ic { width:20px; height:20px; }
+@media(max-width:360px) {
+  .res { grid-template-columns:24px minmax(0,1fr); padding:0 4px; } .res-ic, .res-ic .ic { width:24px; height:24px; }
+  .seg button .ic, .village-seg button .ic { width:17px; height:17px; }
+}

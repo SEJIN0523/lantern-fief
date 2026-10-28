@@ -316,7 +316,7 @@ function renderRecruit() {
   const migs = G.migrants.map((u, i) => recruitCard(u, "mig", i)).join("");
   const migNext = Math.max(0, migrantInterval() - (G.day - G.migDay));
   return locationBanner("village", "마을 광장") +
-    panel("마을 자원자", vols || (volReady ? `<button class="btn" data-act="vol">자원자 찾기</button>` : `<p class="dim">${3 - (G.day - G.volDay)}일 뒤 다시 찾을 수 있어요.</p>`), `${G.roster.length}/${rosterCap()}명 · 무료`) +
+    panel("마을 자원자", (vols || "") + (volReady ? `<button class="btn wide" data-act="vol">${vols ? "다른 자원자 찾기" : "자원자 찾기"}</button>` : `<p class="dim">${3 - (G.day - G.volDay)}일 뒤 새 자원자가 나서요.</p>`), `${G.roster.length}/${rosterCap()}명 · 무료`) +
     panel("이주민", migs || `<p class="dim">${G.fame < 5 ? "마을의 명성이 오르면(습격 격퇴, 원정 승리) 다른 종족 이주민이 찾아와요." : `${migNext}일 뒤 새 이주민이 올 거예요.`}</p>`, `명성 ${G.fame}`) +
     (G.bld.barracks ? panel("병영", `<button class="btn" data-act="barracks">창병 바로 훈련 · 💰20 · 마을 사람 1명</button>`) : "");
 }
