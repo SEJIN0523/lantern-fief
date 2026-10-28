@@ -1137,3 +1137,11 @@ small, .dim, .hint { color:var(--dim); }
 .cmdr-tx b { font-size:15px; color:#f0d49b; }
 .cmdr-tx small { font-size:11px; }
 .cmdr-go { font-size:12px; color:#f0d49b; padding:4px 8px; border:1px solid #c9ad7155; border-radius:4px; }
+/* 주인공 지휘 탭 */
+.cmd-sum { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; margin:6px 0 2px; }
+.cmd-sum > div { display:flex; flex-direction:column; align-items:center; padding:8px 4px; background:#0c1d26aa; border:1px solid #2c4650; border-radius:5px; }
+.cmd-sum small { font-size:11px; } .cmd-sum b { font-size:16px; color:#f0d49b; }
+.hero-path { display:grid; grid-template-columns:1fr; gap:4px; }
+.hp-step { display:flex; justify-content:space-between; align-items:center; padding:6px 10px; border-radius:5px; background:#0c1d26aa; border:1px solid #2c4650; opacity:.55; }
+.hp-step b { font-size:13px; } .hp-step small { font-size:11px; }
+.hp-step.done { opacity:.85; } .hp-step.now { opacity:1; border-color:var(--gold); box-shadow:inset 3px 0 0 var(--gold); }

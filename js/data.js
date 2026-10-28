@@ -94,10 +94,10 @@ for (const id in JOBS) if (JOBS[id].lv == null) JOBS[id].lv = JOBS[id].tier === 
 // tgt: single(단일) lane(한 줄 전후열) col(적 전열 전체) cross(십자) all(전체) self ally allies frontallies
 // rng: melee(전열만) any(아무 칸)
 const SKILLS = {
-  command: { name: "지휘", kind: "passive", desc: "같은 파티 아군 공격 +5%. 지휘 게이지가 찬다." },
-  analyze: { name: "인물 파악", kind: "passive", desc: "동료의 잠재력이 더 잘 보인다. 지휘 오라 +3%." },
-  rally: { name: "재정비", kind: "passive", desc: "지휘 게이지 충전 +30%." },
-  kingsorder: { name: "영주의 명", kind: "passive", desc: "아군 전 능력 +8%." },
+  command: { name: "지휘", kind: "passive", desc: "모든 전투에서 아군 능력 +5%. 아군이 움직일 때마다 지휘 게이지가 찬다." },
+  analyze: { name: "인물 파악", kind: "passive", desc: "동료의 잠재력과 마을 주민의 적성이 보인다. 아군 능력 +8%." },
+  rally: { name: "재정비", kind: "passive", desc: "지휘 게이지가 30% 빨리 찬다. 아군 능력 +11%." },
+  kingsorder: { name: "영주의 명", kind: "passive", desc: "아군 능력 +15%." },
 
   bash: { name: "강타", kind: "atk", pow: 1.6, tgt: "single", rng: "melee", cd: 3 },
   guard: { name: "수호", kind: "passive", desc: "같은 줄 후열 아군이 받는 공격을 대신 받는다." },

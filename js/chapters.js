@@ -94,7 +94,7 @@ Object.assign(SKILLS, {
   m_shatter: { name: "문의 파동", kind: "atk", pow: 1.1, mag: true, tgt: "all", rng: "any", cd: 4, fx: "holy" },
   m_mirror: { name: "거울 지휘", kind: "buff", tgt: "allies", buff: { atk: 0.4, spd: 0.2 }, turns: 3, cd: 5 },
   // 세진·서윤
-  otherpanel: { name: "개척자의 창", kind: "passive", desc: "아군 전 능력 +12%. 지휘 게이지 충전 +30%." },
+  otherpanel: { name: "개척자의 창", kind: "passive", desc: "아군 능력 +27%. 지휘 게이지가 37% 빨리 찬다." },
   riftblade: { name: "균열의 칼날", kind: "atk", pow: 1.5, mag: true, tgt: "col", rng: "any", cd: 3, fx: "magic" },
 });
 Object.assign(JOBS, {

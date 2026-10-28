@@ -408,7 +408,7 @@ function hpBar(u) {
 function renderParty() {
   // 주인공은 동료 목록이 아니라 위쪽 지휘관 칸에
   const h = heroU();
-  const cmdr = h ? `<button class="cmdr" data-act="detail" data-arg="${h.id}"><span class="cmdr-face">${unitFace(h)}</span><span class="cmdr-tx"><small>지휘관</small><b>${esc(h.name)}</b><small>${JOBS[h.job].name} · Lv${h.lv} · 아군 능력 +${Math.round(HERO_AURA[JOBS[h.job].tier] * 100)}%</small></span><span class="cmdr-go">보기</span></button>` : "";
+  const cmdr = h ? `<button class="cmdr" data-act="detail" data-arg="${h.id}"><span class="cmdr-face">${unitFace(h)}</span><span class="cmdr-tx"><small>지휘관</small><b>${esc(h.name)}</b><small>${JOBS[h.job].name} · 아군 능력 +${Math.round(HERO_AURA[JOBS[h.job].tier] * 100)}%</small></span><span class="cmdr-go">보기</span></button>` : "";
   const cards = crew().map((u) => {
     const st = u.injured ? `<span class="tag red">${ic("injury", "sm")}부상 ${u.injured}일</span>` : u.fatigue >= 3 ? `<span class="tag">${ic("tired", "sm")}지침</span>` : "";
     const promo = canPromote(u) ? `<span class="tag gold">${ic("lvup", "sm")}전직</span>` : "";
@@ -487,9 +487,11 @@ function showDetail(u, hireFrom) {
   const m = document.createElement("div");
   m.className = "modal"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true"); m.setAttribute("aria-label", "동료 상세");
   m.dataset.uid = u.id;
-  const tabs = [["stat", "능력"], ["trait", "특성"], ["prof", u.gender === "f" && !u.hero && !hireFrom ? "관계" : "프로필"], ...(u.hero ? [] : [["weapon", "무기"], ["gear", "장비"]]), ["skill", canPromote(u) && !hireFrom ? "전직 ★" : u.hero ? "지휘·전직" : "기술"]];
-  if (u.hero && (DTAB === "weapon" || DTAB === "gear")) DTAB = "stat";
-  const body = DTAB === "stat" ? detailStats(u, d) : DTAB === "trait" ? detailTraits(u) : DTAB === "prof" ? detailProfile(u, hireFrom) : DTAB === "weapon" ? detailWeapon(u, hireFrom) : DTAB === "gear" ? detailGear(u, hireFrom) : detailSkills(u, hireFrom);
+  const tabs = u.hero ? [["cmd", "지휘"], ["prof", "프로필"]]
+    : [["stat", "능력"], ["trait", "특성"], ["prof", u.gender === "f" && !hireFrom ? "관계" : "프로필"], ["weapon", "무기"], ["gear", "장비"], ["skill", canPromote(u) && !hireFrom ? "전직 ★" : "기술"]];
+  if (u.hero && DTAB !== "prof") DTAB = "cmd";
+  if (!u.hero && DTAB === "cmd") DTAB = "stat";
+  const body = DTAB === "cmd" ? detailCommand(u) : DTAB === "stat" ? detailStats(u, d) : DTAB === "trait" ? detailTraits(u) : DTAB === "prof" ? detailProfile(u, hireFrom) : DTAB === "weapon" ? detailWeapon(u, hireFrom) : DTAB === "gear" ? detailGear(u, hireFrom) : detailSkills(u, hireFrom);
   m.innerHTML = `<div class="sheet dt">
     <div class="dt-hero" style="--lc:${LINES[u.line].color}">
       <button class="x" data-act="close">✕</button>
@@ -497,8 +499,8 @@ function showDetail(u, hireFrom) {
       <button class="dt-art" data-act="fullview" data-arg="${u.id}" aria-label="전신 보기">${unitBust(u)}<span class="dt-zoom">전신</span></button>
       <div class="dt-id"><div class="dt-name"><h2>${esc(u.name)}</h2><span class="job">${J.name}</span></div>
         <p>${u.race} · ${u.gender === "m" ? "남" : "여"} · ${J.role}${u.job === "villager" ? " · " + aptText(u) : ""}</p>
-        <div class="dt-lv"><b>Lv${u.lv}</b><div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div><small>${u.exp}/${expNeed(u.lv)}</small></div>
-        <small class="dt-pw">전투력 <b>${fmt(power(u))}</b> · 전투 ${u.battles} · 처치 ${u.kills}</small>
+        ${u.hero ? `<small class="dt-pw">전장 밖에서 지휘 · 아군 능력 <b>+${Math.round(HERO_AURA[J.tier] * 100)}%</b> · 지휘한 전투 ${u.battles}</small>` : `<div class="dt-lv"><b>Lv${u.lv}</b><div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div><small>${u.exp}/${expNeed(u.lv)}</small></div>
+        <small class="dt-pw">전투력 <b>${fmt(power(u))}</b> · 전투 ${u.battles} · 처치 ${u.kills}</small>`}
         ${!hireFrom && canPromote(u) && DTAB !== "skill" ? `<button class="btn sm gold dt-promo" data-act="dtab" data-arg="skill:${u.id}">${ic("lvup", "sm")}전직할 수 있어요 →</button>` : ""}</div>
     </div>
     <div class="seg dseg">${tabs.map(([k, n]) => `<button data-act="dtab" data-arg="${k}:${u.id}${hireFrom ? ":" + hireFrom : ""}" class="${DTAB === k ? "on" : ""}">${n}</button>`).join("")}</div>
@@ -531,6 +533,18 @@ function detailStats(u, d) {
   return `<h4 class="sub">기본 능력 <small>개화 · ${bloom}</small></h4><div class="st-grid">${tiles}</div>
     ${heroU() && JOBS[heroU().job].tier === 0 && !u.hero ? `<p class="dim st-hint">세진의 「인물 파악」이 성장하면 잠재력이 보여요.</p>` : ""}
     <h4 class="sub">전투 능력</h4><div class="cb-grid">${cb}</div>${reb}`;
+}
+// 주인공 지휘 탭: 능력치·레벨 없이, 직업 단계에 따른 지휘 효과만
+const HERO_PATH = [["stranger", "프롤로그"], ["tactician", "1장을 마치면"], ["strategist", "2장을 마치면"], ["lord", "3장을 마치면"], ["pioneer", "5장을 마치면"]];
+function detailCommand(u) {
+  const J = JOBS[u.job];
+  const gauge = has({ skills: unitSkills(u).map((id) => ({ id })) }, "otherpanel") ? 11 : unitSkills(u).includes("rally") ? 10.5 : 8;
+  const sk = unitSkills(u).map((id) => SKILLS[id]).filter(Boolean).map((s) => `<div class="skc"><b>${s.name}</b>${s.desc ? `<small>${s.desc}</small>` : ""}</div>`).join("");
+  const path = HERO_PATH.map(([j, when]) => `<div class="hp-step ${j === u.job ? "now" : (u.jobs || []).includes(j) ? "done" : ""}"><b>${JOBS[j].name}</b><small>아군 +${Math.round(HERO_AURA[JOBS[j].tier] * 100)}% · ${when}</small></div>`).join("");
+  return `<div class="cmd-sum"><div><small>아군 능력</small><b>+${Math.round(HERO_AURA[J.tier] * 100)}%</b></div><div><small>지휘 게이지</small><b>${Math.ceil(100 / gauge)}번 행동</b></div><div><small>지휘 명령</small><b>3가지</b></div></div>
+    <h4 class="sub">지휘 명령 <small>게이지가 차면 전투 화면에서 고른다</small></h4>${Object.values(COMMANDS).map((c) => `<div class="skc"><b>${c.name}</b><small>${c.desc}</small></div>`).join("")}
+    <h4 class="sub">익힌 지휘 기술</h4>${sk}
+    <h4 class="sub">지휘관의 길 <small>이야기가 진행되면 오른다</small></h4><div class="hero-path">${path}</div>`;
 }
 function detailTraits(u) {
   const row = (kind, label) => { const t = traitOf(u, kind); return t ? `<div class="trait"><span class="tk">${label}</span><div><b>${t.name}</b><small>${t.desc}</small></div></div>` : ""; };

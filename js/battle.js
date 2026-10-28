@@ -409,7 +409,7 @@ function battleRewards(B) {
       G.arms.push(res.drop);
     }
   }
-  if (B.hero) { const h = B.hero.unit; h.battles++; const ups = gainExp(h, share); if (ups.length) res.ups[h.id] = ups.length; }
+  if (B.hero) B.hero.unit.battles++;
   for (const c of as) {
     const u = c.unit;
     u.battles++;
