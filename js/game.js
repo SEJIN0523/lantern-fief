@@ -53,6 +53,17 @@ function migrate() {
     }
     ensureProfile(u);
   }
+  const seen = new Set();
+  for (const u of G.roster) {
+    if (u.hero || u.art) continue;
+    const k = u.line + ":" + u.slot;
+    if (seen.has(k)) {
+      const used = new Set([...seen, ...G.roster.map((x) => x.line + ":" + x.slot)]);
+      const alt = LINES[u.line].slots.findIndex((s, i) => !used.has(u.line + ":" + i) && s[0] === u.gender && s[1] === u.race);
+      if (alt >= 0) u.slot = alt;
+    }
+    seen.add(u.line + ":" + u.slot);
+  }
 }
 function hasSave() { try { return !!localStorage.getItem(SAVE_KEY); } catch (e) { return false; } }
 

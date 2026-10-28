@@ -939,3 +939,14 @@ small, .dim, .hint { color:var(--dim); }
   .seg button .ic, .village-seg button .ic { width:17px; height:17px; }
 }
 .dt-promo { align-self:flex-start; margin-top:4px; min-height:32px; padding:4px 10px; font-size:12px; }
+
+/* 동료 카드 v3: 초상은 항상 정사각(카드가 길어져도 확대되지 않음), 태그는 한 줄 */
+.cc { grid-template-columns:100px minmax(0,1fr); align-items:start; }
+.cc-art { width:92px; height:92px; align-self:start; margin:8px 0 8px 8px; border:1px solid #ffffff1a; border-radius:5px; }
+.cc-art>.spr.bust { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 0; }
+.cc-art .lv { bottom:3px; left:3px; font-size:10px; padding:0 5px; line-height:16px; }
+.cc-tx { padding:8px 9px; min-height:108px; }
+.cc-tx .tags { display:flex; flex-wrap:wrap; gap:3px; margin:4px 0 0; }
+.cc-tx .tags .tag { font-size:10px; padding:1px 5px; line-height:16px; }
+.cc-tx .tags .tag .ic { width:14px; height:14px; }
+@media(max-width:360px) { .cc { grid-template-columns:78px minmax(0,1fr); } .cc-art { width:72px; height:72px; margin:6px 0 6px 6px; } }

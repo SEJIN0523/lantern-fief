@@ -23,19 +23,27 @@ function freshName(gender) {
   const free = NAMES[gender].filter((n) => !used.has(n));
   return pick(free.length ? free : NAMES[gender]);
 }
+function usedLooks() {
+  if (typeof G === "undefined" || !G) return new Set();
+  return new Set([...(G.roster || []), ...(G.volunteers || []), ...(G.migrants || [])].filter((u) => !u.hero && !u.art).map((u) => u.line + ":" + u.slot));
+}
 function newUnit(opts = {}) {
   const job = opts.job || "warrior";
   const J = JOBS[job];
   // 마을 주민은 숨은 적성 계열의 인물(계열+칸)로 태어난다
   let lineId = opts.line || J.line;
-  if (job === "villager" && lineId === "villager") lineId = pick(Object.keys(FIRST_JOB));
-  let line = LINES[lineId];
   let slot = opts.slot;
   if (slot == null) {
-    const ok = line.slots.map((s, i) => i).filter((i) => !opts.race || line.slots[i][1] === opts.race);
-    if (!ok.length) { lineId = pick(Object.keys(FIRST_JOB)); line = LINES[lineId]; }
-    slot = pick(ok.length ? ok : line.slots.map((s, i) => i));
-  }
+    // 같은 그림(계열+칸)인 사람이 이미 있으면 피한다
+    const lines = job === "villager" && lineId === "villager" ? Object.keys(FIRST_JOB) : [lineId];
+    const all = lines.flatMap((l) => LINES[l].slots.map((s, i) => [l, i, s]));
+    let cands = all.filter(([, , s]) => !opts.race || s[1] === opts.race);
+    if (!cands.length) cands = all;
+    const used = usedLooks();
+    const fresh = cands.filter(([l, i]) => !used.has(l + ":" + i));
+    [lineId, slot] = pick(fresh.length ? fresh : cands);
+  } else if (job === "villager" && lineId === "villager") lineId = pick(Object.keys(FIRST_JOB));
+  let line = LINES[lineId];
   const [gender, race] = line.slots[slot];
   const u = {
     id: opts.id || "u" + Date.now().toString(36) + (UID++),
