@@ -1145,3 +1145,9 @@ small, .dim, .hint { color:var(--dim); }
 .hp-step { display:flex; justify-content:space-between; align-items:center; padding:6px 10px; border-radius:5px; background:#0c1d26aa; border:1px solid #2c4650; opacity:.55; }
 .hp-step b { font-size:13px; } .hp-step small { font-size:11px; }
 .hp-step.done { opacity:.85; } .hp-step.now { opacity:1; border-color:var(--gold); box-shadow:inset 3px 0 0 var(--gold); }
+/* 장비 그림: 등급 색 테두리 */
+.iic { display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; flex:none; border-radius:6px; border:1px solid color-mix(in srgb, var(--gc) 70%, transparent); background:radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--gc) 22%, transparent), #07131a 75%); box-sizing:border-box; }
+.iic img { width:36px; height:36px; object-fit:contain; image-rendering:auto; }
+.iic.g4, .iic.g5 { box-shadow:0 0 10px color-mix(in srgb, var(--gc) 40%, transparent); }
+.eq:not(:has(b.gname)) .iic { opacity:.45; filter:grayscale(1); }
+.itx { min-width:44px; height:44px; }

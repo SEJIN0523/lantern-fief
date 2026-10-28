@@ -387,15 +387,24 @@ function renderWeaponShop() {
     panel("무기고", arms || '<p class="dim">남는 무기가 없어요. 전투에서 이기면 가끔 무기를 얻어요.</p>', `${G.arms.length}자루`);
 }
 // 장비 아이콘: items 시트 칸이 있으면 그림, 없으면 UI 아이콘
-const ITEM_ART = { leather: "items_armor_2", chain: "items_armor_3", robe: "items_armor_6", plate: "items_armor_5", ring_str: "items_accessory_1", amulet: "items_accessory_4", charm: "items_accessory_7", coin: "items_accessory_8", belt: "items_armor_23", pen: "items_otherworld_1" };
+// 장비 그림(아이템 시트 칸). 무기는 종류별 시트(items_weapon_1~11)가 들어오면 그것을 쓴다
+const ITEM_ART = { leather: "items_armor_2", chain: "items_armor_3", robe: "items_armor_6", plate: "items_armor_5", ring_str: "items_accessory_1", amulet: "items_accessory_4", charm: "items_accessory_7", coin: "items_accessory_8", belt: "items_armor_23", pen: "items_otherworld_1", phone: "items_otherworld_3", notebook: "items_otherworld_16" };
+const WEAPON_ORDER = ["sword", "axe", "spear", "dagger", "bow", "crossbow", "staff", "mace", "fist", "tool", "book"];
+const WEAPON_ART_FALLBACK = { sword: "ui_icons_b_20", book: "ui_icons_b_17" };
+const artOf = (k) => (k && typeof ART !== "undefined" && ART[k] ? ART[k] : null);
+function iconBox(src, g, label) { return `<span class="iic g${g}" title="${label}"><img src="${src}" alt="${label}"></span>`; }
 function itemGrade(it) { return it.otherworld ? 5 : it.price <= 50 ? 0 : it.price <= 100 ? 1 : it.price <= 200 ? 2 : 3; }
 function gradeTag(g) { return `<span class="gtag g${g}">${GRADE_NAME[g]}</span>`; }
 // 아이템 자리: 종류를 글씨로, 등급을 색으로
 function itemIc(id, slot) {
-  const it = ITEMS[id];
-  return `<span class="itx g${it ? itemGrade(it) : 0}">${slot === "armor" ? "방어구" : slot === "weapon" ? "무기" : "장신구"}</span>`;
+  const it = ITEMS[id], g = it ? itemGrade(it) : 0, label = slot === "armor" ? "방어구" : "장신구";
+  const src = artOf(ITEM_ART[id]) || (!id ? artOf(slot === "armor" ? "items_armor_1" : "items_accessory_2") : null);
+  return src ? iconBox(src, g, label) + (id ? "" : "") : `<span class="itx g${g}">${label}</span>`;
 }
-function weaponTag(w) { return `<span class="itx g${w.grade}">${WEAPON_KIND[w.kind]}</span>`; }
+function weaponTag(w) {
+  const src = artOf("items_weapon_" + (WEAPON_ORDER.indexOf(w.kind) + 1)) || artOf(WEAPON_ART_FALLBACK[w.kind]);
+  return src ? iconBox(src, w.grade, WEAPON_KIND[w.kind]) : `<span class="itx g${w.grade}">${WEAPON_KIND[w.kind]}</span>`;
+}
 function itemStatText(it) {
   const n = { atk: "공격", mag: "마공", def: "방어", res: "저항", hp: "HP", eva: "회피", crit: "치명", spd: "속도" };
   return Object.entries(it).filter(([k]) => n[k]).map(([k, v]) => `${n[k]}${v > 0 ? "+" : ""}${v}`).join(" ");
