@@ -378,18 +378,18 @@ function showDetail(u, hireFrom) {
   m.dataset.uid = u.id;
   const tabs = [["stat", "능력"], ["trait", "특성"], ["prof", u.gender === "f" && !u.hero && !hireFrom ? "관계" : "프로필"], ["gear", "장비"], ["skill", "기술"]];
   const body = DTAB === "stat" ? detailStats(u, d) : DTAB === "trait" ? detailTraits(u) : DTAB === "prof" ? detailProfile(u, hireFrom) : DTAB === "gear" ? detailGear(u, hireFrom) : detailSkills(u, hireFrom);
-  m.innerHTML = `<div class="sheet">
+  m.innerHTML = `<div class="sheet dt">
     <div class="dt-hero" style="--lc:${LINES[u.line].color}">
       <button class="x" data-act="close">✕</button>
-      <div class="dt-art">${unitSprite(u)}</div>
-      <div class="dt-id"><h2>${esc(u.name)}</h2><p>${u.race} · ${u.gender === "m" ? "남" : "여"}${u.job === "villager" ? " · " + aptText(u) : ""}</p>
-        <div class="job">${J.name}<small>${J.role}</small></div>
-        <p class="lvl">Lv <b>${u.lv}</b> <small>${u.exp}/${expNeed(u.lv)}</small></p><div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div>
-        <small>전투력 ${fmt(power(u))} · 전투 ${u.battles} · 처치 ${u.kills}</small></div>
+      <div class="dt-art">${unitBust(u)}</div>
+      <div class="dt-id"><div class="dt-name"><h2>${esc(u.name)}</h2><span class="job">${J.name}</span></div>
+        <p>${u.race} · ${u.gender === "m" ? "남" : "여"} · ${J.role}${u.job === "villager" ? " · " + aptText(u) : ""}</p>
+        <div class="dt-lv"><b>Lv${u.lv}</b><div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div><small>${u.exp}/${expNeed(u.lv)}</small></div>
+        <small class="dt-pw">전투력 <b>${fmt(power(u))}</b> · 전투 ${u.battles} · 처치 ${u.kills}</small></div>
     </div>
     <div class="seg dseg">${tabs.map(([k, n]) => `<button data-act="dtab" data-arg="${k}:${u.id}${hireFrom ? ":" + hireFrom : ""}" class="${DTAB === k ? "on" : ""}">${n}</button>`).join("")}</div>
-    <div class="dt-body">${body}</div>
-    ${hireFrom ? "" : !u.hero ? `<button class="btn ghost danger" data-act="dismiss" data-arg="${u.id}">내보내기</button>` : ""}
+    <div class="dt-body">${body}
+    ${hireFrom ? "" : !u.hero ? `<button class="btn ghost danger dt-dismiss" data-act="dismiss" data-arg="${u.id}">내보내기</button>` : ""}</div>
   </div>`;
   document.body.appendChild(m);
 }
@@ -398,13 +398,13 @@ function detailStats(u, d) {
   const top = Math.max(...STATS.map((k) => u.st[k]), 20);
   const reb = typeof canRebirth === "function" && G.bld.spring && G.roster.includes(u)
     ? (canRebirth(u) ? `<button class="btn gold wide" data-act="rebirth" data-arg="${u.id}">💧 환생 · 💰${rebirthCost(u)}${u.reb ? ` · 현재 ${u.reb}회` : ""}</button>` : `<p class="dim">Lv20부터 윤회의 샘에서 환생할 수 있어요.${u.reb ? ` (환생 ${u.reb}회)` : ""}</p>`) : "";
-  const rows = STATS.map((k) => `<div class="srow"><span>${STAT_NAME[k]}</span><div class="mbar"><i style="width:${(u.st[k] / top) * 100}%"></i></div><b>${u.st[k]}</b><span class="pot g${revealLevel(u, k) >= 2 ? u.pot[k] : "x"}">${potText(u, k)}</span></div>`).join("");
-  const big = Math.max(d.atk, d.mag, d.heal, d.def, 30);
-  return `<h4 class="sub">기본 능력 <small>잠재력</small></h4>${rows}${reb}
-    <p class="dim">개화: ${revealLevel(u, "int") >= 3 || u.hero ? BLOOM[u.bloom].name : "???"}${heroU() && JOBS[heroU().job].tier === 0 && !u.hero ? " · 세진의 「인물 파악」이 성장하면 잠재력이 보여요." : ""}</p>
-    <h4 class="sub">전투 능력</h4>
-    ${statBar("HP", d.hp, Math.max(d.hp, 200), "hp")}${statBar("공격", d.atk, big, "atk")}${statBar("마공", d.mag, big, "mag")}${statBar("회복", d.heal, big, "mag")}${statBar("방어", d.def, big, "def")}${statBar("저항", d.res, big, "def")}
-    <div class="minis"><span>${ic("spd", "sm")}속도 ${d.spd}</span><span>회피 ${d.eva}%</span><span>치명 ${d.crit}%</span><span>명중 ${d.acc}</span></div>`;
+  // 기본 능력 6칸(값·잠재력·막대), 전투 능력 10칸
+  const tiles = STATS.map((k) => `<div class="st"><span>${STAT_NAME[k]}</span><em class="pot g${revealLevel(u, k) >= 2 ? u.pot[k] : "x"}">${potText(u, k).replace(/[()]/g, "")}</em><b>${u.st[k]}</b><div class="mbar"><i style="width:${(u.st[k] / top) * 100}%"></i></div></div>`).join("");
+  const cb = [["HP", d.hp], ["공격", d.atk], ["마공", d.mag], ["회복", d.heal], ["방어", d.def], ["저항", d.res], ["속도", d.spd], ["회피", d.eva + "%"], ["치명", d.crit + "%"], ["명중", d.acc]].map(([n, v]) => `<div class="cbt"><span>${n}</span><b>${v}</b></div>`).join("");
+  const bloom = revealLevel(u, "int") >= 3 || u.hero ? BLOOM[u.bloom].name : "???";
+  return `<h4 class="sub">기본 능력 <small>개화 · ${bloom}</small></h4><div class="st-grid">${tiles}</div>
+    ${heroU() && JOBS[heroU().job].tier === 0 && !u.hero ? `<p class="dim st-hint">세진의 「인물 파악」이 성장하면 잠재력이 보여요.</p>` : ""}
+    <h4 class="sub">전투 능력</h4><div class="cb-grid">${cb}</div>${reb}`;
 }
 function detailTraits(u) {
   const row = (kind, label) => { const t = traitOf(u, kind); return t ? `<div class="trait"><span class="tk">${label}</span><div><b>${t.name}</b><small>${t.desc}</small></div></div>` : ""; };

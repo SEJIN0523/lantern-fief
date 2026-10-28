@@ -822,3 +822,42 @@ div.mc-holy, div.mc-heal { border-color: #ffe680; box-shadow: 0 0 14px #ffe680, 
 .bc-t b { margin:0; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .bc-t small { font-size:10px; }
 @media(max-height:700px) { .cell { height:52px; } .cell-u { width:42px; height:42px; } }
+
+/* 동료 상세 v2: 머리·탭은 고정, 본문만 필요할 때 스크롤. 능력은 타일로 한 화면에 */
+.sheet.dt { display:flex; flex-direction:column; overflow:hidden; padding-bottom:0; }
+.sheet.dt .dt-hero { flex:none; align-items:center; gap:12px; padding:14px 12px 12px; }
+.sheet.dt .dt-art { width:88px; height:88px; border-radius:6px; flex:none; }
+.sheet.dt .dt-art:before { display:none; }
+.sheet.dt .dt-art>.spr.bust { width:100%; height:100%; object-fit:cover; object-position:50% 0; }
+.sheet.dt .dt-art>.spr:not(.bust) { width:100%; height:100%; }
+.sheet.dt .dt-id { padding-right:44px; display:flex; flex-direction:column; gap:3px; }
+.dt-name { display:flex; align-items:center; gap:8px; min-width:0; }
+.dt-name h2 { font-size:20px; line-height:24px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dt-name .job { flex:none; margin:0; padding:2px 8px; font-size:12px; line-height:18px; }
+.sheet.dt .dt-id>p { margin:0; font-size:11px; line-height:15px; }
+.dt-lv { display:flex; align-items:center; gap:7px; }
+.dt-lv b { color:var(--gold); font-size:14px; }
+.dt-lv .mbar { flex:1; }
+.dt-lv small { font-size:10px; color:var(--dim); }
+.dt-pw { font-size:11px; color:var(--dim); }.dt-pw b { color:#f0d49b; }
+.sheet.dt .x { top:12px; right:10px; }
+.sheet.dt .dseg { flex:none; margin:0 0 4px; }
+.sheet.dt .dt-body { flex:1; min-height:0; overflow-y:auto; padding:0 0 max(14px,env(safe-area-inset-bottom)); }
+.dt-dismiss { display:block; margin:14px auto 0; min-height:36px; font-size:12px; }
+.st-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+.st { display:grid; grid-template-columns:1fr auto; align-items:center; row-gap:3px; padding:7px 8px 8px; background:#0c1d26aa; border:1px solid #2c4650; border-radius:5px; }
+.st>span { font-size:11px; color:#9fb4b8; }
+.st>em { font-style:normal; font-size:10px; padding:1px 5px; border-radius:3px; background:#07131a; white-space:nowrap; }
+.st>b { grid-column:1/-1; font-size:20px; line-height:22px; }
+.st>.mbar { grid-column:1/-1; height:4px; }
+.st-hint { margin:5px 0 0; font-size:11px; }
+.cb-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; }
+.cbt { display:flex; flex-direction:column; align-items:center; padding:6px 2px; background:#0c1d26aa; border:1px solid #2c4650; border-radius:5px; }
+.cbt span { font-size:10px; color:#9fb4b8; }
+.cbt b { font-size:15px; line-height:19px; }
+.cb-grid + .btn, .cb-grid + .dim { margin-top:10px; }
+.pf { grid-template-columns:1fr 1fr; gap:5px; }
+.pf-row { flex-direction:column; gap:1px; padding:6px 9px; font-size:12px; }
+.pf-row b { text-align:left; }
+.pf-row:nth-child(n+5) { grid-column:1/-1; flex-direction:row; justify-content:space-between; }
+.pf-note { grid-column:1/-1; }
