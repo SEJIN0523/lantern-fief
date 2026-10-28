@@ -1151,3 +1151,6 @@ small, .dim, .hint { color:var(--dim); }
 .iic.g4, .iic.g5 { box-shadow:0 0 10px color-mix(in srgb, var(--gc) 40%, transparent); }
 .eq:not(:has(b.gname)) .iic { opacity:.45; filter:grayscale(1); }
 .itx { min-width:44px; height:44px; }
+.wshop-row { grid-template-columns:56px minmax(0,1fr); }
+.wshop-k { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.wshop-k b { font-size:11px; }

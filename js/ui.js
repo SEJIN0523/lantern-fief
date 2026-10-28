@@ -381,7 +381,7 @@ function renderWeaponShop() {
   // 지금 쓰는 무기 + 다음 전직 때 쓸 무기
   const kinds = [...new Set(crew().flatMap((u) => [JOBS[u.job].weapon, ...(u.job !== "villager" || aptKnown(u) ? nextJobs(u).map((j) => JOBS[j].weapon) : [])]))].filter((k) => k !== "tool" || crew().some((u) => u.job === "villager"));
   const top = shopWeaponGrade();
-  const buy = kinds.map((k) => `<div class="wshop-row"><b>${WEAPON_KIND[k]}</b><div class="wshop-gs">${WEAPON_GRADE.slice(0, top + 1).map((g, i) => `<button class="btn sm wbuy g${i}" data-act="buyw" data-arg="${k}:${i}" ${G.res.gold < g.price ? "disabled" : ""}><b>${g.name}</b><small>힘 ${g.pow} · 금화 ${g.price}</small></button>`).join("")}</div></div>`).join("");
+  const buy = kinds.map((k) => `<div class="wshop-row"><span class="wshop-k">${weaponTag({ kind: k, grade: 0 })}<b>${WEAPON_KIND[k]}</b></span><div class="wshop-gs">${WEAPON_GRADE.slice(0, top + 1).map((g, i) => `<button class="btn sm wbuy g${i}" data-act="buyw" data-arg="${k}:${i}" ${G.res.gold < g.price ? "disabled" : ""}><b>${g.name}</b><small>힘 ${g.pow} · 금화 ${g.price}</small></button>`).join("")}</div></div>`).join("");
   const arms = G.arms.map((w) => `<div class="shop-it"><span class="shop-ic">${weaponTag(w)}</span><div><b class="gname g${w.grade}">${esc(weaponLabel(w))}</b><small>${GRADE_NAME[w.grade]} · 힘 ${Math.round(weaponPow(w))}</small></div><span></span><button class="btn sm" data-act="sellw" data-arg="${w.id}">팔기 ${Math.round(weaponPrice(w) * 0.4)}</button></div>`).join("");
   return panel("무기 상인", buy || '<p class="dim">동료가 없어요.</p>', top < 3 ? "촌장의 집·대장간을 올리면 좋은 무기가 들어와요" : "") +
     panel("무기고", arms || '<p class="dim">남는 무기가 없어요. 전투에서 이기면 가끔 무기를 얻어요.</p>', `${G.arms.length}자루`);
@@ -402,7 +402,9 @@ function itemIc(id, slot) {
   return src ? iconBox(src, g, label) + (id ? "" : "") : `<span class="itx g${g}">${label}</span>`;
 }
 function weaponTag(w) {
-  const src = artOf("items_weapon_" + (WEAPON_ORDER.indexOf(w.kind) + 1)) || artOf(WEAPON_ART_FALLBACK[w.kind]);
+  // 시트 1~11번은 기본 모습, 13~23번은 같은 무기의 좋은 모습(희귀 등급부터)
+  const n = WEAPON_ORDER.indexOf(w.kind) + 1;
+  const src = artOf("items_weapon_" + (w.grade >= 2 ? n + 12 : n)) || artOf("items_weapon_" + n) || artOf(WEAPON_ART_FALLBACK[w.kind]);
   return src ? iconBox(src, w.grade, WEAPON_KIND[w.kind]) : `<span class="itx g${w.grade}">${WEAPON_KIND[w.kind]}</span>`;
 }
 function itemStatText(it) {
