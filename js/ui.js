@@ -488,12 +488,27 @@ function showResult(title, lines, buttons) {
   m.className = "modal center";
   m.innerHTML = `<div class="sheet small result"><h2>${title}</h2>${lines.filter(Boolean).map((l) => `<p>${l}</p>`).join("")}<div class="rbtns">${buttons.map((b, i) => `<button data-ri="${i}" class="btn ${b.ghost ? "" : "gold"}">${b.label}</button>`).join("")}</div></div>`;
   document.body.appendChild(m);
+  let timer = null;
   m.onclick = (e) => {
     const b = e.target.closest("[data-ri]");
     if (!b) return;
+    clearInterval(timer);
     m.remove();
     buttons[+b.dataset.ri].fn();
   };
+  // 전투 뒤 결과창: 자동 진행이 켜져 있으면 첫 버튼(계속 전진·확인)을 3초 뒤 저절로 누른다
+  if (typeof BV !== "undefined" && BV.auto && document.querySelector(".battle")) {
+    const first = m.querySelector('[data-ri="0"]');
+    const label = first.textContent;
+    let n = 3;
+    first.textContent = `${label} (${n})`;
+    timer = setInterval(() => {
+      if (!m.isConnected) return clearInterval(timer);
+      n--;
+      if (n > 0) first.textContent = `${label} (${n})`;
+      else { clearInterval(timer); first.click(); }
+    }, 1000);
+  }
 }
 function rewardLines(B, rw) {
   const out = [`${ic("lvup", "sm")} 경험치 +${rw.exp} (1인당) · ${ic("gold", "sm")} +${rw.gold}`];

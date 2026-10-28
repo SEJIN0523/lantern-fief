@@ -137,7 +137,7 @@ function areaTargets(B, c, sk, primary) {
 }
 
 function dealDamage(B, c, t, pow, sk, ev) {
-  const mag = !!(sk && sk.mag) || c.range === "magic";
+  const mag = !!(sk && sk.mag) || c.range === "magic" || (!sk && c.range === "heal");
   const hitP = mag ? 0.97 : clamp((statOf(B, c, "acc") - statOf(B, t, "eva")) / 100, 0.35, 0.99);
   if (!chance(hitP)) {
     ev.push({ id: t.id, miss: true });
@@ -263,7 +263,8 @@ function step(B) {
     act.t.hp = Math.min(act.t.maxHp, act.t.hp + h);
     out.kind = "heal"; out.heals = [{ id: act.t.id, amt: h }];
   } else if (act.basic) {
-    out.kind = c.range === "magic" ? "magic" : c.range === "ranged" ? "shoot" : "melee";
+    out.kind = c.range === "magic" || c.range === "heal" ? "magic" : c.range === "ranged" ? "shoot" : "melee";
+    if (c.range === "heal") out.fx = "holy";
     out.target = act.t.id;
     let t = act.t;
     const g = guardRedirect(B, t);

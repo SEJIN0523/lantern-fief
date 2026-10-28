@@ -42,8 +42,27 @@ function monSprite(id, cls = "") {
   return `<div class="mon ${cls}${MONSTERS[id].boss ? " boss" : ""}">${MONSTERS[id].icon}</div>`;
 }
 
-const BV = { speed: 1, skip: false, pendingCmd: null, el: null };
-const wait = (ms) => new Promise((r) => setTimeout(r, BV.skip ? 0 : ms / BV.speed));
+const BV = { speed: 1, skip: false, pendingCmd: null, el: null, paused: false, auto: (() => { try { return localStorage.getItem("fief_auto") === "1"; } catch (e) { return false; } })() };
+// 일시정지 중에는 시간이 흐르지 않는 대기
+const wait = (ms) => new Promise((r) => {
+  if (BV.skip) return r();
+  let left = ms / BV.speed, last = performance.now();
+  const tick = () => {
+    const now = performance.now();
+    if (!BV.paused) left -= now - last;
+    last = now;
+    if (left <= 0 || BV.skip) r(); else setTimeout(tick, Math.min(40, left));
+  };
+  setTimeout(tick, Math.min(40, left));
+});
+function battleAnims() { const b = document.querySelector(".battle"); return b ? b.getAnimations({ subtree: true }) : []; }
+function setPaused(on) {
+  BV.paused = on;
+  battleAnims().forEach((a) => { try { if (on && a.playState === "running") a.pause(); else if (!on && a.playState === "paused") a.play(); } catch (e) {} });
+  const btn = document.querySelector("[data-pause]");
+  if (btn) { btn.textContent = on ? "▶ 계속" : "⏸ 정지"; btn.classList.toggle("on", on); }
+  document.querySelector(".battle")?.classList.toggle("paused", on);
+}
 
 function slotPos(side, col, lane) {
   // 아군 왼쪽(후열 더 왼쪽), 적 오른쪽(후열 더 오른쪽). 줄마다 살짝 어긋나게
@@ -280,6 +299,7 @@ async function hitStop(ms) {
   const list = document.getElementById("field").getAnimations({ subtree: true }).filter((a) => a.playState === "running");
   list.forEach((a) => a.pause());
   await new Promise((r) => setTimeout(r, ms));
+  if (BV.paused) return; // 일시정지가 걸렸으면 풀 때 한꺼번에 다시 돈다
   list.forEach((a) => { try { if (a.playState === "paused") a.play(); } catch (e) {} });
 }
 function flashField(color) {
@@ -372,15 +392,22 @@ async function playEvent(B, ev) {
     // 뒤로 9px 반동 → 대상 앞까지 돌진 → 베기 → 330ms에 복귀
     const a = center(ev.actor), t = center(ev.target);
     const dx = (t.x - a.x) - dir * t.w * 0.5, dy = t.y - a.y;
-    await anim(el, [{ transform: "translate(0,0)" }, { transform: `translate(${-9 * dir}px,0) rotate(${-4 * dir}deg)` }], 130, { fill: "forwards" });
-    fxAt(ev.actor, "dust", { foot: true, size: 0.6, ms: 360, flip: dir < 0 });
-    SND.swing();
-    await anim(el, [{ transform: `translate(${-9 * dir}px,0) rotate(${-4 * dir}deg)` }, { transform: `translate(${dx}px,${dy}px) rotate(${7 * dir}deg)` }], 220, { ease: "ease-in", fill: "forwards" });
-    fxAt(ev.target, slashKind(c, sk), { size: 1.15, ms: 320, flip: dir < 0 });
-    anim(el, [{ transform: `translate(${dx}px,${dy}px) rotate(${7 * dir}deg)` }, { transform: `translate(${dx + 6 * dir}px,${dy}px) rotate(${-3 * dir}deg)` }], 120, { fill: "forwards" });
+    const T = 1060, at = (ms) => ms / T;
+    const move = anim(el, [
+      { transform: "translate(0,0) rotate(0)", offset: 0, easing: "ease-out" },
+      { transform: `translate(${-9 * dir}px,0) rotate(${-4 * dir}deg)`, offset: at(130), easing: "ease-in" },
+      { transform: `translate(${dx}px,${dy}px) rotate(${7 * dir}deg)`, offset: at(350), easing: "ease-out" },
+      { transform: `translate(${dx + 6 * dir}px,${dy}px) rotate(${-3 * dir}deg)`, offset: at(470) },
+      { transform: `translate(${dx + 6 * dir}px,${dy}px) rotate(${-3 * dir}deg)`, offset: at(730), easing: "ease-in-out" },
+      { transform: "translate(0,0) rotate(0)", offset: 1 },
+    ], T, { ease: "linear" });
     try {
-      await showHits(B, ev.hits, ev.side);
-      await anim(el, [{ transform: `translate(${dx + 6 * dir}px,${dy}px) rotate(${-3 * dir}deg)` }, { transform: "translate(0,0) rotate(0)" }], 330, { ease: "ease-in-out", fill: "forwards" });
+      await wait(130);
+      fxAt(ev.actor, "dust", { foot: true, size: 0.6, ms: 360, flip: dir < 0 });
+      SND.swing();
+      await wait(220);
+      fxAt(ev.target, slashKind(c, sk), { size: 1.15, ms: 320, flip: dir < 0 });
+      await Promise.all([showHits(B, ev.hits, ev.side), move]);
     } finally { clearAnims(el); }
   } else if (ev.kind === "shoot" || (ev.kind === "atk" && !(sk && sk.mag) && c.range !== "magic")) {
     // 활을 6° 젖힘 → 직선으로 날아가는 화살 + 빛 꼬리
@@ -392,7 +419,7 @@ async function playEvent(B, ev) {
     await showHits(B, ev.hits, ev.side);
   } else if (ev.kind === "magic" || ev.kind === "atk") {
     // 발밑 마법진 → 빛 구체 → 대상에서 폭발과 고리
-    const kind = (sk && sk.fx) || "magic";
+    const kind = (sk && sk.fx) || ev.fx || "magic";
     SND.magic();
     await Promise.all([magicCircle(ev.actor, kind), anim(el, [{ transform: "translateY(0)", filter: "none" }, { transform: "translateY(-10px)", filter: "drop-shadow(0 0 10px #8cf)" }], 360, { fill: "forwards" })]);
     const ts = [...new Set(ev.hits.map((h) => h.id))];
@@ -445,12 +472,12 @@ async function playEvent(B, ev) {
 // 전투 실행. 화면을 그리고 끝나면 B를 돌려준다
 function playBattle(B, opts) {
   return new Promise((resolve) => {
-    BV.skip = false; BV.pendingCmd = null;
+    BV.skip = false; BV.pendingCmd = null; BV.paused = false;
     B.tactic = G.tactic;
     const cmdBtns = B.hero ? Object.entries(COMMANDS).map(([id, c]) => `<button class="cmd-btn" data-cmd="${id}" disabled><b>${c.name}</b><small>${c.desc}</small></button>`).join("") : "";
     app.innerHTML = `<div class="battle">
       <div class="b-top"><span class="b-title"><small>영지를 위한 전투</small>${esc(opts.title || "전투")}</span><span class="b-spd">${[1, 2, 4].map((s) => `<button data-spd="${s}" class="${BV.speed === s ? "on" : ""}">${s}x</button>`).join("")}<button data-sfx="1" class="${SFX.on ? "on" : ""}" aria-label="효과음">${SFX.on ? "🔊" : "🔇"}</button><button data-skip="1">결과 ▶▶</button></span></div>
-      <div class="order-label"><span>행동 순서</span><span>AUTO BATTLE</span></div><div class="order" id="order" aria-label="행동 순서"></div>
+      <div class="order-label"><span>행동 순서</span><span class="b-tog"><button data-pause="1">⏸ 정지</button><button data-auto="1" class="${BV.auto ? "on" : ""}">${BV.auto ? "자동 진행 ON" : "자동 진행 OFF"}</button></span></div><div class="order" id="order" aria-label="행동 순서"></div>
       ${renderField(B, opts)}
       <div class="b-ctl">
         ${B.hero ? `<div class="cmd"><div class="cmd-head"><span>${ic("lantern", "sm")} 세진의 지휘</span><div class="cmd-bar"><i id="cmdg"></i></div></div><div class="cmd-row">${cmdBtns}</div></div>` : `<div class="hint">세진이 파티에 없으면 지휘를 쓸 수 없어요.</div>`}
@@ -462,7 +489,12 @@ function playBattle(B, opts) {
       const t = e.target.closest("button");
       if (!t) return;
       if (t.dataset.spd) { BV.speed = +t.dataset.spd; root.querySelectorAll("[data-spd]").forEach((b) => b.classList.toggle("on", b === t)); }
-      if (t.dataset.skip) BV.skip = true;
+      if (t.dataset.skip) { BV.skip = true; setPaused(false); }
+      if (t.dataset.pause) setPaused(!BV.paused);
+      if (t.dataset.auto) {
+        BV.auto = !BV.auto; t.textContent = BV.auto ? "자동 진행 ON" : "자동 진행 OFF"; t.classList.toggle("on", BV.auto);
+        try { localStorage.setItem("fief_auto", BV.auto ? "1" : "0"); } catch (e) {}
+      }
       if (t.dataset.sfx) {
         SFX.on = !SFX.on; t.textContent = SFX.on ? "🔊" : "🔇"; t.classList.toggle("on", SFX.on);
         try { localStorage.setItem("fief_sfx", SFX.on ? "1" : "0"); } catch (e) {}
@@ -478,6 +510,7 @@ function playBattle(B, opts) {
       for (const c of B.units) anim(body(c.id), [{ transform: `translateX(${c.side === "A" ? -40 : 40}px)`, opacity: 0 }, { transform: "translateX(0)", opacity: 1 }], 450);
       await wait(500);
       while (!B.over) {
+        while (BV.paused && !BV.skip) await new Promise((r) => setTimeout(r, 80));
         if (BV.pendingCmd) { const ev = useCommand(B, BV.pendingCmd); BV.pendingCmd = null; await playEvent(B, ev); }
         const ev = step(B);
         if (BV.skip) { updateBars(B); continue; }
