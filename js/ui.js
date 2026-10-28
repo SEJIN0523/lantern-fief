@@ -13,6 +13,38 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 const fmt = (n) => (n >= 1e9 ? (n / 1e9).toFixed(2) + "B" : n >= 1e6 ? (n / 1e6).toFixed(2) + "M" : n >= 1e4 ? (n / 1e3).toFixed(1) + "K" : String(Math.round(n)));
 const sign = (v) => (v >= 0 ? "+" + v : String(v));
 
+// ---------- 주인공 이름 ----------
+// 대사·글은 "세진"으로 써 두고, 화면에 넣는 순간 정한 이름으로 바꾼다(받침에 맞춰 조사도)
+const HERO_TOKEN = "세진";
+function heroName() { return (typeof G !== "undefined" && G && G.heroName) || HERO_TOKEN; }
+function hasBatchim(ch) { const c = ch.charCodeAt(0) - 0xac00; return c >= 0 && c <= 11171 && c % 28 !== 0; }
+const JOSA = { "이에요": ["이에요", "예요"], "이야": ["이야", "야"], "이라": ["이라", "라"], "으로": ["으로", "로"], "이": ["이", "가"], "은": ["은", "는"], "을": ["을", "를"], "과": ["과", "와"], "아": ["아", "야"] };
+function hn(s) {
+  const n = heroName();
+  if (n === HERO_TOKEN || typeof s !== "string" || !s.includes(HERO_TOKEN)) return s;
+  const b = hasBatchim(n[n.length - 1]);
+  return s.replace(/세진(이에요|이야|이라|으로|이|은|을|과|아)?/g, (m, j) => n + (j ? JOSA[j][b ? 0 : 1] : ""));
+}
+// 화면에 글을 넣는 두 통로(innerHTML, textContent)에서 한 번에 바꾼다
+for (const [proto, prop] of [[Element.prototype, "innerHTML"], [Node.prototype, "textContent"]]) {
+  const d = Object.getOwnPropertyDescriptor(proto, prop);
+  Object.defineProperty(proto, prop, { ...d, set(v) { d.set.call(this, hn(v)); } });
+}
+function askHeroName(done) {
+  const m = document.createElement("div");
+  m.className = "modal center"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true"); m.setAttribute("aria-label", "주인공 이름");
+  m.innerHTML = `<div class="sheet small name-sheet"><h2>주인공의 이름</h2>
+    <p class="dim">낯선 세계에 떨어진 당신의 이름을 정해 주세요.</p>
+    <input id="hero-name" maxlength="6" placeholder="세진" autocomplete="off">
+    <button class="btn gold wide" id="hero-ok">이 이름으로 시작</button></div>`;
+  document.body.appendChild(m);
+  const inp = m.querySelector("#hero-name");
+  inp.value = ""; setTimeout(() => inp.focus(), 50);
+  const go = () => { const n = inp.value.trim().replace(/[<>&"]/g, "").slice(0, 6) || HERO_TOKEN; m.remove(); done(n); };
+  m.querySelector("#hero-ok").onclick = go;
+  inp.onkeydown = (e) => { if (e.key === "Enter") go(); };
+}
+
 // UI 아이콘: Codex 아이콘 시트가 있으면 그림, 없으면 이모지
 const ICON = {
   gold: ["ui_icons_a_1", "💰"], food: ["ui_icons_a_2", "🍞"], wood: ["ui_icons_a_3", "🪵"], stone: ["ui_icons_a_4", "🪨"],
@@ -325,7 +357,7 @@ function renderRecruit() {
   const vols = G.volunteers.map((u, i) => recruitCard(u, "vol", i)).join("");
   const migs = G.migrants.map((u, i) => recruitCard(u, "mig", i)).join("");
   const migNext = Math.max(0, migrantInterval() - (G.day - G.migDay));
-  return panel("마을 자원자", (vols || "") + (volReady ? `<button class="btn wide" data-act="vol">${vols ? "다른 자원자 찾기" : "자원자 찾기"}</button>` : `<p class="dim">${3 - (G.day - G.volDay)}일 뒤 새 자원자가 나서요.</p>`), `${G.roster.length}/${rosterCap()}명 · 무료`) +
+  return panel("마을 자원자", (vols || "") + (volReady ? `<button class="btn wide" data-act="vol">${vols ? "다른 자원자 찾기" : "자원자 찾기"}</button>` : `<p class="dim">${3 - (G.day - G.volDay)}일 뒤 새 자원자가 나서요.</p>`), `${crew().length}/${rosterCap()}명 · 무료`) +
     panel("이주민", migs || `<p class="dim">${G.fame < 5 ? "마을의 명성이 오르면(습격 격퇴, 원정 승리) 다른 종족 이주민이 찾아와요." : `${migNext}일 뒤 새 이주민이 올 거예요.`}</p>`, `명성 ${G.fame}`) +
     (G.bld.barracks ? panel("병영", `<button class="btn" data-act="barracks">창병 바로 훈련 · 💰20 · 마을 사람 1명</button>`) : "");
 }
@@ -372,7 +404,7 @@ function renderParty() {
       <div class="mbar xp"><i style="width:${(u.exp / expNeed(u.lv)) * 100}%"></i></div>
       <div class="tags">${st}${promo}${loveTag(u)}</div><small class="pw">전투력 ${fmt(power(u))}</small></div></div>`;
   }).join("");
-  return panel("동료", `<div class="cards">${cards}</div>`, `${G.roster.length}/${rosterCap()}명`);
+  return panel("동료", `<div class="cards">${cards}</div>`, `${crew().length}/${rosterCap()}명 + 지휘관`);
 }
 
 function renderForm() {
@@ -385,7 +417,7 @@ function renderForm() {
       grid += `<div role="button" tabindex="0" aria-label="${col === 0 ? '전열' : '후열'} ${lane + 1}줄 ${u ? esc(u.name) : '빈 칸'}" class="cell ${col === 0 ? "front" : "back"} ${u && SEL === u.id ? "sel" : ""} ${u ? "full" : ""}" data-act="cell" data-arg="${col}:${lane}">${u ? `<div class="cell-u" style="--lc:${LINES[u.line].color}">${unitFace(u)}</div><div class="cell-t"><b>${esc(u.name)}</b><small>Lv${u.lv} · ${JOBS[u.job].name}</small></div>${u.injured ? `<em>${ic("injury", "sm")}</em>` : ""}` : `<span class="plus">＋</span>`}</div>`;
     }
   }
-  const bench = G.roster.filter((u) => !G.form.some((f) => f.id === u.id)).map((u) => `<button class="bc ${SEL === u.id ? "on" : ""}" data-act="pickunit" data-arg="${u.id}"><div class="bc-art" style="--lc:${LINES[u.line].color}">${unitFace(u)}</div><span class="bc-t"><b>${esc(u.name)}</b><small>Lv${u.lv} · ${JOBS[u.job].name}</small></span></button>`).join("");
+  const bench = G.roster.filter((u) => !u.hero && !G.form.some((f) => f.id === u.id)).map((u) => `<button class="bc ${SEL === u.id ? "on" : ""}" data-act="pickunit" data-arg="${u.id}"><div class="bc-art" style="--lc:${LINES[u.line].color}">${unitFace(u)}</div><span class="bc-t"><b>${esc(u.name)}</b><small>Lv${u.lv} · ${JOBS[u.job].name}</small></span></button>`).join("");
   const tp = formUnits().reduce((a, f) => a + power(f.unit), 0);
   return panel("편성", `
     <div class="fwrap"><div class="fgrid"><div class="fh">후열</div><div class="fh">전열 ▶ 적</div>${grid}</div></div>

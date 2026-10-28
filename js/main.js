@@ -5,8 +5,10 @@ let PEEK = null; // 영입 전에 들여다보는 동료
 const LOVE_Q = []; // 전투 뒤에 보여 줄 호감 단계 장면
 
 function startNewGame() {
-  newGame();
-  playScenes(["p1", "p2", "p3", "p4", "p5", "p6", "p7"], tutorialBattle);
+  askHeroName((name) => {
+    newGame(name);
+    playScenes(["p1", "p2", "p3", "p4", "p5", "p6", "p7"], tutorialBattle);
+  });
 }
 
 function tutorialBattle() {

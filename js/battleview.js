@@ -404,7 +404,9 @@ async function playEvent(B, ev) {
   if (ev.kind === "command") {
     banner(COMMANDS[ev.cmd].name, "cmd"); SND.cmd();
     flashField("#66e6ee");
-    await Promise.all([fxAt(ev.actor, "cmd", { size: 1.5, ms: 600 }), anim(el, [{ transform: "scale(1)" }, { transform: "scale(1.18)", filter: "drop-shadow(0 0 12px #5ff)" }, { transform: "scale(1)" }], 520)]);
+    const ch = document.querySelector(".cmd-face");
+    if (ch) anim(ch, [{ transform: "scale(1)" }, { transform: "scale(1.2)", filter: "drop-shadow(0 0 10px #5ff)" }, { transform: "scale(1)" }], 520);
+    await wait(420);
     for (const id of ev.buffed || []) { fxAt(id, "buff", { rise: true, size: 0.9 }); popText(id, "▲", "buff"); }
     for (const h of ev.heals || []) { fxAt(h.id, "heal", { size: 0.9 }); popText(h.id, "+" + h.amt, "heal"); }
     updateBars(B); await wait(350); return;
@@ -503,7 +505,7 @@ function playBattle(B, opts) {
       <div class="order-label"><span>행동 순서</span><span class="b-tog"><button data-pause="1">⏸ 정지</button><button data-auto="1" class="${BV.auto ? "on" : ""}">${BV.auto ? "자동 진행 ON" : "자동 진행 OFF"}</button></span></div><div class="order" id="order" aria-label="행동 순서"></div>
       ${renderField(B, opts)}
       <div class="b-ctl">
-        ${B.hero ? `<div class="cmd"><div class="cmd-head"><span>${ic("lantern", "sm")} 세진의 지휘</span><div class="cmd-bar"><i id="cmdg"></i></div></div><div class="cmd-row">${cmdBtns}</div></div>` : `<div class="hint">세진이 파티에 없으면 지휘를 쓸 수 없어요.</div>`}
+        ${B.hero ? `<div class="cmd"><div class="cmd-head"><span class="cmd-who"><span class="cmd-face">${unitFace(B.hero.unit)}</span>세진의 지휘</span><div class="cmd-bar"><i id="cmdg"></i></div></div><div class="cmd-row">${cmdBtns}</div></div>` : ""}
         <div class="tactic-label">전투 방침</div><div class="seg tac">${[["all", "전원 공격"], ["boss", "강적 집중"], ["safe", "생존 우선"], ["save", "기술 아끼기"]].map(([k, n]) => `<button data-tac="${k}" class="${B.tactic === k ? "on" : ""}">${n}</button>`).join("")}</div>
       </div>
     </div>`;

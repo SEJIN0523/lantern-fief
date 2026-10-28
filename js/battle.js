@@ -34,12 +34,14 @@ function mkFromUnit(u, col, lane, opts) {
   return c;
 }
 
+var MON_POWER = 1.2;
 function mkMonster(id, lv, col, lane, idx) {
   const M = MONSTERS[id];
   const [hp, atk, def, spd, mag] = M.base;
   const g = lv - 1;
   // Lv20을 넘으면 성장을 조금씩 누그러뜨린다(후반 보스가 권장 레벨에서 잡히도록)
-  const damp = 1 / (1 + Math.max(0, g - 20) * 0.007);
+  // 주인공이 전장 밖에서 지휘하며 동료 5명이 모두 싸우므로 몬스터를 그만큼 단단하게
+  const damp = MON_POWER / (1 + Math.max(0, g - 20) * 0.007);
   return {
     side: "E", mon: id, id: "e" + idx, name: M.name, icon: M.icon, col, lane, lv, boss: !!M.boss, beast: !!M.beast,
     maxHp: Math.round(hp * 1.3 * (1 + 0.34 * g) * damp), hp: 0,
@@ -56,9 +58,10 @@ function createBattle(party, enemies, opts = {}) {
   const B = { units: [], log: [], turn: 0, cmd: 0, tactic: "all", over: false, win: false, opts, gold: 0 };
   for (const p of party) B.units.push(mkFromUnit(p.unit, p.col, p.lane, opts));
   enemies.forEach((e, i) => { const m = mkMonster(e.id, e.lv, e.col, e.lane, i); m.hp = m.maxHp; B.units.push(m); });
-  const heroC = B.units.find((c) => c.side === "A" && c.unit.hero);
-  B.hero = heroC || null;
-  B.aura = heroC ? HERO_AURA[JOBS[heroC.unit.job].tier] : 0;
+  // 주인공은 전장 밖 지휘석: 맞지 않고, 지휘 게이지와 능력 보너스만 준다
+  const hu = typeof heroU === "function" ? heroU() : null;
+  B.hero = hu ? { id: "cmdr", side: "A", unit: hu, name: hu.name, alive: true, skills: unitSkills(hu).map((id) => ({ id, cd: 0 })) } : null;
+  B.aura = hu ? HERO_AURA[JOBS[hu.job].tier] : 0;
   if (typeof loveBattleBonus === "function") loveBattleBonus(B);
   B.lonerOK = party.length <= 3;
   for (const c of B.units) {
@@ -397,6 +400,7 @@ function battleRewards(B) {
   if (!B.win) { exp = Math.round(exp * 0.5); gold = Math.round(gold * 0.3); }
   const share = Math.round((exp / Math.max(1, as.length)) * 2.1);
   const res = { exp: share, gold, ups: {}, injured: [] };
+  if (B.hero) { const h = B.hero.unit; h.battles++; const ups = gainExp(h, share); if (ups.length) res.ups[h.id] = ups.length; }
   for (const c of as) {
     const u = c.unit;
     u.battles++;
@@ -411,7 +415,7 @@ function battleRewards(B) {
     const ids = new Set(as.map((c) => c.unit.id));
     const away = (G.dispatch && G.dispatch.ids) || [];
     res.bench = Math.max(1, Math.round(share * 0.15));
-    for (const u of G.roster) if (!ids.has(u.id) && !away.includes(u.id)) { const ups = gainExp(u, res.bench); if (ups.length) res.ups[u.id] = ups.length; }
+    for (const u of G.roster) if (!ids.has(u.id) && !away.includes(u.id) && !(B.hero && u === B.hero.unit)) { const ups = gainExp(u, res.bench); if (ups.length) res.ups[u.id] = ups.length; }
   }
   return res;
 }

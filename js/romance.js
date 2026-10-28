@@ -103,7 +103,7 @@ function addLove(u, v) {
   while (u.loveStage < 3 && u.love >= LOVE_STAGES[u.loveStage + 1].at) { u.loveStage++; ups.push(u.loveStage); }
   return ups;
 }
-// 세진과 같은 파티에서 싸우면 능력 보너스
+// 출전하면 호감 단계만큼 능력 보너스(주인공이 지휘하는 전투)
 function loveBattleBonus(B) {
   if (!B.hero) return;
   for (const c of B.units) {
@@ -250,7 +250,7 @@ function detailProfile(u, hireFrom) {
   const love = `<div class="love-box">
     <div class="love-head"><b>세진과의 관계 · ${st.name}</b><span>♥ ${Math.floor(u.love)}</span></div>
     <div class="love-bar"><i style="width:${u.love}%"></i></div>
-    <small>${next ? `다음 「${next.name}」 ${next.at}` : "서약을 맺었어요"} · 같은 파티면 능력 +${Math.round(st.bonus * 100)}%${REL[p.rel].gain ? ` · ${REL[p.rel].name}라 마음이 쉽게 열리지 않아요` : ""}</small>
+    <small>${next ? `다음 「${next.name}」 ${next.at}` : "서약을 맺었어요"} · 출전하면 능력 +${Math.round(st.bonus * 100)}%${REL[p.rel].gain ? ` · ${REL[p.rel].name}라 마음이 쉽게 열리지 않아요` : ""}</small>
     <div class="love-acts">
       <button class="btn ${talked ? "" : "gold"}" ${talked ? "disabled" : ""} data-act="lovetalk" data-arg="${u.id}">💬 ${talked ? "오늘 대화함" : "대화하기"}</button>
       ${u.loveStage === 3 && u.love >= 84 ? `<button class="btn gold" data-act="loveconfess" data-arg="${u.id}">💌 고백하기</button>` : ""}

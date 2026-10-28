@@ -177,7 +177,7 @@ const TRAITS = {
     { id: "lazy", name: "게으름", desc: "속도 -5%, 피로 회복 +", mod: { spd: -0.05, rest: 1 } },
     { id: "diligent", name: "노력가", desc: "경험치 +20%", mod: { exp: 0.2 } },
     { id: "optimist", name: "낙천가", desc: "부상 회복 2배", mod: { injury: 0.5 } },
-    { id: "loyal", name: "충직함", desc: "세진과 같은 파티면 전 능력 +5%", mod: { withHero: 0.05 } },
+    { id: "loyal", name: "충직함", desc: "주인공을 믿고 따른다: 전투에서 전 능력 +5%", mod: { withHero: 0.05 } },
     { id: "greedy", name: "탐욕스러움", desc: "전리품 금화 +20%, 급여 +", mod: { gold: 0.2, wage: 0.3 } },
     { id: "loner", name: "고독을 즐김", desc: "파티 3명 이하면 능력 +15%", mod: { loner: 0.15 } },
     { id: "chatty", name: "수다쟁이", desc: "친밀도 상승 2배", mod: { bond: 1 } },

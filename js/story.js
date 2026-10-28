@@ -151,6 +151,6 @@ function startChapter1() {
   const hans = newUnit({ job: "villager", line: "soldier", slot: 0, name: "한스", lv: 1, traits: { personality: "diligent", hobby: "train", origin: "farm" } });
   const elma = newUnit({ job: "villager", line: "cleric", slot: 2, name: "엘마", lv: 1, traits: { personality: "kind", hobby: "cook", origin: "farm" } });
   G.roster.push(hans, elma);
-  G.form = [{ id: hans.id, col: 0, lane: 1 }, { id: elma.id, col: 0, lane: 3 }, { id: heroU().id, col: 1, lane: 2 }];
+  G.form = [{ id: hans.id, col: 0, lane: 1 }, { id: elma.id, col: 1, lane: 2 }];
   ensureProfile(hans); ensureProfile(elma);
 }

@@ -7,7 +7,7 @@ let G = null;
 function heroU() { return G ? G.roster.find((u) => u.hero) : null; }
 function unitById(id) { return G.roster.find((u) => u.id === id); }
 
-function newGame() {
+function newGame(name) {
   G = {
     v: 1, day: 1, chapter: 0, story: "prologue",
     res: { gold: 60, food: 40, wood: 30, stone: 0 },
@@ -20,8 +20,9 @@ function newGame() {
     dungeon: { goblin_forest: 0 },
     offers: [], offersDay: 0, volunteers: [], volDay: -99,
     inv: {}, flags: {}, log: [], raids: [], seen: {},
+    heroName: name || "세진",
   };
-  const hero = newUnit({ job: "stranger", line: "hero", slot: 0, hero: true, name: "세진", traits: { personality: "calm", hobby: "read", origin: "wander", quirk: "keeneye" }, pot: { str: 2, vit: 3, agi: 3, int: 5, spi: 5, luk: 4 }, bloom: "late" });
+  const hero = newUnit({ job: "stranger", line: "hero", slot: 0, hero: true, name: name || "세진", traits: { personality: "calm", hobby: "read", origin: "wander", quirk: "keeneye" }, pot: { str: 2, vit: 3, agi: 3, int: 5, spi: 5, luk: 4 }, bloom: "late" });
   hero.origin = "이계";
   G.roster.push(hero);
   return G;
@@ -43,6 +44,8 @@ function load() {
 function migrate() {
   for (const k in BUILDINGS) G.bld[k] = G.bld[k] || 0;
   G.chStart = G.chStart || 0; G.migrants = G.migrants || []; G.migDay = G.migDay || 0; G.dispatch = G.dispatch || null;
+  G.heroName = G.heroName || "세진";
+  G.form = G.form.filter((f) => { const u = G.roster.find((x) => x.id === f.id); return u && !u.hero; });
   G.offers = [];
   for (const u of G.roster) {
     // 예전 평민 계열 → 적성 계열로
@@ -177,7 +180,9 @@ function refreshMigrants() {
   G.migDay = G.day;
   log(`이주민 ${n}가족이 마을에 도착했다`);
 }
-function canRecruit() { return G.roster.length < rosterCap(); }
+// 주인공은 싸우지 않고 지휘만 한다: 숙소 인원·편성·파견은 동료만 센다
+function crew() { return G.roster.filter((u) => !u.hero); }
+function canRecruit() { return crew().length < rosterCap(); }
 function hire(u, from) {
   if (!canRecruit()) return "숙소가 가득 찼어요";
   if (G.res.gold < (u.price || 0)) return "금화가 부족해요";
@@ -197,23 +202,23 @@ function barracksRecruit() {
 }
 
 // 편성: 비어 있으면 자동 채움
-function formUnits() { return G.form.map((f) => ({ ...f, unit: unitById(f.id) })).filter((f) => f.unit && !f.unit.injured); }
+function formUnits() { return G.form.map((f) => ({ ...f, unit: unitById(f.id) })).filter((f) => f.unit && !f.unit.hero && !f.unit.injured); }
 // 마을 방어전: 부상자도 체력 50%로 싸운다
 function raidParty() {
-  const party = G.form.map((f) => ({ ...f, unit: unitById(f.id) })).filter((f) => f.unit);
+  const party = G.form.map((f) => ({ ...f, unit: unitById(f.id) })).filter((f) => f.unit && !f.unit.hero);
   const carry = {};
   for (const f of party) if (f.unit.injured) carry[f.unit.id] = 0.5;
   return { party, carry };
 }
 // onlyId를 주면 그 동료만 빈 칸에 넣는다(직접 뺀 동료를 다시 채우지 않도록)
 function autoForm(onlyId) {
-  G.form = G.form.filter((f) => unitById(f.id));
+  G.form = G.form.filter((f) => unitById(f.id) && !unitById(f.id).hero);
   if (G.form.length >= 5) return;
   const used = new Set(G.form.map((f) => f.id));
   const taken = new Set(G.form.map((f) => f.col + ":" + f.lane));
   for (const u of G.roster) {
     if (G.form.length >= 5) break;
-    if (used.has(u.id) || u.injured || (onlyId && u.id !== onlyId)) continue;
+    if (u.hero || used.has(u.id) || u.injured || (onlyId && u.id !== onlyId)) continue;
     const J = JOBS[u.job];
     const wantBack = u.hero || ["ranged", "magic", "heal"].includes(J.range);
     const order = wantBack ? [1, 0] : [0, 1];
@@ -283,7 +288,7 @@ function dispatchSpots() {
   }
   return out.sort((a, b) => b.lv - a.lv).slice(0, 3);
 }
-function dispatchCands() { return G.roster.filter((u) => !u.injured && !G.form.some((f) => f.id === u.id)); }
+function dispatchCands() { return G.roster.filter((u) => !u.hero && !u.injured && !G.form.some((f) => f.id === u.id)); }
 function resolveDispatch() {
   const D = G.dispatch;
   G.dispatch = null;
