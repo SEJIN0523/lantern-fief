@@ -195,7 +195,13 @@ def face_crop(cell, size):
     out = []
     for ratio, px in ((0.4, size), (0.62, size * 3 // 2)):
         side = int((bot - head) * ratio)
-        y0 = int(head - side * 0.08)
+        # 머리카락 끝이 액자에 닿지 않게: 얼굴 폭 안에서 가장 위의 머리카락을 찾아 그 위로 여백을 둔다
+        # (지팡이·창 끝처럼 머리보다 한참 위로 솟은 것은 무시)
+        x0, x1 = max(0, int(c - side * 0.35)), min(a.shape[1], int(c + side * 0.35))
+        rows = np.nonzero(a[:head, x0:x1].any(axis=1))[0]
+        hair = [y for y in rows if head - y < side * 0.45]
+        top = min(hair) if hair else head
+        y0 = int(min(head - side * 0.12, top - side * 0.06))
         out.append(im.crop((int(c - side / 2), y0, int(c + side / 2), y0 + side)).resize((px, px), Image.LANCZOS))
     return out
 
